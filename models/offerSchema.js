@@ -9,7 +9,7 @@ const offerSchema = new mongoose.Schema({
         min: 1,
         max: 100
     },
-    product: {
+    product: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Product'
     },

@@ -1,6 +1,7 @@
 const walletModal = require('../../models/walletSchema');
 const userModal = require('../../models/userSchema');
-const mongoose = require('mongoose')
+const transactionModal = require('../../models/transactionSchema');
+
 
 const loadWalletPage = async (req,res) => {
     try {
@@ -9,7 +10,11 @@ const loadWalletPage = async (req,res) => {
         const user = await userModal.findById(userID)
         const userWallet = await walletModal.findOne({userId:userID})
 
-        const transactions = []
+        const transactions = await transactionModal.find(
+            {userId: userID}, 
+            null, 
+            {sort: {createdAt: -1}}
+        );
 
         res.render('User/userWalletPage',{user,transactions,userWallet});
     } catch (error) {

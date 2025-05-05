@@ -406,6 +406,12 @@
                             <span>Wallet</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="/referral" class="nav-link1">
+                            <i class="fas fa-gift"></i>
+                            <span>Refer & Earn</span>
+                        </a>
+                    </li>
                     <li class="mt-4">
                         <a href="/logout" class="nav-link1 text-danger">
                             <i class="fas fa-sign-out-alt"></i>
@@ -436,138 +442,72 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Wallet Features -->
-            <!-- <div class="row mb-4">
-                <div class="col-md-4 mb-3">
-                    <div class="content-card h-100">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-gift fa-2x text-primary"></i>
-                            </div>
-                            <h5 class="mb-2">Referral Bonus</h5>
-                            <p class="mb-0">Invite friends and earn ₹100 for each successful referral.</p>
-                            <div class="mt-3">
-                                <a href="#referralModal" data-bs-toggle="modal" class="btn outline-btn btn-sm">Invite Now</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="content-card h-100">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-percent fa-2x text-primary"></i>
-                            </div>
-                            <h5 class="mb-2">Cashback</h5>
-                            <p class="mb-0">Get up to 5% cashback on every purchase when using wallet balance.</p>
-                            <div class="mt-3">
-                                <a href="/shop" class="btn outline-btn btn-sm">Shop Now</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="content-card h-100">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-tag fa-2x text-primary"></i>
-                            </div>
-                            <h5 class="mb-2">Exclusive Offers</h5>
-                            <p class="mb-0">Unlock special deals and discounts with your wallet balance.</p>
-                            <div class="mt-3">
-                                <a href="/offers" class="btn outline-btn btn-sm">View Offers</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-           
-            <!-- Transaction History -->
-            <!-- <div class="content-card">
-                <div class="card-header">
-                    <h5>Transaction History</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Transaction ID</th>
-                                    <th>Date</th>
-                                    <th>Description</th>
-                                    <th>Type</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (transactions && transactions.length > 0) { %>
-                                <% transactions.forEach(transaction => { %>
-                                <tr>
-                                    <td>#<%= transaction._id.toString().slice(-8) %></td>
-                                    <td><%= new Date(transaction.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
-                                    <td><%= transaction.description %></td>
-                                    <td>
-                                        <span class="transaction-badge <%= transaction.type.toLowerCase() %>">
-                                            <%= transaction.type %>
-                                        </span>
-                                    </td>
-                                    <td class="<%= transaction.type === 'Credit' ? 'amount-credit' : 'amount-debit' %>">
-                                        <%= transaction.type === 'Credit' ? '+' : '-' %>₹<%= transaction.amount.toFixed(2) %>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                                <% } else { %>
-                                <tr>
-                                    <td colspan="5">
-                                        <div class="empty-state">
-                                            <div class="empty-icon">
-                                                <i class="fas fa-receipt"></i>
-                                            </div>
-                                            <p>No transactions found in your wallet history.</p>
-                                            <a href="#addFundsModal" data-bs-toggle="modal" class="btn primary-btn btn-sm">Add Funds</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div> -->
+                   
+
+<!-- Transaction History -->
+<div class="content-card">
+    <div class="card-header">
+        <h5>Transaction History</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (transactions && transactions.length > 0) { %>
+                        <% transactions.forEach(transaction => { %>
+                            <tr>
+                                <td><%= new Date(transaction.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
+                                <td>
+                                    <% if (transaction.description === 'Order Payment') { %>
+                                        Order Payment
+                                    <% } else if (transaction.description === 'Order Refund') { %>
+                                        Order Refund
+                                    <% } else if (transaction.description === 'Order Cancellation') { %>
+                                        Order Cancellation
+                                    <% } else if (transaction.description === 'Referral Bonus') { %>
+                                        Referral Bonus
+                                    <% } else if (transaction.description === 'Referral Reward - Friend Joined') { %>
+                                        Referral Reward - Friend Joined
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <span class="transaction-badge <%= transaction.type.toLowerCase() %>">
+                                        <%= transaction.type %>
+                                    </span>
+                                </td>
+                                <td class="<%= transaction.type === 'Credit' ? 'amount-credit' : 'amount-debit' %>">
+                                    <%= transaction.type === 'Credit' ? '+' : '-' %>₹<%= transaction.amount.toFixed(2) %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <p>No transactions yet</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 
-
-
-
-    <!-- Referral Modal -->
-    <div class="modal fade" id="referralModal" tabindex="-1" aria-labelledby="referralModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="referralModalLabel">Refer & Earn</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <i class="fas fa-gift fa-3x text-primary mb-3"></i>
-                    <h5 class="mb-3">Invite friends and earn ₹100</h5>
-                    <p>Share your referral code with friends. When they sign up and make their first purchase, you both get ₹100 in your wallet!</p>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" value="<%= user.referralCode || 'BOOKWORM123' %>" id="referralCode" readonly>
-                        <button class="btn primary-btn" type="button" onclick="copyReferralCode()">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <a href="#" class="btn outline-btn" onclick="shareReferral()">
-                            <i class="fas fa-share-alt me-2"></i> Share
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

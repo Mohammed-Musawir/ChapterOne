@@ -9,11 +9,13 @@ const loadCart = async (req, res) => {
         const cart = await cartModel.findOne({ userId }).populate('books.product');
         const wishlist = await wishlistModel.findOne({ userId });
         
+        // Fetch all active offers
         const activeOffers = await offerModel.find({ 
             isActive: true, 
             endDate: { $gt: new Date() } 
         });
         
+        // Organize offers by type for easier lookup
         const productOffers = new Map();
         const categoryOffers = new Map();
         
@@ -25,6 +27,7 @@ const loadCart = async (req, res) => {
             }
         });
 
+        // Get product IDs from cart and wishlist to exclude from recommendations
         const cartProductIds = cart?.books.map(item => item.product._id.toString()) || [];
         
         const wishlistProductIds = wishlist?.books && Array.isArray(wishlist.books) 
@@ -35,7 +38,7 @@ const loadCart = async (req, res) => {
         
         const excludingProductIds = [...new Set([...cartProductIds, ...wishlistProductIds])];
         
-
+        // Get recommended books excluding products in cart and wishlist
         let recommendedBooks = [];
         if (excludingProductIds.length === 0) {
             recommendedBooks = await productModal.find().limit(4);
@@ -45,29 +48,44 @@ const loadCart = async (req, res) => {
             }).limit(4);
         }
         
-
+        /**
+         * Apply the best available offer to a product
+         * Prioritizes the offer with higher discount percentage
+         */
         const applyBestOffer = (product) => {
             const productObj = typeof product.toObject === 'function' ? product.toObject() : product;
             const productId = productObj._id.toString();
-            
-            // Use category_id field from product schema instead of category
             const categoryId = productObj.category_id ? productObj.category_id.toString() : null;
             
+            // Get applicable offers
             const productOffer = productOffers.get(productId);
             const categoryOffer = categoryId ? categoryOffers.get(categoryId) : null;
-            
 
+            
+            // Determine the best offer based on discount percentage
             let bestOffer = null;
-            if (productOffer && categoryOffer) {
-                bestOffer = productOffer.discountPercentage >= categoryOffer.discountPercentage ? productOffer : categoryOffer;
-            } else {
-                bestOffer = productOffer || categoryOffer;
-            }
-            
+            let offerSource = null;
 
+            if (productOffer && categoryOffer) {
+                if (productOffer.discountPercentage >= categoryOffer.discountPercentage) {
+                    bestOffer = productOffer;
+                    offerSource = 'product';
+                } else {
+                    bestOffer = categoryOffer;
+                    offerSource = 'category';
+                }
+            } else if (productOffer) {
+                bestOffer = productOffer;
+                offerSource = 'product';
+            } else if (categoryOffer) {
+                bestOffer = categoryOffer;
+                offerSource = 'category';
+            }
+            console.log(bestOffer);
+            // Apply the best offer if available
             if (bestOffer) {
                 const discountAmount = Math.round((productObj.salePrice * bestOffer.discountPercentage) / 100);
-                const discountedPrice = productObj.salePrice - discountAmount;
+                const discountedPrice = productObj.salePrice - discountAmount; 
                 
                 return {
                     ...productObj,
@@ -75,44 +93,55 @@ const loadCart = async (req, res) => {
                     offerPercentage: bestOffer.discountPercentage,
                     offerType: bestOffer.offerType,
                     offerName: bestOffer.name,
-                    originalPrice: productObj.salePrice,
-                    discountedPrice: discountedPrice
+                    offerSource: offerSource,
+                    regularPrice: productObj.regularPrice,
+                    salePrice: discountedPrice
                 };
             } else {
+                // No offer available, use the regular sale price
                 return {
                     ...productObj,
                     hasOffer: false,
-                    originalPrice: productObj.salePrice,
-                    discountedPrice: productObj.salePrice
+                    regularPrice: productObj.regularPrice,
+                    salePrice: productObj.salePrice
                 };
             }
         };
 
+        // Apply offers to recommended books
         recommendedBooks = recommendedBooks.map(product => applyBestOffer(product));
         
-       
+        // Calculate subtotal and apply offers to cart items
         let subtotal = 0;
-        if (cart && cart.books) {
-            cart.books = cart.books.map(item => {
+        
+        if (cart && cart.books && cart.books.length > 0) {
+            // Create a new array for modified books
+            const updatedBooks = [];
+            
+            for (let i = 0; i < cart.books.length; i++) {
+                const item = cart.books[i];
                 const product = item.product;
+                
+                if (!product) continue;
+                
+                // Apply offer to the product
                 const productWithOffer = applyBestOffer(product);
                 
-                
+                // Create a new item with updated product data
                 const updatedItem = {
-                    ...item.toObject(),
-                    hasOffer: productWithOffer.hasOffer,
-                    offerPercentage: productWithOffer.offerPercentage,
-                    offerType: productWithOffer.offerType,
-                    offerName: productWithOffer.offerName,
-                    originalPrice: productWithOffer.originalPrice,
-                    discountedPrice: productWithOffer.discountedPrice
+                    _id: item._id,
+                    product: productWithOffer,
+                    quantity: item.quantity
                 };
                 
+                // Calculate item total based on sale price (which may be discounted)
+                subtotal += productWithOffer.salePrice * item.quantity;
                 
-                subtotal += productWithOffer.discountedPrice * item.quantity;
-                
-                return updatedItem;
-            });
+                updatedBooks.push(updatedItem);
+            }
+            
+            // Replace the original books array with our updated one
+            cart.books = updatedBooks;
         }
         
         const totalProductPrice = subtotal;
@@ -131,7 +160,6 @@ const loadCart = async (req, res) => {
         return res.status(500).render('500');
     }
 }
-
 
 const addToCart = async (req, res) => {
     try {
@@ -286,7 +314,7 @@ const updateCart = async (req, res) => {
          await cart.save();
  
          let totalPrice = 0;
-         for (let item of cart.books) { 
+         for (let item of cart.books) {
              const prod = await productModal.findById(item.product);
              if (prod) {
                  totalPrice += prod.salePrice * item.quantity;

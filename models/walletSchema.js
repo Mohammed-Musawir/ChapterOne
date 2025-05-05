@@ -1,14 +1,6 @@
 const { default: mongoose } = require("mongoose")
 
 const walletSchema = new mongoose.Schema({
-    description: { 
-        type: String,
-        enum: ['Order Payment', 'Order Return', 'Order Cancel'] 
-    },
-    type: {
-        type: String,
-        enum: ['Credit', 'Debit']
-    },
     amount: {
         type: Number
     },
@@ -18,4 +10,4 @@ const walletSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model("Wallet", walletSchema);
+module.exports = mongoose.model("Wallet", walletSchema); 

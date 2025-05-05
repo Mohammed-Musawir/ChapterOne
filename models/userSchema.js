@@ -33,9 +33,28 @@ const userSchema = new mongoose.Schema({
         unique: true,
         sparse: true 
     },
-    profileImage: {
+    profileImage: { 
         type: String,
-        default:'/images/default/vectorstock_42797445.jpg'  // <-- default image URL
+        default:'/images/default/vectorstock_42797445.jpg'  
+    },
+    referralCode: {
+        type: String,
+        unique: true,
+        default: function() {
+            return Math.random().toString(36).substring(2, 10).toUpperCase();
+        }
+    },
+    referralCount: {
+        type: Number,
+        default: 0
+    },
+    hasAppliedReferral: {
+        type: Boolean,
+        default: false
+    },
+    hasAppliedReferralCode: {
+        type: String,
+        default: null
     },
     createdOn: {
         type: Date,

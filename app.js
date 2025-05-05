@@ -8,6 +8,7 @@ const nocache = require('nocache');
 const ejs = require("ejs");
 const MongoStore = require("connect-mongo");
 const passport = require('passport');
+const flash = require('connect-flash');
 require('./config/passport');
 app.locals.companyName = 'ChapterOne'
 const cookieParser = require('cookie-parser');
@@ -23,6 +24,7 @@ dotenv.config();
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 app.use(cookieParser());
+app.use(flash());
 
 app.use(nocache());
 app.use(session({

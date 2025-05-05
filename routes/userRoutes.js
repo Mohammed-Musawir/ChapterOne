@@ -31,6 +31,8 @@ const walletController = require('../controllers/user/walletController');
 
 const razorpayController = require('../controllers/user/userRazorpayController');
 
+const referralController = require('../controllers/user/refferalController');
+
 const JWT_Config = require('../config/jwt');
 const userAuth = require('../middleware/googleChek');
 const { route } = require('./adminRoutes');
@@ -249,5 +251,10 @@ router.post('/orders/:orderId/multiple-products/cancel',orderController.bulkProd
 router.post('/orders/:orderId/multiple-products/return',orderController.bulkProductReturn);
 
 
+
+//REFERRAL
+
+router.get('/referral',referralController.loadRefferal);
+router.post('/referral/apply',referralController.applyReferral);
 
 module.exports = router;
