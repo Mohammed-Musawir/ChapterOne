@@ -24,10 +24,9 @@ const loadCart = async (req, res) => {
                 categoryOffers.set(offer.category.toString(), offer);
             }
         });
-        
+
         const cartProductIds = cart?.books.map(item => item.product._id.toString()) || [];
         
-
         const wishlistProductIds = wishlist?.books && Array.isArray(wishlist.books) 
             ? wishlist.books
                 .filter(item => item.product) 
@@ -36,6 +35,7 @@ const loadCart = async (req, res) => {
         
         const excludingProductIds = [...new Set([...cartProductIds, ...wishlistProductIds])];
         
+
         let recommendedBooks = [];
         if (excludingProductIds.length === 0) {
             recommendedBooks = await productModal.find().limit(4);
@@ -45,14 +45,18 @@ const loadCart = async (req, res) => {
             }).limit(4);
         }
         
-        recommendedBooks = recommendedBooks.map(product => {
-            const productObj = product.toObject(); 
+
+        const applyBestOffer = (product) => {
+            const productObj = typeof product.toObject === 'function' ? product.toObject() : product;
             const productId = productObj._id.toString();
-            const categoryId = productObj.category ? productObj.category.toString() : null;
+            
+            // Use category_id field from product schema instead of category
+            const categoryId = productObj.category_id ? productObj.category_id.toString() : null;
             
             const productOffer = productOffers.get(productId);
             const categoryOffer = categoryId ? categoryOffers.get(categoryId) : null;
             
+
             let bestOffer = null;
             if (productOffer && categoryOffer) {
                 bestOffer = productOffer.discountPercentage >= categoryOffer.discountPercentage ? productOffer : categoryOffer;
@@ -60,54 +64,54 @@ const loadCart = async (req, res) => {
                 bestOffer = productOffer || categoryOffer;
             }
             
+
             if (bestOffer) {
-                const discountAmount = (productObj.salePrice * bestOffer.discountPercentage) / 100;
+                const discountAmount = Math.round((productObj.salePrice * bestOffer.discountPercentage) / 100);
                 const discountedPrice = productObj.salePrice - discountAmount;
                 
-                productObj.hasOffer = true;
-                productObj.offerPercentage = bestOffer.discountPercentage;
-                productObj.originalPrice = productObj.salePrice;
-                productObj.discountedPrice = discountedPrice;
+                return {
+                    ...productObj,
+                    hasOffer: true,
+                    offerPercentage: bestOffer.discountPercentage,
+                    offerType: bestOffer.offerType,
+                    offerName: bestOffer.name,
+                    originalPrice: productObj.salePrice,
+                    discountedPrice: discountedPrice
+                };
             } else {
-                productObj.hasOffer = false;
+                return {
+                    ...productObj,
+                    hasOffer: false,
+                    originalPrice: productObj.salePrice,
+                    discountedPrice: productObj.salePrice
+                };
             }
-            
-            return productObj;
-        });
+        };
+
+        recommendedBooks = recommendedBooks.map(product => applyBestOffer(product));
         
+       
         let subtotal = 0;
         if (cart && cart.books) {
             cart.books = cart.books.map(item => {
                 const product = item.product;
-                const productId = product._id.toString();
-                const categoryId = product.category ? product.category.toString() : null;
+                const productWithOffer = applyBestOffer(product);
                 
-                const productOffer = productOffers.get(productId);
-                const categoryOffer = categoryId ? categoryOffers.get(categoryId) : null;
                 
-                let bestOffer = null;
-                if (productOffer && categoryOffer) {
-                    bestOffer = productOffer.discountPercentage >= categoryOffer.discountPercentage ? productOffer : categoryOffer;
-                } else {
-                    bestOffer = productOffer || categoryOffer;
-                }
+                const updatedItem = {
+                    ...item.toObject(),
+                    hasOffer: productWithOffer.hasOffer,
+                    offerPercentage: productWithOffer.offerPercentage,
+                    offerType: productWithOffer.offerType,
+                    offerName: productWithOffer.offerName,
+                    originalPrice: productWithOffer.originalPrice,
+                    discountedPrice: productWithOffer.discountedPrice
+                };
                 
-                if (bestOffer) {
-                    const discountAmount = (product.salePrice * bestOffer.discountPercentage) / 100;
-                    const discountedPrice = product.salePrice - discountAmount;
-                    
-                    item.hasOffer = true;
-                    item.offerPercentage = bestOffer.discountPercentage;
-                    item.originalPrice = product.salePrice;
-                    item.discountedPrice = discountedPrice;
-                    
-                    subtotal += discountedPrice * item.quantity;
-                } else {
-                    item.hasOffer = false;
-                    subtotal += product.salePrice * item.quantity;
-                }
                 
-                return item;
+                subtotal += productWithOffer.discountedPrice * item.quantity;
+                
+                return updatedItem;
             });
         }
         
@@ -127,6 +131,7 @@ const loadCart = async (req, res) => {
         return res.status(500).render('500');
     }
 }
+
 
 const addToCart = async (req, res) => {
     try {
@@ -281,7 +286,7 @@ const updateCart = async (req, res) => {
          await cart.save();
  
          let totalPrice = 0;
-         for (let item of cart.books) {
+         for (let item of cart.books) { 
              const prod = await productModal.findById(item.product);
              if (prod) {
                  totalPrice += prod.salePrice * item.quantity;
