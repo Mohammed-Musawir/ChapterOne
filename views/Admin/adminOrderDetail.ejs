@@ -1,0 +1,681 @@
+<%- include("../partials/admin/adminHeader") %>
+
+<style>
+    /* Breadcrumb styles */
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #6B7280;
+        margin-bottom: 20px;
+    }
+    
+    .breadcrumb a {
+        color: #8B5A2B;
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+    
+    .breadcrumb-separator {
+        margin: 0 8px;
+        color: #D1D5DB;
+    }
+    
+    /* Container styles */
+    .main-container {
+        background-color: #FBF7F4;
+    }
+    
+    .page-title {
+        color: #8B5A2B;
+    }
+    
+    .section-title {
+        color: #8B5A2B;
+        font-weight: 600;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #F5EBE0;
+        padding-bottom: 8px;
+    }
+    
+    .info-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    /* Status badge styles */
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        display: inline-block;
+    }
+    
+    .status-pending {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+    
+    .status-processing {
+        background-color: #E0F2FE;
+        color: #0369A1;
+    }
+    
+    .status-shipped {
+        background-color: #DBEAFE;
+        color: #1E40AF;
+    }
+    
+    .status-delivered {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .status-cancelled {
+        background-color: #FEE2E2;
+        color: #B91C1C;
+    }
+    
+    .status-returned {
+        background-color: #F3E8FF;
+        color: #6B21A8;
+    }
+    
+    /* Payment status badges */
+    .payment-pending {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+    
+    .payment-completed {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .payment-failed {
+        background-color: #FEE2E2;
+        color: #B91C1C;
+    }
+    
+    .payment-cancelled {
+        background-color: #F3E8FF;
+        color: #6B21A8;
+    }
+    
+    /* Product card styles */
+    .product-card {
+        display: flex;
+        border-bottom: 1px solid #F3F4F6;
+        padding: 15px 0;
+    }
+    
+    .product-card:last-child {
+        border-bottom: none;
+    }
+    
+    .product-image {
+        width: 80px;
+        height: 120px;
+        object-fit: contain;
+        border-radius: 4px;
+        margin-right: 15px;
+    }
+    
+    .product-details {
+        flex-grow: 1;
+    }
+    
+    .product-price {
+        color: #8B5A2B;
+        font-weight: 600;
+    }
+    
+    /* Actions button */
+    .action-btn {
+        background-color: #8B5A2B;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+    
+    .action-btn:hover {
+        background-color: #6B4423;
+    }
+    
+    .secondary-btn {
+        background-color: #F3F4F6;
+        color: #374151;
+        border: 1px solid #D1D5DB;
+    }
+    
+    .secondary-btn:hover {
+        background-color: #E5E7EB;
+    }
+    
+    /* Status update form */
+    .status-select {
+        border: 1px solid #D1D5DB;
+        border-radius: 4px;
+        padding: 8px 12px;
+        background-color: #F9FAFB;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+    
+    /* Timeline styles */
+    .timeline {
+        position: relative;
+        margin: 20px 0;
+    }
+    
+    .timeline:before {
+        content: '';
+        position: absolute;
+        height: 100%;
+        width: 2px;
+        background-color: #E5E7EB;
+        left: 15px;
+        top: 0;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 40px;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-dot {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #8B5A2B;
+        left: 8px;
+        top: 4px;
+    }
+    
+    .timeline-date {
+        font-size: 12px;
+        color: #6B7280;
+    }
+    
+    .timeline-content {
+        font-size: 14px;
+        margin-top: 4px;
+    }
+    
+    /* Summary section */
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #F3F4F6;
+    }
+    
+    .summary-row:last-child {
+        border-bottom: none;
+        font-weight: 600;
+    }
+    
+    /* SweetAlert2 Custom Styling */
+    .swal2-popup {
+        border-radius: 10px;
+        font-family: inherit;
+    }
+    
+    .swal2-title {
+        color: #8B5A2B;
+    }
+    
+    .swal2-confirm { 
+        background-color: #8B5A2B !important;
+    }
+    
+    .swal2-confirm:focus {
+        box-shadow: 0 0 0 3px rgba(139, 90, 43, 0.5) !important;
+    }
+</style>
+
+<!-- Tailwind CSS CDN -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<body>
+    <div class="container mx-auto px-4 py-8 mt-16 main-container">
+        <!-- Breadcrumb navigation -->
+        <div class="breadcrumb">
+            <a href="/admin/dashboard">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="/admin/order">Orders</a>
+            <span class="breadcrumb-separator">/</span>
+            <span><%= order.orderId %></span>
+        </div>
+        
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold page-title">Order Details</h1>
+            
+            <div class="flex items-center">
+                <a href="/admin/order" class="action-btn secondary-btn mr-3">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Orders
+                </a>
+            </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Order Info -->
+            <div class="info-card">
+                <h2 class="section-title">
+                    <i class="fas fa-info-circle mr-2"></i> Order Information
+                </h2>
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 mb-1">Order ID</p>
+                    <p class="font-medium"><%= order.orderId %></p>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 mb-1">Order Date</p>
+                    <p class="font-medium"><%= new Date(order.orderedDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></p>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 mb-1">Order Status</p>
+                    <span class="status-badge status-<%= order.orderStatus %>">
+                        <%= order.orderStatus %>
+                    </span>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Payment Status</p>
+                    <span class="status-badge payment-<%= order.paymentStatus %>">
+                        <%= order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1) %>
+                    </span>
+                </div>
+            </div> 
+            
+            <!-- Customer Info -->
+            <div class="info-card">
+                <h2 class="section-title">
+                    <i class="fas fa-user mr-2"></i> Customer Information
+                </h2>
+    
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 mb-1">Name</p>
+                    <p class="font-medium"><%= customer.name %></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Email</p>
+                    <p class="font-medium"><%= customer.email %></p>
+                </div>
+            </div>
+            
+            <!-- Payment Info -->
+            <div class="info-card">
+                <h2 class="section-title">
+                    <i class="fas fa-credit-card mr-2"></i> Payment Information
+                </h2>
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 mb-1">Payment Method</p>
+                    <p class="font-medium">
+                        <% if (order.paymentMethod === 'cod') { %>
+                            Cash on Delivery
+                        <% } else if (order.paymentMethod === 'razorPay') { %>
+                            Razorpay
+                        <% } else if (order.paymentMethod === 'upi') { %>
+                            UPI
+                        <% } else if (order.paymentMethod === 'wallet') { %>
+                            Wallet
+                        <% } %>
+                    </p>
+                </div>
+                <% if (order.orderStatus === 'delivered' && order.transactionId && order.paymentMethod === 'cod') { %>
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-500 mb-1">Transaction ID</p>
+                        <p class="font-medium"><%= order.transactionId %></p>
+                    </div>
+                <% } %>
+                <% if (order.paymentError) { %>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Payment Error</p>
+                        <p class="font-medium text-red-600"><%= order.paymentError %></p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- Order Details -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Products Section -->
+            <div class="lg:col-span-2">
+                
+                <div class="info-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-shopping-cart mr-2"></i> Order Items (<%= order.products.length %>)
+                    </h2>
+                    
+                    <% order.products.forEach(item => { %>
+                        <div class="product-card">
+                            <img src="<%= item.productDetails.productImages[0] %>"  class="product-image">
+                            <div class="product-details">
+                                <h3 class="font-medium text-gray-900"><%= item.productDetails.name %></h3>
+                                <p class="text-sm text-gray-500">By: <%= item.productDetails.writer %></p>
+                                <div class="flex justify-between items-center mt-3">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Quantity: <%= item.quantity %></p>
+                                        <p class="product-price mt-1">₹<%= item.productDetails.discoundedPrice ? item.productDetails.discoundedPrice : item.productDetails.salePrice   %></p>
+                                    </div>
+                                    <div>
+                                        <span class="status-badge status-<%= item.productOrderStatus %>">
+                                            <%= item.productOrderStatus %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+                
+                <!-- Shipping Address -->
+                <div class="info-card mt-6">
+                    <h2 class="section-title">
+                        <i class="fas fa-map-marker-alt mr-2"></i> Shipping Address
+                    </h2>
+                    <div class="flex flex-col">
+                        <span class="text-sm uppercase font-semibold mb-2"><%= order.shippingAddress.addressType %></span>
+                        <span class="text-gray-700"><%= customer.name %></span>
+                        <p class="text-gray-700 mt-2">
+                            <%= order.shippingAddress.landmark %>, 
+                            <%= order.shippingAddress.city %>, 
+                            <%= order.shippingAddress.state %> - <%= order.shippingAddress.pin_code %>
+                        </p>
+                        <% if (order.shippingAddress.alternative_no) { %>
+                            <p class="text-gray-700 mt-2">Alternative Phone: <%= order.shippingAddress.alternative_no %></p>
+                        <% } %>
+                    </div>
+                </div>
+                
+    
+                <!-- Add this section right after the Shipping Address box and before the Order Timeline box -->
+    <% if (order.orderStatus === 'cancelled' && order.orderCancellation) { %>
+        <div class="info-card mt-6">
+            <h2 class="section-title">
+                <i class="fas fa-ban mr-2"></i> Cancellation Details
+            </h2>
+            <div class="flex flex-col">
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 mb-1">Cancellation Date</p>
+                    <p class="font-medium"><%= new Date(order.orderCancellation.cancelledAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Cancellation Reason</p>
+                    <p class="font-medium"><%= order.orderCancellation.reason || 'No reason provided' %></p>
+                </div>
+            </div>
+        </div>
+        <% } %>
+        
+        <% if (order.orderStatus === 'returned' && order.orderReturned) { %>
+        <div class="info-card mt-6">
+            <h2 class="section-title">
+                <i class="fas fa-undo mr-2"></i> Return Details
+            </h2>
+            <div class="flex flex-col">
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 mb-1">Return Date</p>
+                    <p class="font-medium"><%= new Date(order.orderReturned.returnedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Return Reason</p>
+                    <p class="font-medium"><%= order.orderReturned.reason || 'No reason provided' %></p>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    
+        
+                <!-- Order Timeline -->
+                <div class="info-card mt-6">
+                    <h2 class="section-title">
+                        <i class="fas fa-history mr-2"></i> Order Timeline
+                    </h2>
+                    <div class="timeline">
+                        <% 
+                        // Sample timeline data - in a real application, you would fetch this from your database
+                        const timeline = [
+                            { status: 'Order Placed', date: order.createdAt, description: 'Order was placed by customer' },
+                        ];
+                        
+                        // Add status changes based on current order status
+                        if (['processing', 'shipped', 'delivered', 'cancelled', 'returned'].includes(order.orderStatus)) {
+                            timeline.push({ 
+                                status: 'Processing', 
+                                date: new Date(new Date(order.createdAt).getTime() + 1000*60*60), // Just for demo
+                                description: 'Order is being processed'
+                            });
+                        }
+                        
+                        if (['shipped', 'delivered', 'returned'].includes(order.orderStatus)) {
+                            timeline.push({ 
+                                status: 'Shipped', 
+                                date: new Date(new Date(order.createdAt).getTime() + 1000*60*60*24), // Just for demo
+                                description: 'Order has been shipped'
+                            });
+                        }
+                        
+                        if (['delivered', 'returned'].includes(order.orderStatus)) {
+                            timeline.push({ 
+                                status: 'Delivered', 
+                                date: new Date(new Date(order.createdAt).getTime() + 1000*60*60*24*3), // Just for demo
+                                description: 'Order has been delivered'
+                            });
+                        }
+                        
+                        if (order.orderStatus === 'returned') {
+                            timeline.push({ 
+                                status: 'Returned', 
+                                date: new Date(new Date(order.createdAt).getTime() + 1000*60*60*24*5), // Just for demo
+                                description: 'Order has been returned by customer'
+                            });
+                        }
+                        
+                        if (order.orderStatus === 'cancelled') {
+                            timeline.push({ 
+                                status: 'Cancelled', 
+                                date: new Date(new Date(order.createdAt).getTime() + 1000*60*60*2), // Just for demo
+                                description: 'Order has been cancelled'
+                            });
+                        }
+                        
+                        // Sort by date (most recent first)
+                        timeline.sort((a, b) => new Date(b.date) - new Date(a.date));
+                        %>
+                        
+                        <% timeline.forEach(item => { %>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-date">
+                                    <%= new Date(item.date).toLocaleDateString('en-IN', { 
+                                        day: '2-digit', 
+                                        month: 'short', 
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }) %>
+                                </div>
+                                <div class="timeline-content">
+                                    <strong><%= item.status %></strong>: <%= item.description %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Summary & Actions Section --> 
+            <div class="lg:col-span-1">
+                <!-- Order Summary -->
+    <!-- Order Summary -->
+    <div class="info-card">
+        <h2 class="section-title">
+            <i class="fas fa-calculator mr-2"></i> Order Summary
+        </h2>
+        <div class="mt-4">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹<%= adjustedSubtotal %></span>
+            </div>
+            
+            <% if (order.coupon && order.coupon.couponCode) { %>
+            <div class="summary-row">
+                <span>Coupon (<%= order.coupon.couponCode %>)</span>
+                <span>-₹<%= order.coupon.discount.toLocaleString('en-IN') %></span>
+            </div>
+            <% } %>
+            
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span>₹<%= order.shippingCost.toLocaleString('en-IN') %></span>
+            </div>
+            
+            <% if (order.gstAmount) { %>
+            <div class="summary-row">
+                <span>GST (<%= order.gstRate %>%)</span>
+                <span>₹<%= order.gstAmount %></span>
+            </div>
+            <% } %>
+            
+
+            <div class="summary-row total-row">
+                <span>Total</span>
+                <span>₹<%= order.totalAmount.toLocaleString('en-IN') %></span>
+            </div>
+            
+        </div>
+    </div>
+                
+                <!-- Order Actions -->
+                <% if (!['delivered', 'cancelled', 'returned'].includes(order.orderStatus)) { %>
+                    <div class="info-card mt-6">
+                        <h2 class="section-title">
+                            <i class="fas fa-cog mr-2"></i> Order Actions
+                        </h2>
+                        <form id="updateStatusForm" class="mt-4">
+                            <div class="mb-4">
+                                <label for="orderStatus" class="block text-sm font-medium text-gray-700 mb-2">Update Order Status</label>
+                                <div class="flex">
+                                    <select id="orderStatus" name="orderStatus" class="status-select flex-grow">
+                                        <option value="pending" <%= order.orderStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+                                        <option value="processing" <%= order.orderStatus === 'processing' ? 'selected' : '' %>>Processing</option>
+                                        <option value="shipped" <%= order.orderStatus === 'shipped' ? 'selected' : '' %>>Shipped</option>
+                                        <option value="delivered" <%= order.orderStatus === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                        <option value="cancelled" <%= order.orderStatus === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                        <option value="returned" <%= order.orderStatus === 'returned' ? 'selected' : '' %>>Returned</option>
+                                    </select>
+                                    <button type="submit" class="action-btn ml-2">Update</button>
+                                </div>
+                            </div>
+                        </form> 
+                        
+                        <!-- <% if (order.paymentStatus !== 'completed' && order.paymentMethod === 'cod') { %>
+                            <div>
+                                <label for="paymentStatus" class="block text-sm font-medium text-gray-700 mb-2">Update Payment Status</label>
+                                <div class="flex">
+                                    <select id="paymentStatus" name="paymentStatus" class="status-select flex-grow">
+                                        <option value="pending" <%= order.paymentStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+                                        <option value="completed" <%= order.paymentStatus === 'completed' ? 'selected' : '' %>>Completed</option>
+                                        <option value="failed" <%= order.paymentStatus === 'failed' ? 'selected' : '' %>>Failed</option>
+                                        <option value="cancelled" <%= order.paymentStatus === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                    </select>
+                                    <button type="button" id="updatePaymentBtn" class="action-btn ml-2">Update</button>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div> -->
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Update Order Status
+        document.getElementById('updateStatusForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const orderId = '<%= order._id %>';
+            const newStatus = document.getElementById('orderStatus').value;
+            
+            // Show loading state
+            Swal.fire({
+                title: 'Updating...',
+                text: 'Updating order status',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Send AJAX request to update order status
+            fetch('/admin/orders/update-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    status: newStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Updated',
+                        text: 'Order status has been updated successfully',
+                        confirmButtonColor: '#8B5A2B',
+                        timer: 2000,
+                        timerProgressBar: true
+                    }).then(() => {
+                        // Reload the page to reflect changes
+                        window.location.reload();
+                    });
+                } else {
+                    // Show error message if there was an error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Update Failed',
+                        text: 'Failed to update order status: ' + data.message,
+                        confirmButtonColor: '#8B5A2B'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error updating order status:', error);
+                
+                // Show error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while updating the order status',
+                    confirmButtonColor: '#8B5A2B'
+                });
+            });
+        });
+        
+    </script>
+</body>

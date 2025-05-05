@@ -1,0 +1,337 @@
+<%- include('../Partials/user/homepage/header', { title: 'ChapterOne | Contact Us' }) %>
+<link rel="stylesheet" href="/css/User/userHome.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.all.min.js"></script>
+
+<!-- Contact Hero Section -->
+<div class="hero-section container-fluid">
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p class="lead text-center">We'd love to hear from you.</p>
+    </div>
+</div>
+
+<!-- Contact Information -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-6">
+            <h2 class="mb-4" style="font-family: 'Playfair Display', serif; color: var(--primary-brown);">Get in Touch</h2>
+            <p>Have a question about a specific book? Want to join our book club? Or perhaps you're an author interested in hosting an event? Whatever your inquiry, we're here to help.</p>
+            <p>Fill out the form or use the contact information below to reach us. Our team will get back to you as soon as possible.</p>
+            
+            <div class="mt-5">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-map-marker-alt fa-2x me-3" style="color: var(--primary-brown);"></i>
+                    <div>
+                        <h5 class="mb-0" style="font-family: 'Playfair Display', serif;">Visit Us</h5>
+                        <p class="mb-0">123 Reading Lane, Bookville, BK 98765</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-phone fa-2x me-3" style="color: var(--primary-brown);"></i>
+                    <div>
+                        <h5 class="mb-0" style="font-family: 'Playfair Display', serif;">Call Us</h5>
+                        <p class="mb-0">(555) 123-4567</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-envelope fa-2x me-3" style="color: var(--primary-brown);"></i>
+                    <div>
+                        <h5 class="mb-0" style="font-family: 'Playfair Display', serif;">Email Us</h5>
+                        <p class="mb-0">hello@chapterone.com</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-clock fa-2x me-3" style="color: var(--primary-brown);"></i>
+                    <div>
+                        <h5 class="mb-0" style="font-family: 'Playfair Display', serif;">Hours</h5>
+                        <p class="mb-0">Monday - Friday: 9am - 8pm<br>Saturday: 10am - 6pm<br>Sunday: 12pm - 5pm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4">
+                <h3 class="mb-4 text-center" style="font-family: 'Playfair Display', serif; color: var(--primary-brown);">Send Us a Message</h3>
+                <form id="contactForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <select class="form-select" id="subject" required>
+                            <option value="" selected disabled>Select a subject</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="book">Book Availability</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" rows="5" required></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-lg" style="background-color: var(--primary-brown); color: white;">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- FAQ Section -->
+<div class="container mt-5">
+    <h2 class="text-center mb-5" style="font-family: 'Playfair Display', serif; color: var(--primary-brown);">Frequently Asked Questions</h2>
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="accordion" id="contactFAQ">
+                <div class="accordion-item border-0 mb-3 shadow-sm">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            Do you offer special orders for books not in stock?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#contactFAQ">
+                        <div class="accordion-body">
+                            Yes! We're happy to special order any book that's in print. Special orders typically arrive within 3-7 business days, and we'll contact you as soon as your book arrives.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 mb-3 shadow-sm">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            How can I join your book club?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#contactFAQ">
+                        <div class="accordion-body">
+                            Our book clubs are open to all! You can register by filling out a form in-store, contacting us through this page, or signing up directly on our Events page. Book clubs meet monthly, and new members are always welcome.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 mb-3 shadow-sm">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            Do you buy used books?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#contactFAQ">
+                        <div class="accordion-body">
+                            We do accept gently used books for store credit. Please bring your books during our buying hours (Tuesday-Thursday, 12pm-5pm) and one of our buyers will assess them. Please note that we can't accept all books due to space limitations and condition requirements.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Newsletter Section -->
+<div class="container mt-5 mb-5">
+    <div class="card border-0 shadow-sm p-5 text-center" style="background-color: var(--accent-cream);">
+        <h2 style="font-family: 'Playfair Display', serif; color: var(--primary-brown);">Stay Connected</h2>
+        <p class="mb-4">Subscribe to our newsletter for updates on new releases, upcoming events, and exclusive offers.</p>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form class="d-flex">
+                    <input type="email" class="form-control me-2" placeholder="Your email address" required>
+                    <button type="submit" class="btn" style="background-color: var(--primary-brown); color: white;">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all dropdowns
+    var dropdownElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'))
+    var dropdownList = dropdownElementList.map(function(dropdownToggleEl) {
+        return new bootstrap.Dropdown(dropdownToggleEl)
+    });
+    
+    // Form submission handling with fetch
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            
+            // Show loading state
+            Swal.fire({
+                title: 'Sending...',
+                text: 'Please wait while we process your message',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+                background: '#faf7f2',
+                color: '#6b4226'
+            });
+            
+            // Send data to the backend
+            fetch('/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    subject,
+                    message
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Success message
+                Swal.fire({
+                    title: 'Thank You!',
+                    text: 'Your message has been sent successfully. We\'ll get back to you soon!',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#6b4226',
+                    background: '#faf7f2',
+                    color: '#6b4226'
+                });
+                
+                // Reset the form
+                contactForm.reset();
+            })
+            .catch(error => {
+                // Error message
+                Swal.fire({
+                    title: 'Oops!',
+                    text: 'Something went wrong. Please try again later or contact us directly.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#6b4226',
+                    background: '#faf7f2',
+                    color: '#6b4226'
+                });
+                console.error('Error:', error);
+            });
+        });
+    }
+    
+    // Newsletter subscription handling
+    const newsletterForm = document.querySelector('.container.mt-5.mb-5 form');
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = this.querySelector('input[type="email"]').value;
+            
+            // Show loading state
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Adding you to our newsletter',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+                background: '#faf7f2',
+                color: '#6b4226'
+            });
+            
+            // Send newsletter subscription to backend
+            fetch('/api/newsletter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Success message
+                Swal.fire({
+                    title: 'Subscribed!',
+                    text: 'You\'ve been successfully subscribed to our newsletter.',
+                    icon: 'success',
+                    confirmButtonText: 'Happy Reading!',
+                    confirmButtonColor: '#6b4226',
+                    background: '#faf7f2',
+                    color: '#6b4226'
+                });
+                
+                // Reset the form
+                this.reset();
+            })
+            .catch(error => {
+                // Error message
+                Swal.fire({
+                    title: 'Subscription Error',
+                    text: 'We couldn\'t add you to our newsletter. Please try again later.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#6b4226',
+                    background: '#faf7f2',
+                    color: '#6b4226'
+                });
+                console.error('Error:', error);
+            });
+        });
+    }
+});
+</script>
+
+<style>
+    .hero-section {
+        background-color: var(--accent-cream);
+        padding: 5rem 0;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .hero-section h1 {
+        font-family: 'Playfair Display', serif;
+        color: var(--primary-brown);
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: var(--accent-cream);
+        color: var(--primary-brown);
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0,0,0,.125);
+    }
+</style>
+
+<%- include('../Partials/user/homepage/footer') %>

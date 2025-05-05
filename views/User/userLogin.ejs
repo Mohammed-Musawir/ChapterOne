@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - ChapterONE Bookstore</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-brown: #8B4513;
+            --light-brown: #D2B48C;
+            --cream: #F5F5DC;
+            --dark-brown: #654321;
+            --white: #FFFFFF;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background-color: var(--cream);
+            color: var(--dark-brown);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('/api/placeholder/1920/1080');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            background-color: rgba(245, 245, 220, 0.9);
+        }
+        
+        .signin-container {
+            max-width: 450px;
+            width: 100%;
+            padding: 40px;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .logo h1 {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--dark-brown);
+            margin: 0;
+        }
+        
+        .logo span {
+            color: var(--primary-brown);
+        }
+        
+        .logo p {
+            color: var(--primary-brown);
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-brown);
+        }
+        
+        .form-control {
+            padding: 12px;
+            border: 1px solid var(--light-brown);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-brown);
+            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            background-image: none;
+        }
+
+        .invalid-feedback {
+            display: none;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--primary-brown);
+            font-size: 1.2rem;
+        }
+        .password-toggle:hover {
+            color: var(--dark-brown);
+        }
+        
+        .btn-brown {
+            background-color: var(--primary-brown);
+            color: var(--white);
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn-brown:hover {
+            background-color: var(--dark-brown);
+            transform: translateY(-2px);
+        }
+        
+        .btn-google {
+            background-color: #FFFFFF;
+            color: #444;
+            border: 1px solid #DDD;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-google:hover {
+            background-color: #F5F5F5;
+            transform: translateY(-2px);
+        }
+        
+        .google-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: var(--dark-brown);
+        }
+        
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--light-brown);
+        }
+        
+        .divider::before {
+            margin-right: 10px;
+        }
+        
+        .divider::after {
+            margin-left: 10px;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-brown);
+            border-color: var(--primary-brown);
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .forgot-password a {
+            color: var(--primary-brown);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .forgot-password a:hover {
+            color: var(--dark-brown);
+            text-decoration: underline;
+        }
+        
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .signup-link a {
+            color: var(--primary-brown);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .signup-link a:hover {
+            color: var(--dark-brown);
+            text-decoration: underline;
+        }
+        
+        .back-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        
+        .back-home a {
+            color: var(--primary-brown);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .back-home a:hover {
+            color: var(--dark-brown);
+        }
+        
+        .back-icon {
+            margin-right: 5px;
+        }
+        
+        .alert {
+            padding: 8px 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="back-home">
+        <a href="/">
+            <i class="fas fa-arrow-left back-icon"></i> Back to Page
+        </a>
+    </div>
+
+    <div class="signin-container">
+        <div class="logo" >
+            <h1>Chapter<span>ONE</span></h1>
+            <p>Your Journey Begins Here</p>
+        </div>
+        
+        <!-- Alert message (hidden by default) -->
+        <div class="alert alert-danger d-none" id="error-message">
+            Invalid email or password. Please try again.
+        </div>
+
+        <form id="loginForm">
+            <!-- CSRF Token Hidden Input -->
+            <input type="hidden" name="_csrf" id="csrfToken" value="">
+            
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email" required>
+                <div class="invalid-feedback" id="email-feedback"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <div class="password-container">
+                    <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password" required>
+                    <span class="password-toggle" id="togglePassword" onclick="togglePassword('password')" style="display: none;">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                    <div class="invalid-feedback" id="password-feedback"></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="forgot-password">
+                    <a href="/forgot-password">Forgot Password?</a>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-brown" id="loginButton">Sign In</button>
+            
+            <div class="divider">OR</div>
+            
+            <a href="/auth/google/login" type="button" class="btn btn-google">
+                <i class="fab fa-google google-icon"></i> Continue with Google
+            </a>
+            
+            <div class="signup-link">
+                Don't have an account? <a href="/signup">Sign Up</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to handle email not found error
+            function handleEmailNotFound() {
+                document.getElementById('email').classList.add('is-invalid');
+                document.getElementById('email-feedback').innerText = 'This email is not registered with us.';
+                document.getElementById('email-feedback').style.display = 'block';
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Account Not Found',
+                    text: 'This email is not registered with us. Would you like to create a new account?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#8B4513',
+                    cancelButtonColor: '#654321',
+                    confirmButtonText: 'Sign Up',
+                    cancelButtonText: 'Try Again'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/signup';
+                    }
+                });
+            }
+            
+            // Function to handle incorrect password error
+            function handlePasswordIncorrect() {
+                document.getElementById('password').classList.add('is-invalid');
+                document.getElementById('password-feedback').innerText = 'The password you entered is incorrect.';
+                document.getElementById('password-feedback').style.display = 'block';
+            }
+            
+            // Function to handle general errors
+            function handleGeneralError(message) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Error',
+                    text: message || 'An error occurred during login.',
+                    confirmButtonColor: '#8B4513',
+                    confirmButtonText: 'OK'
+                });
+            }
+            
+            // Process URL parameters (for redirects)
+            const urlParams = new URLSearchParams(window.location.search);
+            const errorType = urlParams.get('error');
+            
+            if (errorType === 'emailNotFound') {
+                handleEmailNotFound();
+            } else if (errorType === 'passwordIncorrect') {
+                handlePasswordIncorrect();
+            } else if (errorType) {
+                handleGeneralError('Login failed. Please try again.');
+            }
+            
+            // Check for server-rendered message (for direct renders)
+            const serverMessage = document.getElementById('server-message');
+            if (serverMessage && serverMessage.dataset.message) {
+                const message = serverMessage.dataset.message;
+                
+                if (message.includes('user doesnt exist') || message.includes('user doesn\'t exist')) {
+                    handleEmailNotFound();
+                } 
+                else if (message.includes('password is incorrect')) {
+                    handlePasswordIncorrect();
+                }
+                else {
+                    // For any other error message
+                    handleGeneralError(message);
+                }
+            }
+
+            // Handle form submission with fetch
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Reset validation state
+                resetValidation();
+                
+                // Get form data
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                // Show loading state
+                const loginButton = document.getElementById('loginButton');
+                const originalButtonText = loginButton.innerHTML;
+                loginButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Signing in...';
+                loginButton.disabled = true;
+
+                // Send fetch request
+                fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        _csrf: document.getElementById('csrfToken').value
+                    }),
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect || '/home';
+                    } else {
+                        // Handle validation errors
+                        if (data.error === 'emailNotFound') {
+                            handleEmailNotFound();
+                        } else if (data.error === 'passwordIncorrect') {
+                            handlePasswordIncorrect();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    handleGeneralError('There was a problem connecting to the server. Please try again.');
+                })
+                .finally(() => {
+                    // Reset button state
+                    loginButton.innerHTML = originalButtonText;
+                    loginButton.disabled = false;
+                });
+            });
+        });
+        
+        function resetValidation() {
+            // Clear validation states
+            document.getElementById('email').classList.remove('is-invalid');
+            document.getElementById('password').classList.remove('is-invalid');
+            document.getElementById('email-feedback').style.display = 'none';
+            document.getElementById('password-feedback').style.display = 'none';
+        }
+
+        function togglePassword(inputId) { 
+            const passwordInput = document.getElementById(inputId);
+            const icon = document.querySelector(`#togglePassword i`);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Show/hide eye button based on password input
+        document.getElementById('password').addEventListener('input', function() {
+            const passwordInput = document.getElementById('password');
+            const eyeButton = document.querySelector('.password-toggle');
+
+            if (passwordInput.value.length > 0) {
+                eyeButton.style.display = 'block';
+            } else {
+                eyeButton.style.display = 'none';
+            }
+        });
+    </script>
+    
+    <!-- Hidden div to pass server message (to be added by your template engine)
+    <div id="server-message" data-message="{{message}}" style="display: none;"></div> -->
+</body>
+</html>

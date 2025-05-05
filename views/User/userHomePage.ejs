@@ -1,0 +1,611 @@
+<%- include('../Partials/user/homepage/header', { title: 'ChapterOne | Discover Your Story' }) %>
+<link rel="stylesheet" href="/css/User/userHome.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Include SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.css">
+
+<style>
+    .wishlist-btn .fas.fa-heart {
+    color: red;
+    transition: all 0.2s ease;
+}
+
+.wishlist-btn:hover {
+    cursor: pointer;
+}
+
+/* Custom styling for SweetAlert2 to match the site theme */
+.swal2-popup {
+    font-family: 'Playfair Display', serif;
+    border-radius: 8px;
+}
+
+.swal2-title {
+    color: var(--primary-brown);
+}
+
+.swal2-confirm {
+    background-color: var(--primary-brown) !important;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px; /* Changed from right to left */
+    background-color: #8B5A2B; /* Changed from red to match your primary-brown theme */
+    color: white;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    z-index: 2;
+}
+        
+        /* Price display styling */
+        .original-price {
+            text-decoration: line-through;
+            color: #777;
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+
+        .discounted-price {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        /* Offer name tag */
+        .offer-tag {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background-color: rgba(139, 90, 43, 0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    max-width: 70%; /* Reduced from 90% to leave space for buttons */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 2;
+}
+        
+</style>
+   
+
+<body>
+    
+     <!-- Hero Section -->
+     <div class="hero-section container-fluid">
+        <div class="container">
+            <h1>Discover Your Next Great Story</h1>
+            <p class="lead text-center">Curated collections. Timeless narratives. Endless imagination.</p>
+            <a href="/shop" class="btn btn-primary hero-btn mt-3">Browse Collection</a>
+        </div>
+    </div>
+
+    <!-- Welcome Content Section -->
+    <div class="container my-5">
+        <div class="row align-items-center welcome-section">
+            <div class="col-md-6">
+                <h2 class="section-title">Welcome to ChapterOne</h2>
+                <p class="welcome-text">At ChapterOne, we believe every great journey begins with turning a page. Our carefully curated collection brings together classics and contemporary bestsellers that promise to transport you to new worlds.</p>
+                <p class="welcome-text">Whether you're seeking adventure, romance, knowledge, or inspiration, our shelves hold stories waiting just for you.</p>
+                <a href="/about" class="btn btn-outline-primary mt-3">Our Story</a>
+            </div>
+            <div class="col-md-6">
+                <img src="/images/reading-corner.jpg" alt="Reading Corner" class="img-fluid rounded shadow-lg">
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Selling Books -->
+    <div class="container mt-5">
+        <div class="book-grid">
+            <h2 class="text-center mb-5" style="font-family: 'Playfair Display', serif; color: var(--primary-brown);">
+                New Arrivals
+            </h2>
+            <div class="row">
+                <% books.forEach(book => { %>
+                    <div class="col-md-4 mb-4">
+                        <div class="book-card" data-id="<%= book._id %>">
+                            <div class="card-image-container position-relative">
+                                <!-- Discount badge -->
+                                <% if (book.discount > 0) { %>
+                                    <div class="discount-badge">
+                                        <%= book.discount %>% OFF
+                                    </div>
+                                    <div class="offer-tag">
+                                        <%= book.offerName %>
+                                    </div>
+                                <% } %>
+                                
+                                <a href="/bookPage/<%= book._id %>" class="text-decoration-none">
+                                    <img src="<%= book.productImages[0] %>" alt="<%= book.name %>" class="img-fluid">
+                                </a>
+                                <div class="card-actions">
+                                    <button class="action-btn wishlist-btn" title="Add to Wishlist">
+                                        <i class="<%= wishlist && wishlist.books.some(item => item.product.equals(book._id)) ? 'fas' : 'far' %> fa-heart" 
+                                            <% if(wishlist && wishlist.books.some(item => item.product.equals(book._id))) { %>style="color: red;"<% } %>></i>
+                                    </button>
+                                    <button class="action-btn cart-btn" title="Add to Cart">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-content p-3">
+                                <a href="/bookPage/<%= book._id %>" class="text-decoration-none">
+                                    <h5 class="book-title"><%= book.title %></h5>
+                                    <p class="book-author"><%= book.writer %></p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="book-price mb-0">
+                                            <% if (book.discount > 0) { %>
+                                                <span class="original-price">₹<%= book.salePrice %></span>
+                                                <span class="discounted-price">₹<%= book.discountedPrice %></span>
+                                            <% } else { %>
+                                                <span>₹<%= book.salePrice %></span>
+                                            <% } %>
+                                        </div>
+                                        <div class="book-rating">
+                                            <i class="fas fa-star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/shop" class="btn btn-view-all">View All Books</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Featured Collection -->
+    <div class="container mt-5">
+        <div class="featured-section p-5">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="mb-4">Monthly Featured Collection</h2>
+                    <h3 class="featured-title">Crime & Mystery</h3>
+                    <p class="featured-desc">Unravel enigmatic plots and follow brilliant detectives through twisting narratives that will keep you guessing until the final page.</p>
+                    <a href="/collection/mystery" class="btn btn-secondary mt-3">Explore Collection</a>
+                </div>
+                <div class="col-md-6">
+                    <img src="/images/mystery-collection.jpg" alt="Mystery Collection" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Categories -->
+    <div class="container mt-5">
+        <div class="categories-section">
+            <h2 class="text-center mb-5" style="font-family: 'Playfair Display', serif; color: var(--primary-brown);">Book Categories</h2>
+            <div class="row text-center g-4">
+                <% categories.forEach(category => { %>
+                    <div class="col-md-4 col-sm-6 mb-4">
+                        <a href="/category/<%= category.id %>" class="category-link">
+                            <div class="category-item">
+                                <i class="fas fa-book category-icon"></i>
+                                <h4 class="category-name"><%= category.name %></h4>
+                                <span class="explore-text">Explore <i class="fas fa-arrow-right"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="container mt-5">
+        <div class="testimonials-section">
+            <h2 class="text-center mb-5" style="font-family: 'Playfair Display', serif; color: var(--primary-brown);">Reader Reviews</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars mb-3">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"ChapterOne has completely transformed my reading experience. Their curated selections have introduced me to authors I would have never discovered otherwise."</p>
+                        <p class="testimonial-author">- Sarah J.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars mb-3">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"The quality of service and the condition of the books I receive is always exceptional. My home library has grown beautifully thanks to ChapterOne."</p>
+                        <p class="testimonial-author">- Rajiv M.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars mb-3">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <p class="testimonial-text">"Fast delivery, beautiful packaging, and a personal touch with every order. Reading has become a luxury experience with ChapterOne."</p>
+                        <p class="testimonial-author">- Priya K.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newsletter -->
+    <div class="container mt-5">
+        <div class="newsletter-section text-center">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <h2 class="mb-3">Stay Updated</h2>
+                    <p class="mb-4">Subscribe to our newsletter for new releases, author spotlights, and exclusive offers.</p>
+                    <form class="newsletter-form">
+                        <div class="input-group mb-3">
+                            <input type="email" class="form-control" placeholder="Enter your email address" aria-label="Email address">
+                            <button class="btn btn-primary" type="submit">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include SweetAlert2 JS -->
+     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.js"></script>
+    
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check user active status on page load
+    checkUserStatus();
+    
+    const wishlistButtons = document.querySelectorAll('.wishlist-btn');
+    const cartButtons = document.querySelectorAll('.cart-btn');
+    
+    wishlistButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Prevent click event from bubbling up to parent elements
+            e.stopPropagation();
+            
+            const bookCard = this.closest('.book-card');
+            const bookId = bookCard.getAttribute('data-id') || 
+                        bookCard.querySelector('a').href.split('/').pop();
+            const heartIcon = this.querySelector('i');
+            
+            // Toggle heart icon
+            if (heartIcon.classList.contains('far')) {
+                // Add to wishlist
+                addToWishlist(bookId, heartIcon);
+            } else {
+                // Remove from wishlist
+                removeFromWishlist(bookId, heartIcon);
+            }
+        });
+    });
+    
+    cartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Prevent click event from bubbling up to parent elements
+            e.stopPropagation();
+            
+            const bookCard = this.closest('.book-card');
+            const bookId = bookCard.getAttribute('data-id') || 
+                        bookCard.querySelector('a').href.split('/').pop();
+            
+            // Add to cart functionality
+            addToCart(bookId);
+        });
+    });
+    
+    // Function to check user active status
+    function checkUserStatus() {
+    fetch('/api/user/status', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json()) // Convert response to JSON
+    .then(data => {
+        if (data.success) {
+            // User is active, continue normally
+            console.log('User status:', data);
+            return;
+        }
+
+        // Handle errors based on errorType
+        switch (data.errorType) {
+            case 'USER_BLOCKED':
+                Swal.fire({
+                    title: 'Account Inactive',
+                    text: 'Your account is inactive. Please contact support for assistance.',
+                    icon: 'warning',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Back to Login'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+                break;
+
+            case 'UNAUTHORIZED':
+                // User is not logged in - redirect to login
+                Swal.fire({
+                    title: 'Unauthorized Access',
+                    text: 'Please log in to continue.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Login'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+                break;
+
+            case 'USER_NOT_FOUND':
+                Swal.fire({
+                    title: 'User Not Found',
+                    text: 'Your user account could not be found. Please try logging in again.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Login'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+                break;
+
+            case 'SERVER_ERROR':
+                Swal.fire({
+                    title: 'Server Error',
+                    text: 'Something went wrong. Please try again later.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B'
+                });
+                break;
+
+            default:
+                // Handle unknown errors
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message || 'Something went wrong',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B'
+                });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+
+        // Generic error alert
+        Swal.fire({
+            title: 'Error!',
+            text: 'Something went wrong. Please try again later.',
+            icon: 'error',
+            confirmButtonColor: '#8B5A2B'
+        });
+    });
+}
+
+    
+    // Function to add book to wishlist
+    function addToWishlist(bookId, heartIcon) {
+        console.log("Adding to wishlist: ", bookId);
+        fetch('/wishlist/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ bookId: bookId })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw err; // Pass the error object with type
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Change heart icon to filled (red)
+            heartIcon.classList.remove('far');
+            heartIcon.classList.add('fas');
+            heartIcon.style.color = 'red';
+            
+            // Show SweetAlert2 success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Added to wishlist!',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            handleApiError(error);
+        });
+    }
+    
+    // Function to remove book from wishlist
+    function removeFromWishlist(bookId, heartIcon) {
+        fetch('/wishlist/remove', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ bookId: bookId })
+        })
+        .then(response => response.json())
+        .then(data => {
+
+
+            if (data.success) {
+                Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'data.message',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+
+            // Change heart icon back to outline
+            heartIcon.classList.remove('fas');
+            heartIcon.classList.add('far');
+            heartIcon.style.color = '';
+        } else {
+            console.log('Failed to remove:', data.message);
+        }
+            
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            handleApiError(error);
+        });
+    }
+    
+    // Function to add book to cart
+    function addToCart(bookId) {
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ bookId: bookId })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw err; // Pass the error object with type
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+           
+               
+            
+            // Show SweetAlert2 success message
+            if(data.success){
+                Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Added to cart!',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+            }
+             
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops',
+                text: error.message,
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        });
+    }
+    
+    // Common error handler function based on errorType
+    function handleApiError(error) {
+        // Check error type and display appropriate message
+        switch(error.errorType) {
+            case 'USER_BLOCKED':
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Account Inactive',
+                    text: 'Your account is inactive. Contact support for help.',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Contact Support'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/support';
+                    }
+                });
+                break;
+                
+            case 'UNAUTHORIZED':
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Login Required',
+                    text: 'Please log in to continue.',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Login'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+                break;
+                
+            case 'USER_NOT_FOUND':
+                Swal.fire({
+                    icon: 'error',
+                    title: 'User Not Found',
+                    text: 'Your user account could not be found. Please log in again.',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Login'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+                break;
+                
+            case 'SERVER_ERROR':
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: 'Something went wrong. Please try again later.',
+                    confirmButtonColor: '#8B5A2B'
+                });
+                break;
+
+            case 'OUT_OF_STOCK':
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Out of Stock',
+                    text: 'This book is currently out of stock.',
+                    confirmButtonColor: '#8B5A2B'
+                });
+                break;
+                
+            default:
+                // Default error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text:  'Something went wrong',
+                    confirmButtonColor: '#8B5A2B'
+                });
+        }
+    }
+});
+    </script>
+</body>
+
+    <%- include('../Partials/user/homepage/footer') %>

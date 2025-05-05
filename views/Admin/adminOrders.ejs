@@ -1,0 +1,421 @@
+<%- include("../partials/admin/adminHeader") %>
+
+<style>
+    .filter-container {
+        background: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: fit-content;
+        margin-left: auto;
+        margin-bottom: 15px;
+    }
+
+    .select-filter {
+        width: auto !important;
+        min-width: 120px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        display: inline-block;
+    }
+    
+    /* Original status styles */
+    .status-pending {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+    
+    .status-shipped {
+        background-color: #DBEAFE;
+        color: #1E40AF;
+    }
+    
+    .status-delivered {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .status-cancelled {
+        background-color: #FEE2E2;
+        color: #B91C1C;
+    }
+    
+    /* New status styles for missing options */
+    .status-processing {
+        background-color: #E0F2FE;
+        color: #0369A1;
+    }
+    
+    .status-returned {
+        background-color: #F3E8FF;
+        color: #6B21A8;
+    }
+    
+    .product-item {
+        padding: 4px 0;
+        border-bottom: 1px dashed #f0f0f0;
+    }
+    
+    .product-item:last-child {
+        border-bottom: none;
+    }
+    
+    .main-container {
+        background-color: #FBF7F4;
+    }
+    
+    .table-container {
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+    
+    .page-title {
+        color: #8B5A2B;
+    }
+    
+    .status-select {
+        border: 1px solid #D1D5DB;
+        border-radius: 4px;
+        padding: 4px 8px;
+        background-color: #F9FAFB;
+        font-size: 14px;
+        width: 120px;
+    }
+    
+    /* Style for disabled select */
+    .status-select:disabled {
+        background-color: #E5E7EB;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+    
+    .action-btn {
+        background-color: #8B5A2B;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+    
+    .action-btn:hover {
+        background-color: #6B4423;
+    }
+    
+    .pagination-btn {
+        padding: 6px 12px;
+        margin: 0 4px;
+        border-radius: 4px;
+        background-color: #F3F4F6;
+        border: 1px solid #D1D5DB;
+        cursor: pointer;
+    }
+    
+    .pagination-btn.active {
+        background-color: #8B5A2B;
+        color: white;
+        border-color: #8B5A2B;
+    }
+    
+    thead {
+        background-color: #F5EBE0;
+    }
+    
+    th {
+        color: #8B5A2B !important;
+        font-weight: 600;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #FEFAF5;
+    }
+    
+    .no-orders {
+        text-align: center;
+        padding: 40px 0;
+        color: #4B5563;
+    }
+    
+    .no-orders i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        color: #D1D5DB;
+    }
+    
+    /* SweetAlert Custom Styling */
+    .swal2-popup {
+        border-radius: 10px;
+        font-family: inherit;
+    }
+    
+    .swal2-title {
+        color: #8B5A2B;
+    }
+    
+    .swal2-confirm {
+        background-color: #8B5A2B !important;
+    }
+    
+    .swal2-confirm:focus {
+        box-shadow: 0 0 0 3px rgba(139, 90, 43, 0.5) !important;
+    }
+</style>
+
+<!-- Tailwind CSS CDN -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container mx-auto px-4 py-8 mt-16 main-container">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold page-title">Order Management</h1>
+        
+        <!-- <div class="filter-container">
+            <select class="form-select select-filter" aria-label="Filter by" id="filter-orders">
+                <option value="all">All Orders</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="returned">Returned</option>
+            </select>
+        </div> -->
+    </div>
+  
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div class="table-container">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% if (orders && orders.length > 0) { %>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900"><%= order.orderId %></div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-500"><%= new Date(order.date).toLocaleDateString('en-IN', { month: 'short', day: '2-digit', year: 'numeric' }) %></div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900"><%= order.customer.name %></div>
+                                    <div class="text-sm text-gray-500"><%= order.customer.email %></div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="text-sm text-gray-900">
+                                        <% order.products.forEach(product => { %>
+                                            <div class="product-item">
+                                                <div><%= product.name %></div>
+                                                <div class="text-xs text-gray-500">Qty: <%= product.quantity %></div>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">₹<%= order.total.toLocaleString('en-IN') %></div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900"><%= order.paymentMethod %></div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <span class="status-badge status-<%= order.status %>"><%= order.status %></span>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap text-sm">
+                                    <% 
+                                    // Check if the status is one of the final states
+                                    const isFinalState = ['delivered', 'cancelled', 'returned'].includes(order.status);
+                                    %>
+                                    <select class="status-select mr-2" data-order-id="<%= order._id %>" <%= isFinalState ? 'disabled' : '' %>>
+                                        <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                        <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>Processing</option>
+                                        <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
+                                        <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                        <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                        <option value="returned" <%= order.status === 'returned' ? 'selected' : '' %>>Returned</option>
+                                    </select>
+                                    <a href="/admin/orders/<%= order._id %>" class="action-btn mt-2">View</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8">
+                                <div class="no-orders">
+                                    <i class="fas fa-box-open"></i>
+                                    <h3 class="text-lg font-medium mb-2">No Orders Found</h3>
+                                    <p class="text-gray-500">There are currently no orders matching your criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Pagination - Only show if there are orders -->
+    <% if (orders && orders.length > 0) { %>
+        <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-700">
+                Showing <span class="font-medium"><%= (currentPage - 1) * pageSize + 1 %></span> to 
+                <span class="font-medium"><%= Math.min(currentPage * pageSize, totalOrders) %></span> of 
+                <span class="font-medium"><%= totalOrders %></span> results
+            </div>
+            <div class="flex">
+                <% if (currentPage > 1) { %>
+                    <a href="/admin/orders?page=<%= currentPage - 1 %>&status=<%= currentStatus %>" class="pagination-btn">&laquo; Previous</a>
+                <% } else { %>
+                    <button class="pagination-btn" disabled>&laquo; Previous</button>
+                <% } %>
+                
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <a href="/admin/orders?page=<%= i %>&status=<%= currentStatus %>" 
+                        class="pagination-btn <%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+                <% } %>
+                
+                <% if (currentPage < totalPages) { %>
+                    <a href="/admin/orders?page=<%= currentPage + 1 %>&status=<%= currentStatus %>" class="pagination-btn">Next &raquo;</a>
+                <% } else { %>
+                    <button class="pagination-btn" disabled>Next &raquo;</button>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    // Function to update status badge when dropdown changes
+    document.querySelectorAll('.status-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const row = this.closest('tr');
+            const statusBadge = row.querySelector('.status-badge');
+            const orderId = this.getAttribute('data-order-id');
+            const newStatus = this.value;
+            
+            // Remove all status classes
+            statusBadge.classList.remove('status-pending', 'status-processing', 'status-shipped', 'status-delivered', 'status-cancelled', 'status-returned');
+            
+            // Add new status class and update text
+            statusBadge.classList.add('status-' + newStatus);
+            statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+            
+            // Check if the new status is a final state
+            const isFinalState = ['delivered', 'cancelled', 'returned'].includes(newStatus);
+            
+            // If it's a final state, disable the select after update
+            if (isFinalState) {
+                this.disabled = true;
+            }
+            
+            // Show loading state
+            Swal.fire({
+                title: 'Updating...',
+                text: 'Updating order status',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Send AJAX request to update order status
+            fetch('/admin/orders/update-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    status: newStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Updated',
+                        text: 'Order status has been updated successfully',
+                        confirmButtonColor: '#8B5A2B',
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                } else {
+                    // Show error message if there was an error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Update Failed',
+                        text: 'Failed to update order status: ' + data.message,
+                        confirmButtonColor: '#8B5A2B'
+                    });
+                    
+                    // Revert the changes if update fails
+                    this.value = statusBadge.textContent.toLowerCase();
+                    if (isFinalState) {
+                        this.disabled = false;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error updating order status:', error);
+                
+                // Show error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while updating the order status',
+                    confirmButtonColor: '#8B5A2B'
+                });
+                
+                // Revert the changes if update fails
+                this.value = statusBadge.textContent.toLowerCase();
+                if (isFinalState) {
+                    this.disabled = false;
+                }
+            });
+        });
+    });
+    
+    // Filter functionality
+    document.getElementById('filter-orders').addEventListener('change', function() {
+        const filterValue = this.value;
+        window.location.href = '/admin/orders?status=' + filterValue;
+    });
+    
+    // Set the filter dropdown to the current status
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status') || 'all';
+        document.getElementById('filter-orders').value = status;
+    });
+</script>
+
+<%- include("../partials/admin/adminFooter") %>

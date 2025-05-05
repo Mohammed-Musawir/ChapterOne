@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChapterOne | <%= typeof pageTitle !== 'undefined' ? pageTitle : 'Account Management' %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <style>
+            :root {
+                --primary-brown: #8B5A2B;
+                --secondary-brown: #A67C52;
+                --light-brown: #D2B48C;
+                --dark-brown: #654321;
+                --accent-gold: #D4AF37;
+                --soft-shadow: rgba(0, 0, 0, 0.05);
+                --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                --sidebar-width: 260px;
+            }
+    
+            body {
+                font-family: 'Poppins', sans-serif;
+                background-color: #f8f9fa;
+                margin: 0;
+                padding: 0;
+            }
+    
+            .dashboard-container {
+                display: flex;
+                min-height: 100vh;
+            }
+    
+            /* Sidebar Styles */
+            .dashboard-sidebar {
+                width: var(--sidebar-width);
+                background-color: white;
+                position: fixed;
+                height: 100vh;
+                box-shadow: var(--card-shadow);
+                padding: 25px 0;
+                overflow-y: auto;
+                z-index: 10;
+                transition: transform 0.3s ease;
+            }
+    
+            .logo-text {
+                font-family: 'Playfair Display', serif;
+                color: var(--primary-brown);
+                margin: 0;
+            }
+    
+            .user-profile .profile-image img {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border: 3px solid var(--light-brown);
+            }
+    
+            .sidebar-nav ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+    
+            .sidebar-nav li {
+                margin-bottom: 5px;
+            }
+    
+            .nav-link1 {
+                display: flex;
+                align-items: center;
+                padding: 12px 20px;
+                color: #555;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-left: 3px solid transparent;
+            }
+    
+            .nav-link1.active {
+                background-color: rgba(139, 90, 43, 0.1);
+                color: var(--primary-brown);
+                border-left-color: var(--primary-brown);
+            }
+    
+            .nav-link1:hover {
+                background-color: rgba(139, 90, 43, 0.1);
+                color: var(--primary-brown);
+                border-left-color: var(--primary-brown);
+            }
+    
+            .nav-link1 i {
+                margin-right: 12px;
+                width: 20px;
+                text-align: center;
+            }
+    
+            /* Main Content Styles */
+            .dashboard-content {
+                flex: 1;
+                margin-left: var(--sidebar-width);
+                padding: 30px;
+                transition: margin-left 0.3s ease;
+            }
+    
+            .dashboard-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+            }
+    
+            .dashboard-header h2 {
+                font-family: 'Playfair Display', serif;
+                color: var(--primary-brown);
+                margin: 0;
+            }
+    
+            /* Content Cards */
+            .content-card {
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: var(--card-shadow);
+                margin-bottom: 25px;
+                overflow: hidden;
+            }
+    
+            .card-header {
+                padding: 15px 20px;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+    
+            .card-header h5 {
+                margin: 0;
+                color: var(--secondary-brown);
+                font-family: 'Playfair Display', serif;
+            }
+    
+            .card-body {
+                padding: 20px;
+            }
+    
+            /* Breadcrumb */
+            .breadcrumb-container {
+                margin-bottom: 20px;
+            }
+    
+            .breadcrumb-item a {
+                color: var(--secondary-brown);
+                text-decoration: none;
+            }
+    
+            .breadcrumb-item.active {
+                color: var(--primary-brown);
+                font-weight: 500;
+            }
+    
+            /* Order Summary */
+            .order-summary {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+    
+            .summary-item {
+                flex: 1;
+                min-width: 200px;
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: var(--card-shadow);
+                padding: 15px;
+            }
+    
+            .summary-item h6 {
+                color: #888;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+    
+            .summary-item p {
+                color: var(--dark-brown);
+                font-weight: 500;
+                margin: 0;
+            }
+    
+            .status-badge {
+                padding: 5px 10px;
+                border-radius: 50px;
+                font-size: 12px;
+                font-weight: 500;
+            }
+    
+            .status-badge.delivered {
+                background-color: rgba(39, 174, 96, 0.1);
+                color: #27ae60;
+            }
+    
+            .status-badge.processing {
+                background-color: rgba(241, 196, 15, 0.1);
+                color: #f1c40f;
+            }
+    
+            .status-badge.pending {
+                background-color: rgba(52, 152, 219, 0.1);
+                color: #3498db;
+            }
+    
+            .status-badge.shipped {
+                background-color: rgba(142, 68, 173, 0.1);
+                color: #8e44ad;
+            }
+    
+            .status-badge.cancelled {
+                background-color: rgba(231, 76, 60, 0.1);
+                color: #e74c3c;
+            }
+    
+            .status-badge.returned {
+                background-color: rgba(41, 128, 185, 0.1);
+                color: #2980b9;
+            }
+    
+            /* Product Items */
+            .product-item {
+                display: flex;
+                border-radius: 8px;
+                margin-bottom: 15px;
+                background-color: white;
+                padding: 15px;
+                box-shadow: var(--card-shadow);
+                transition: all 0.3s ease;
+                position: relative;
+            }
+    
+            .product-item.cancelled {
+                border-left: 4px solid #e74c3c;
+                opacity: 0.8;
+            }
+    
+            .product-item.returned {
+                border-left: 4px solid #2980b9;
+                opacity: 0.8;
+            }
+    
+            .product-image {
+                width: 80px;
+                height: 100px;
+                object-fit: cover;
+                border-radius: 5px;
+                margin-right: 15px;
+            }
+    
+            .product-details {
+                flex: 1;
+            }
+    
+            .product-title {
+                font-weight: 500;
+                color: var(--dark-brown);
+                margin-bottom: 5px;
+            }
+    
+            .product-meta {
+                color: #888;
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+    
+            .product-price {
+                font-weight: 500;
+                color: var(--primary-brown);
+            }
+    
+            .product-status {
+                /* display: inline-block;
+                position: relative;
+                top: 15px;
+                right: 15px; */
+                margin-right: 100px;
+            }
+    
+            .product-action {
+                margin-top: 10px;
+            }
+    
+            .product-checkbox {
+                margin-right: 15px;
+                align-self: center;
+            }
+    
+            .checkbox-container {
+                position: relative;
+                display: inline-block;
+                width: 24px;
+                height: 24px;
+            }
+    
+            .checkbox-container input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+            }
+    
+            .checkmark {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 24px;
+                width: 24px;
+                background-color: #eee;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+            }
+    
+            .checkbox-container:hover input~.checkmark {
+                background-color: #ccc;
+            }
+    
+            .checkbox-container input:checked~.checkmark {
+                background-color: var(--primary-brown);
+            }
+    
+            .checkmark:after {
+                content: "";
+                position: absolute;
+                display: none;
+            }
+    
+            .checkbox-container input:checked~.checkmark:after {
+                display: block;
+            }
+    
+            .checkbox-container .checkmark:after {
+                left: 9px;
+                top: 5px;
+                width: 6px;
+                height: 12px;
+                border: solid white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+    
+            /* Order Timeline */
+            .order-stepper {
+                display: flex;
+                justify-content: space-between;
+                position: relative;
+                margin: 30px 0;
+                padding: 0;
+            }
+    
+            .order-stepper::before {
+                content: '';
+                position: absolute;
+                top: 25px;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background-color: #e0e0e0;
+                z-index: 1;
+            }
+    
+            .step {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                z-index: 2;
+                flex: 1;
+            }
+    
+            .step-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background-color: white;
+                border: 2px solid #e0e0e0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 10px;
+                color: #888;
+                font-size: 20px;
+            }
+    
+            .step.active .step-icon {
+                background-color: var(--primary-brown);
+                border-color: var(--primary-brown);
+                color: white;
+            }
+    
+            .step.completed .step-icon {
+                background-color: var(--light-brown);
+                border-color: var(--light-brown);
+                color: white;
+            }
+    
+            .step-label {
+                font-weight: 500;
+                color: #555;
+                margin-bottom: 5px;
+                text-align: center;
+            }
+    
+            .step.active .step-label {
+                color: var(--primary-brown);
+                font-weight: 600;
+            }
+    
+            .step.completed .step-label {
+                color: var(--secondary-brown);
+            }
+    
+            .step-date {
+                font-size: 12px;
+                color: #888;
+                text-align: center;
+            }
+    
+            .step-progress {
+                position: absolute;
+                top: 25px;
+                left: 0;
+                height: 2px;
+                background-color: var(--primary-brown);
+                z-index: 1;
+            }
+    
+            /* Custom product stepper */
+            .product-timeline {
+                padding-left: 20px;
+                position: relative;
+                margin-top: 20px;
+            }
+    
+            .product-timeline::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background-color: #e0e0e0;
+            }
+    
+            .timeline-point {
+                position: relative;
+                padding-bottom: 15px;
+                padding-left: 20px;
+            }
+    
+            .timeline-point::before {
+                content: '';
+                position: absolute;
+                left: -10px;
+                top: 6px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background-color: var(--dark-brown);
+                border: 2px solid var(--primary-brown);
+                z-index: 1;
+            }
+    
+            .timeline-point.cancelled::before {
+                background-color: #e74c3c;
+                border-color: #e74c3c;
+            }
+    
+            .timeline-point.returned::before {
+                background-color: #2980b9;
+                border-color: #2980b9;
+            }
+    
+            .timeline-date {
+                font-size: 12px;
+                color: #888;
+                margin-bottom: 2px;
+            }
+    
+            .timeline-title {
+                font-weight: 500;
+                color: var(--dark-brown);
+            }
+    
+            /* Action buttons */
+            .action-buttons {
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+                flex-wrap: wrap;
+            }
+    
+            .action-buttons .btn {
+                flex: 1;
+                padding: 10px;
+                min-width: 120px;
+                transition: all 0.3s ease;
+            }
+    
+            .btn-danger {
+                background-color: #dc3545;
+                color: white;
+                border-color: #dc3545;
+            }
+    
+            .btn-danger:hover {
+                background-color: #bb2d3b;
+                border-color: #b02a37;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+            }
+    
+            .btn-primary-brown {
+                background-color: var(--primary-brown);
+                color: white;
+                border-color: var(--primary-brown);
+            }
+    
+            .btn-primary-brown:hover {
+                background-color: var(--dark-brown);
+                border-color: var(--dark-brown);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(139, 90, 43, 0.2);
+            }
+    
+            .btn-outline-brown {
+                color: var(--primary-brown);
+                background-color: white;
+                border-color: var(--primary-brown);
+            }
+    
+            .btn-outline-brown:hover {
+                background-color: rgba(139, 90, 43, 0.1);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(139, 90, 43, 0.1);
+            }
+    
+            .back-btn {
+                color: var(--primary-brown);
+                background-color: rgba(139, 90, 43, 0.1);
+                padding: 8px 20px;
+                border-radius: 5px;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+            }
+    
+            .back-btn:hover {
+                background-color: var(--primary-brown);
+                color: white;
+            }
+    
+            .back-btn i {
+                margin-right: 8px;
+            }
+    
+            .logo-container {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 20px;
+                margin-bottom: 25px;
+            }
+    
+            .back-home-btn {
+                color: var(--primary-brown);
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                font-size: 14px;
+                padding: 6px 12px;
+                border: 1px solid var(--primary-brown);
+                border-radius: 6px;
+                transition: all 0.3s ease;
+                width: fit-content;
+            }
+    
+            .back-home-btn:hover {
+                background-color: var(--primary-brown);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+    
+            .back-home-btn i {
+                margin-right: 6px;
+                font-size: 16px;
+            }
+    
+            /* Modals */
+            .modal-content {
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+    
+            .modal-header {
+                border-bottom: 1px solid #eee;
+                background-color: rgba(139, 90, 43, 0.05);
+            }
+    
+            .modal-header .modal-title {
+                color: var(--dark-brown);
+                font-family: 'Playfair Display', serif;
+            }
+    
+            .modal-footer {
+                border-top: 1px solid #eee;
+            }
+    
+            /* Toggle sidebar */
+            .toggle-sidebar {
+                display: none;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 100;
+                background-color: var(--primary-brown);
+                color: white;
+                border: none;
+                width: 40px;
+                height: 40px;
+                border-radius: 5px;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+    
+            /* Responsive */
+            @media (max-width: 992px) {
+                .dashboard-sidebar {
+                    transform: translateX(-100%);
+                }
+    
+                .dashboard-sidebar.active {
+                    transform: translateX(0);
+                }
+    
+                .dashboard-content {
+                    margin-left: 0;
+                }
+    
+                .toggle-sidebar {
+                    display: flex;
+                }
+    
+                .order-summary {
+                    flex-direction: column;
+                }
+    
+                .product-checkbox {
+                    margin-right: 10px;
+                }
+            }
+    
+            @media (max-width: 768px) {
+                .product-item {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+    
+                .product-image {
+                    margin-bottom: 10px;
+                    margin-right: 0;
+                }
+    
+                .product-status {
+                    display: flex;
+                    position:relative;
+                    top: auto;
+                    right: auto;
+                    margin-top: 10px;
+                }
+    
+                .action-buttons {
+                    flex-direction: column;
+                }
+    
+                .action-buttons .btn {
+                    width: 100%;
+                    margin-bottom: 10px;
+                }
+    
+                .order-stepper {
+                    flex-direction: column;
+                    margin-left: 20px;
+                }
+    
+                .order-stepper::before {
+                    top: 0;
+                    bottom: 0;
+                    left: 25px;
+                    width: 2px;
+                    height: auto;
+                }
+    
+                .step {
+                    flex-direction: row;
+                    align-items: flex-start;
+                    margin-bottom: 30px;
+                    width: 100%;
+                }
+    
+                .step-icon {
+                    margin-right: 15px;
+                    margin-bottom: 0;
+                }
+    
+                .step-text {
+                    text-align: left;
+                }
+    
+                .step-label {
+                    text-align: left;
+                }
+    
+                .step-date {
+                    text-align: left;
+                }
+    
+                .step-progress {
+                    top: 0;
+                    left: 25px;
+                    width: 2px;
+                    height: 0%;
+                }
+            }
+
+             .swal-brown-theme {
+     background-color: #fff;
+     border: 2px solid #8B5A2B;
+     border-radius: 10px;
+ }
+ .swal-title {
+     color: #8B5A2B;
+ }
+ .swal-confirm-button {
+     background-color: #8B5A2B !important;
+     color: #fff !important;
+     border-radius: 5px !important;
+     padding: 8px 16px !important;
+ }
+ .swal-cancel-button {
+     background-color: #fff !important;
+     color: #8B5A2B !important;
+     border: 1px solid #8B5A2B !important;
+     border-radius: 5px !important;
+     padding: 8px 16px !important;
+ }
+
+ /* Offer Price Styling */
+.original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9em;
+    margin-right: 8px;
+}
+
+.offered-price {
+    font-weight: bold;
+    color: #8b5a2b;
+}
+
+.offer-badge {
+    background-color: #28a745;
+    color: white;
+    font-size: 0.7em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.offer-name {
+    margin-top: 4px;
+    font-size: 0.8em;
+}
+
+/* For cancelled and returned products, dim the offer info too */
+.product-item.cancelled .offer-badge,
+.product-item.returned .offer-badge {
+    opacity: 0.5;
+}
+        </style>
+
+    </head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Mobile Toggle Button (visible on small screens) -->
+        <button class="toggle-sidebar d-lg-none">
+            <i class="fas fa-bars"></i>
+        </button>
+    
+        <!-- Sidebar -->
+        <div class="dashboard-sidebar">
+            <div class="logo-container">
+                <a href="/" class="back-home-btn">
+                    <i class="fas fa-home me-1"></i> Back To Home
+                </a>
+            </div>
+            <div class="logo-container">
+                <h3 class="logo-text">ChapterOne</h3>
+            </div>
+    
+            <div class="user-profile text-center mb-4">
+                <div class="profile-image">
+                    <img src="<%= user.profileImage || '/api/placeholder/80/80' %>" alt="Profile Picture" class="rounded-circle">
+                </div>
+                <h5 class="mt-3"><%= user.name %></h5>
+                <p class="text-muted small"><%= user.email %></p>
+            </div>
+    
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="/account" class="nav-link1 <%= activePage === 'dashboard' ? 'active' : '' %>">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/profile" class="nav-link1 <%= activePage === 'profile' ? 'active' : '' %>">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/edit-profile" class="nav-link1 <%= activePage === 'edit-profile' ? 'active' : '' %>">
+                            <i class="fas fa-user-edit"></i>
+                            <span>Edit Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/change-password" class="nav-link1 <%= activePage === 'change-password' ? 'active' : '' %>">
+                            <i class="fas fa-lock"></i>
+                            <span>Change Password</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/change-email" class="nav-link1 <%= activePage === 'change-email' ? 'active' : '' %>">
+                            <i class="fas fa-envelope"></i>
+                            <span>Change Email</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/orders" class="nav-link1 <%= activePage === 'orders' ? 'active' : '' %>">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/wallet" class="nav-link1 <%= activePage === 'wallet' ? 'active' : '' %>">
+                            <i class="fas fa-wallet"></i>
+                            <span>Wallet</span>
+                        </a>
+                    </li>
+                    <li class="mt-4">
+                        <a href="/logout" class="nav-link1 text-danger">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <!-- Breadcrumb - Removed duplicate breadcrumb section -->
+            <nav aria-label="breadcrumb" class="breadcrumb-container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/account/orders">Orders</a></li>
+                    <li class="breadcrumb-item"><a href="/account/orders/<%= order.orderId %>">Order #<%= order.orderId %></a></li>
+                    <li class="breadcrumb-item active">Product Actions</li>
+                </ol>
+            </nav>
+        
+            <div class="dashboard-header">
+                <h2>Manage Order Products</h2>
+                <div class="header-actions">
+                    <a href="/account/orders" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Order
+                    </a>
+                    <a href="/account/orders/<%= order.orderId %>/invoice" class="back-btn">
+                        <i class="fas fa-file-invoice me-1"></i> Download Invoice
+                    </a>
+                </div>
+            </div>
+        
+            <!-- Order Summary Cards -->
+            <div class="order-summary">
+                <div class="summary-item">
+                    <h6>Order Number</h6>
+                    <p>#<%= order.orderId %></p>
+                </div>
+                <div class="summary-item">
+                    <h6>Order Date</h6>
+                    <p><%= new Date(order.orderedDate).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      }) %></p>
+                </div>
+                <div class="summary-item">
+                    <h6>Payment Method</h6>
+                    <p><%= order.paymentMethod === 'cod'? 'Cash on delivery' : order.paymentMethod %></p>
+                </div>
+                <div class="summary-item">
+                    <h6>Order Status</h6>
+                    <p><span class="status-badge <%= order.orderStatus %>"><%= order.orderStatus %></span></p>
+                </div>
+            </div>
+        
+            <!-- Order Timeline Card -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h5>Order Timeline</h5>
+                </div>
+                <div class="card-body">
+                    <div class="order-stepper-container">
+                        <div class="order-stepper">
+                            <% 
+                            // Define the steps and their mapping to the orderStatus
+                            const steps = [
+                                { 
+                                    name: 'Order Placed', 
+                                    icon: 'check', 
+                                    date: order.orderedDate ? new Date(order.orderedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null,
+                                    status: 'completed' // Order placed is always completed if we have an order
+                                },
+                                { 
+                                    name: 'Processing', 
+                                    icon: 'box', 
+                                    date: order.orderStatus === 'processing' ? 'In Progress' : 
+                                           (order.orderStatus === 'shipped' || order.orderStatus === 'delivered') ? 
+                                           new Date(order.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null,
+                                    status: getStepStatus('processing', order.orderStatus)
+                                },
+                                { 
+                                    name: 'Shipped', 
+                                    icon: 'truck', 
+                                    date: order.orderStatus === 'shipped' ? 'In Progress' : 
+                                           order.orderStatus === 'delivered' ? 
+                                           new Date(order.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null,
+                                    status: getStepStatus('shipped', order.orderStatus)
+                                },
+                                { 
+                                    name: 'Delivered', 
+                                    icon: 'box-open', 
+                                    date: order.orderStatus === 'delivered' ? 
+                                           new Date(order.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null,
+                                    status: getStepStatus('delivered', order.orderStatus)
+                                }
+                            ];
+        
+                            // Function to determine step status
+                            function getStepStatus(step, currentStatus) {
+                                const statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+                                
+                                // Handle cancelled or returned orders
+                                if (currentStatus === 'cancelled' || currentStatus === 'returned') {
+                                    const currentIndex = statusOrder.indexOf(step);
+                                    const lastActiveIndex = statusOrder.indexOf(order.orderStatus === 'pending' ? 'pending' : 
+                                                           order.orderStatus === 'cancelled' || order.orderStatus === 'returned' ? 
+                                                           'processing' : order.orderStatus);
+                                    
+                                    if (step === 'pending') return 'completed';
+                                    if (currentIndex <= lastActiveIndex) return 'completed';
+                                    return '';
+                                }
+                                
+                                // Handle normal flow
+                                const stepIndex = statusOrder.indexOf(step);
+                                const currentIndex = statusOrder.indexOf(currentStatus);
+                                
+                                if (stepIndex < currentIndex) return 'completed';
+                                if (stepIndex === currentIndex) return 'active';
+                                return '';
+                            }
+                            %>
+                            
+                            <% steps.forEach((step, index) => { %>
+                                <div class="step <%= step.status %>">
+                                    <div class="step-icon">
+                                        <i class="fas fa-<%= step.icon %>"></i>
+                                    </div>
+                                    <div class="step-text">
+                                        <div class="step-label"><%= step.name %></div>
+                                        <div class="step-date"><%= step.date || (step.status === 'active' ? 'In Progress' : 'Upcoming') %></div>
+                                    </div>
+                                </div>
+                            <% }); %>
+        
+                            <% if (order.orderStatus === 'cancelled') { %>
+                                <div class="step active">
+                                    <div class="step-icon" style="background-color: #e74c3c; border-color: #e74c3c;">
+                                        <i class="fas fa-times-circle"></i>
+                                    </div>
+                                    <div class="step-text">
+                                        <div class="step-label">Cancelled</div>
+                                        <div class="step-date">
+                                            <%= order.orderCancellation && order.orderCancellation.cancelledAt ? 
+                                                new Date(order.orderCancellation.cancelledAt).toLocaleDateString('en-US', 
+                                                { year: 'numeric', month: 'long', day: 'numeric' }) : 
+                                                new Date(order.updatedAt).toLocaleDateString('en-US', 
+                                                { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+        
+                            <% if (order.orderStatus === 'returned') { %>
+                                <div class="step active">
+                                    <div class="step-icon" style="background-color: #2980b9; border-color: #2980b9;">
+                                        <i class="fas fa-undo-alt"></i>
+                                    </div>
+                                    <div class="step-text">
+                                        <div class="step-label">Returned</div>
+                                        <div class="step-date">
+                                            <%= order.orderReturned && order.orderReturned.returnedAt ? 
+                                                new Date(order.orderReturned.returnedAt).toLocaleDateString('en-US', 
+                                                { year: 'numeric', month: 'long', day: 'numeric' }) : 
+                                                new Date(order.updatedAt).toLocaleDateString('en-US', 
+                                                { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Products Actions - Improved Version -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h5>Order Products</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Manage your products individually or select multiple items for bulk actions:</p>
+        
+                    <!-- Bulk Action Controls -->
+                    <div class="bulk-actions mb-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <h6 class="me-3 mb-0">Bulk Actions:</h6>
+                            
+                            <% if (order.orderStatus === 'pending' || order.orderStatus === 'processing') { %>
+                                <button type="button" class="btn btn-sm btn-danger me-2" id="bulk-cancel-btn" data-bs-toggle="modal" data-bs-target="#bulkCancelModal">
+                                    <i class="fas fa-times-circle me-1"></i> Cancel Selected
+                                </button>
+                            <% } %>
+                            
+                            <% if (order.orderStatus === 'delivered') { %>
+                                <button type="button" class="btn btn-sm btn-primary-brown me-2" id="bulk-return-btn" data-bs-toggle="modal" data-bs-target="#bulkReturnModal">
+                                    <i class="fas fa-undo-alt me-1"></i> Return Selected
+                                </button>
+                            <% } %>
+                            
+                            <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'returned') { %>
+                                <button type="button" class="btn btn-sm btn-outline-brown" id="select-all-btn">
+                                    <i class="fas fa-check-square me-1"></i> Select All
+                                </button>
+                            <% } %>
+                        </div>
+                        
+                        <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'returned') { %>
+                            <div class="alert alert-info small" role="alert">
+                                <i class="fas fa-info-circle me-1"></i> 
+                                You can manage products individually or select multiple items for bulk actions. 
+                                Cancelled or returned products cannot be selected.
+                            </div>
+                        <% } else { %>
+                            <div class="alert alert-warning small" role="alert">
+                                <i class="fas fa-exclamation-triangle me-1"></i> 
+                                Bulk actions are not available for cancelled or returned orders.
+                            </div>
+                        <% } %>
+                    </div>
+                    
+                    <!-- Individual Products -->
+                    <% order.products.forEach((product, index) => { %>
+                        
+                        <div class="product-item <%= product.productOrderStatus === 'cancelled' ? 'cancelled' : product.productOrderStatus === 'returned' ? 'returned' : '' %>" id="product-<%= product.product._id %>">
+                            <!-- Checkbox for bulk selection -->
+                            <div class="product-checkbox">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="selectedProducts" value="<%= product.product._id %>" 
+                                        <%= (product.productOrderStatus === 'cancelled' || product.productOrderStatus === 'returned' || order.orderStatus === 'cancelled' || order.orderStatus === 'returned') ? 'disabled' : '' %>>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            
+                            <!-- Product image -->
+                            <img src="<%= product.productDetails.productImages[0] || '/api/placeholder/80/100' %>" alt="<%= product.title %>" class="product-image">
+                            
+                            <!-- Product details -->
+                            <div class="product-details">
+                                <div class="product-title"><%= product.productDetails.name %></div>
+                                <div class="product-meta">Author: <%= product.productDetails.writer %></div>
+                                <div class="product-meta">Qty: <%= product.quantity %></div>
+                                <!-- <div class="product-price">₹<%= product.productDetails.salePrice.toFixed(2) %></div> -->
+                                  <!-- Updated price display with offer information -->
+                                  <% if (product.offer) { %>
+                                    <div class="product-price">
+                                        <span class="product-price">₹<%= product.offer.offeredPrice %></span>
+                                    </div>
+                                <% } else { %>
+                                    <div class="product-price">₹<%= product.productDetails.salePrice.toFixed(2) %></div>
+                                <% } %>
+
+
+                                <!-- Product timeline -->
+                                <div class="product-timeline mt-3">
+                                    <div class="timeline-header">
+                                        <span class="small text-muted"><i class="fas fa-history me-1"></i> Product Timeline</span>
+                                        <button class="btn btn-sm btn-link p-0 ms-2 toggle-timeline" data-product-id="<%= product.product._id %>">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="timeline-content" id="timeline-<%= product.product %>" style="display: none;">
+                                        <% if (product.timeline && product.timeline.length > 0) { %>
+                                            <% product.timeline.forEach(event => { %>
+                                                <div class="timeline-point <%= event.type.toLowerCase() %>">
+                                                    <div class="timeline-date"><%= event.date %></div>
+                                                    <div class="timeline-title"><%= event.title %></div>
+                                                    <% if (event.description) { %>
+                                                        <div class="timeline-description text-muted small"><%= event.description %></div>
+                                                    <% } %>
+                                                </div>
+                                            <% }); %>
+                                        <% } else { %>
+                                            <div class="timeline-empty text-muted small">No timeline events for this product.</div>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Product status badge -->
+                            <div class="product-status">
+                                <span class="status-badge <%= product.productOrderStatus %>"><%= product.productOrderStatus %></span>
+                            </div>
+                            
+                            <!-- Individual product actions -->
+                            <div class="product-actions">
+                                <% if (product.productOrderStatus !== 'cancelled' && product.productOrderStatus !== 'returned' && 
+                                      order.orderStatus !== 'cancelled' && order.orderStatus !== 'returned') { %>
+                                    
+                                    <% if (order.orderStatus === 'pending' || order.orderStatus === 'processing') { %>
+                                        <button type="button" class="btn btn-sm btn-danger mb-2 w-100 single-cancel-btn" 
+                                                data-product-id="<%= product.product._id %>" 
+                                                data-product-name="<%= product.productDetails.name %>"
+                                                data-bs-toggle="modal" data-bs-target="#singleCancelModal">
+                                            <i class="fas fa-times-circle me-1"></i> Cancel
+                                        </button>
+                                        
+                                    <% } %>
+                                    
+                                    <% if (order.orderStatus === 'delivered') { %>
+                                        <button type="button" class="btn btn-sm btn-primary-brown w-100 single-return-btn" 
+                                                data-product-id="<%= product.product._id %>" 
+                                                data-product-name="<%= product.productDetails.name %>"
+                                                data-bs-toggle="modal" data-bs-target="#singleReturnModal">
+                                            <i class="fas fa-undo-alt me-1"></i> Return
+                                        </button>
+                                    <% } %>
+                                    
+                                <% } else { %>
+                                    <div class="text-muted small">
+                                        <%= product.productOrderStatus === 'cancelled' ? 'This product has been cancelled' : 
+                                           product.productOrderStatus === 'returned' ? 'This product has been returned' : 
+                                           'No actions available' %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    <!-- Single Product Cancel Modal -->
+    <div class="modal fade" id="singleCancelModal" tabindex="-1" aria-labelledby="singleCancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="singleCancelModalLabel">Cancel Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="single-cancel-form" action="/orders/<%= order.orderId %>/single-product/cancel" method="POST">
+                    <div class="modal-body">
+                        <div class="product-info mb-3">
+                            <h6>Product: <span id="singleCancelProductName"></span></h6>
+                        </div>
+                        
+                        <p>Are you sure you want to cancel this product from your order?</p>
+                        <p class="text-muted">Note: This action cannot be undone once processed.</p>
+    
+                        <div class="mb-3">
+                            <label for="singleCancelReason" class="form-label">Reason for Cancellation</label>
+                            <select class="form-select" id="singleCancelReason" name="cancelReason" required>
+                                <option value="">-- Select a reason --</option>
+                                <option value="wrong_item">Ordered Wrong Item</option>
+                                <option value="delay">Shipping Delay</option>
+                                <option value="found_cheaper">Found Cheaper Elsewhere</option>
+                                <option value="changed_mind">Changed My Mind</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+    
+                        <div class="mb-3">
+                            <label for="singleCancelDetails" class="form-label">Additional Details (Optional)</label>
+                            <textarea class="form-control" id="singleCancelDetails" name="cancelDetails" rows="3"
+                                placeholder="Please provide any additional information that might help us improve our service."></textarea>
+                        </div>
+                        
+                        <input type="hidden" name="productIds" id="single-cancel-product-id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+   <!-- Single Product Return Modal -->
+<div class="modal fade" id="singleReturnModal" tabindex="-1" aria-labelledby="singleReturnModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="singleReturnModalLabel">Return Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="single-return-form" action="/orders/<%= order.orderId %>/single-product/return" method="POST">
+                <div class="modal-body">
+                    <div class="product-info mb-3">
+                        <h6>Product: <span id="singleReturnProductName"></span></h6>
+                    </div>
+                    
+                    <p>Are you sure you want to return this product from your order?</p>
+                    <p class="text-muted">Note: This action cannot be undone once processed.</p>
+
+                    <div class="mb-3">
+                        <label for="singleReturnReason" class="form-label">Reason for Return</label>
+                        <select class="form-select" id="singleReturnReason" name="returnReason" required>
+                            <option value="">-- Select a reason --</option>
+                            <option value="damaged">Item Damaged/Defective</option>
+                            <option value="not_as_described">Not as Described</option>
+                            <option value="wrong_item">Wrong Item Delivered</option>
+                            <option value="quality_issues">Quality Issues</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="singleReturnDetails" class="form-label">Additional Details (Optional)</label>
+                        <textarea class="form-control" id="singleReturnDetails" name="returnDetails" rows="3"
+                            placeholder="Please provide any additional information that might help us process your return."></textarea>
+                    </div>
+                    
+                    <input type="hidden" name="productIds" id="single-return-product-id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Confirm Return</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    
+    <!-- Bulk Cancel Modal -->
+    <div class="modal fade" id="bulkCancelModal" tabindex="-1" aria-labelledby="bulkCancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bulkCancelModalLabel">Cancel Selected Products</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="bulk-cancel-form" action="/account/orders/<%= order.orderId %>/cancel" method="POST">
+                    <div class="modal-body">
+                        <div id="selectedProductsList" class="mb-3"></div>
+                        
+                        <p>Are you sure you want to cancel the selected product(s) from your order?</p>
+                        <p class="text-muted">Note: This action cannot be undone once processed.</p>
+    
+                        <div class="mb-3">
+                            <label for="bulkCancelReason" class="form-label">Reason for Cancellation</label>
+                            <select class="form-select" id="bulkCancelReason" name="cancelReason" required>
+                                <option value="">-- Select a reason --</option>
+                                <option value="wrong_item">Ordered Wrong Item</option>
+                                <option value="delay">Shipping Delay</option>
+                                <option value="found_cheaper">Found Cheaper Elsewhere</option>
+                                <option value="changed_mind">Changed My Mind</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+    
+                        <div class="mb-3">
+                            <label for="bulkCancelDetails" class="form-label">Additional Details (Optional)</label>
+                            <textarea class="form-control" id="bulkCancelDetails" name="cancelDetails" rows="3"
+                                placeholder="Please provide any additional information that might help us improve our service."></textarea>
+                        </div>
+                        
+                        <input type="hidden" name="productIds" id="bulk-cancel-product-ids">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Bulk Return Modal -->
+    <div class="modal fade" id="bulkReturnModal" tabindex="-1" aria-labelledby="bulkReturnModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bulkReturnModalLabel">Return Selected Products</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="bulk-return-form" action="/account/orders/<%= order.orderId %>/return" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div id="selectedReturnsProductsList" class="mb-3"></div>
+                        
+                        <p>Please fill in the details for returning the selected product(s):</p>
+    
+                        <div class="mb-3">
+                            <label for="bulkReturnReason" class="form-label">Reason for Return</label>
+                            <select class="form-select" id="bulkReturnReason" name="returnReason" required>
+                                <option value="">-- Select a reason --</option>
+                                <option value="damaged">Item Damaged/Defective</option>
+                                <option value="not_as_described">Not as Described</option>
+                                <option value="wrong_item">Wrong Item Delivered</option>
+                                <option value="quality_issues">Quality Issues</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+    
+
+    
+                        <div class="mb-3">
+                            <label for="bulkReturnDetails" class="form-label">Additional Details</label>
+                            <textarea class="form-control" id="bulkReturnDetails" name="returnDetails" rows="3"
+                                placeholder="Please provide details about the issue with the product(s)."></textarea>
+                        </div>
+                        
+                        <input type="hidden" name="productIds" id="bulk-return-product-ids">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary-brown">Submit Return Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+// Base DOM element references
+const toggleSidebar = document.querySelector('.toggle-sidebar');
+const sidebarElement = document.querySelector('.dashboard-sidebar');
+const selectAllBtn = document.getElementById('select-all-btn');
+const bulkCancelBtn = document.getElementById('bulk-cancel-btn');
+const bulkReturnBtn = document.getElementById('bulk-return-btn');
+const timelineToggles = document.querySelectorAll('.toggle-timeline');
+const singleCancelBtns = document.querySelectorAll('.single-cancel-btn');
+const singleReturnBtns = document.querySelectorAll('.single-return-btn');
+
+// Forms
+const singleCancelForm = document.getElementById('single-cancel-form');
+const singleReturnForm = document.getElementById('single-return-form');
+const bulkCancelForm = document.getElementById('bulk-cancel-form');
+const bulkReturnForm = document.getElementById('bulk-return-form');
+
+// Modal data elements
+const singleCancelProductId = document.getElementById('single-cancel-product-id');
+const singleCancelProductName = document.getElementById('singleCancelProductName');
+const singleReturnProductId = document.getElementById('single-return-product-id');
+const singleReturnProductName = document.getElementById('singleReturnProductName');
+const bulkCancelProductIds = document.getElementById('bulk-cancel-product-ids');
+const bulkReturnProductIds = document.getElementById('bulk-return-product-ids');
+const selectedProductsList = document.getElementById('selectedProductsList');
+const selectedReturnsProductsList = document.getElementById('selectedReturnsProductsList');
+
+// SweetAlert2 Custom Theme
+const brownTheme = Swal.mixin({
+    customClass: {
+        popup: 'swal-brown-theme',
+        title: 'swal-title',
+        confirmButton: 'swal-confirm-button',
+        cancelButton: 'swal-cancel-button',
+    },
+    buttonsStyling: false
+});
+
+// Initialize UI state
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if there are any valid products for actions
+    checkActionButtonsState();
+    
+    // Set up individual form submission handlers
+    setupSingleCancelForm();
+    setupSingleReturnForm();
+    setupBulkCancelForm();
+    setupBulkReturnForm();
+});
+
+// Sidebar toggle functionality
+if (toggleSidebar) {
+    toggleSidebar.addEventListener('click', function() {
+        sidebarElement.classList.toggle('active');
+    });
+}
+
+// Product Timeline Toggles
+timelineToggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+        const productId = this.getAttribute('data-product-id');
+        const timelineContent = document.getElementById(`timeline-${productId}`);
+        
+        if (timelineContent) {
+            if (timelineContent.style.display === 'none' || !timelineContent.style.display) {
+                timelineContent.style.display = 'block';
+                this.querySelector('i').classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                timelineContent.style.display = 'none';
+                this.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        }
+    });
+});
+
+// Single Cancel Buttons
+singleCancelBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const productId = this.getAttribute('data-product-id');
+        const productName = this.getAttribute('data-product-name');
+        
+        // Make sure we're setting these values correctly
+        if (singleCancelProductId) singleCancelProductId.value = productId;
+        if (singleCancelProductName) singleCancelProductName.textContent = productName;
+        
+
+    });
+});
+
+// Single Return Buttons
+singleReturnBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const productId = this.getAttribute('data-product-id');
+        const productName = this.getAttribute('data-product-name');
+        
+        singleReturnProductId.value = productId;
+        singleReturnProductName.textContent = productName;
+    });
+});
+
+// Select All Button Functionality
+if (selectAllBtn) {
+    selectAllBtn.addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('input[name="selectedProducts"]:not(:disabled)');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !allChecked;
+        });
+        
+        // Update select all button text
+        this.innerHTML = allChecked ? 
+            '<i class="fas fa-check-square me-1"></i> Select All' : 
+            '<i class="fas fa-times-square me-1"></i> Deselect All';
+    });
+}
+
+// Function to get selected product IDs and names
+function getSelectedProducts() {
+    const checkboxes = document.querySelectorAll('input[name="selectedProducts"]:checked');
+    const products = [];
+    
+    checkboxes.forEach(cb => {
+        const productId = cb.value;
+        const productItem = cb.closest('.product-item');
+        const productName = productItem.querySelector('.product-title').textContent;
+        
+        products.push({
+            id: productId,
+            name: productName
+        });
+    });
+    
+    return products;
+}
+
+// Bulk Cancel Button
+if (bulkCancelBtn) {
+    bulkCancelBtn.addEventListener('click', function(e) {
+        const selectedProducts = getSelectedProducts();
+        
+        if (selectedProducts.length === 0) {
+            e.preventDefault();
+            
+            // Use SweetAlert2
+            brownTheme.fire({
+                title: 'No Products Selected',
+                text: 'Please select at least one product to cancel.',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        
+        // Set the product IDs in the hidden input
+        bulkCancelProductIds.value = selectedProducts.map(p => p.id).join(',');
+        
+        // Display selected products in the modal
+        selectedProductsList.innerHTML = '<h6>Selected Products:</h6>';
+        selectedProductsList.innerHTML += '<ul class="list-group">';
+        selectedProducts.forEach(product => {
+            selectedProductsList.innerHTML += `<li class="list-group-item">${product.name}</li>`;
+        });
+        selectedProductsList.innerHTML += '</ul>';
+    });
+}
+
+// Bulk Return Button
+if (bulkReturnBtn) {
+    bulkReturnBtn.addEventListener('click', function(e) {
+        const selectedProducts = getSelectedProducts();
+        
+        if (selectedProducts.length === 0) {
+            e.preventDefault();
+            
+            // Use SweetAlert2
+            brownTheme.fire({
+                title: 'No Products Selected',
+                text: 'Please select at least one product to return.',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        
+        // Set the product IDs in the hidden input
+        bulkReturnProductIds.value = selectedProducts.map(p => p.id).join(',');
+        
+        // Display selected products in the modal
+        selectedReturnsProductsList.innerHTML = '<h6>Selected Products:</h6>';
+        selectedReturnsProductsList.innerHTML += '<ul class="list-group">';
+        selectedProducts.forEach(product => {
+            selectedReturnsProductsList.innerHTML += `<li class="list-group-item">${product.name}</li>`;
+        });
+        selectedReturnsProductsList.innerHTML += '</ul>';
+    });
+}
+
+// Enable/disable action buttons based on product selection
+function checkActionButtonsState() {
+    const hasSelectableProducts = document.querySelectorAll('input[name="selectedProducts"]:not(:disabled)').length > 0;
+    
+    if (bulkCancelBtn) {
+        bulkCancelBtn.disabled = !hasSelectableProducts;
+    }
+    
+    if (bulkReturnBtn) {
+        bulkReturnBtn.disabled = !hasSelectableProducts;
+    }
+}
+
+// Update action buttons when checkboxes are changed
+document.addEventListener('change', function(e) {
+    if (e.target.matches('input[name="selectedProducts"]')) {
+        const selectedCount = document.querySelectorAll('input[name="selectedProducts"]:checked').length;
+        
+        if (bulkCancelBtn) {
+            bulkCancelBtn.disabled = selectedCount === 0;
+        }
+        
+        if (bulkReturnBtn) {
+            bulkReturnBtn.disabled = selectedCount === 0;
+        }
+    }
+});
+
+// Handle product checkbox selection feedback
+const productCheckboxes = document.querySelectorAll('input[name="selectedProducts"]');
+productCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const productItem = this.closest('.product-item');
+        if (this.checked) {
+            productItem.style.backgroundColor = 'rgba(139, 90, 43, 0.05)';
+        } else {
+            productItem.style.backgroundColor = '';
+        }
+    });
+});
+
+// SweetAlert2 notifications for form submission feedback
+function showSweetAlert(message, type = 'success') {
+    const iconMap = {
+        'success': 'success',
+        'info': 'info',
+        'warning': 'warning',
+        'danger': 'error',
+        'error': 'error'
+    };
+    
+    brownTheme.fire({
+        title: type.charAt(0).toUpperCase() + type.slice(1),
+        text: message,
+        icon: iconMap[type] || 'info',
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        position: 'top-end',
+        toast: true
+    });
+}
+
+// Extract order ID from URL for API endpoints
+function getOrderId() {
+    // Get the order ID from the current URL
+    const pathParts = window.location.pathname.split('/');
+    const orderIdIndex = pathParts.indexOf('orders') + 1;
+    return pathParts[orderIdIndex];
+}
+
+// 1. Single Cancel Form Fetch Handler
+function setupSingleCancelForm() {
+    if (!singleCancelForm) return;
+    
+    singleCancelForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate form
+        const reason = document.getElementById('singleCancelReason').value;
+        if (!reason) {
+            brownTheme.fire({
+                title: 'Missing Information',
+                text: 'Please select a reason for cancellation.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+        submitBtn.disabled = true;
+        
+        // Get data
+        const productId = document.getElementById('single-cancel-product-id').value;
+        const cancelReason = document.getElementById('singleCancelReason').value;
+        const cancelDetails = document.getElementById('singleCancelDetails').value;
+        const orderId = getOrderId();
+        
+        console.log(productId,'product details');
+        // Prepare request data
+        const requestData = {
+            productIds: productId,
+            cancelReason: cancelReason,
+            cancelDetails: cancelDetails
+        };
+        console.log(requestData)
+        // Send Fetch request
+        fetch(`/orders/${orderId}/single-product/cancel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(requestData),
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(singleCancelForm.closest('.modal'));
+            modal.hide();
+            
+            // Show success message
+            showSweetAlert(data.message || 'Product cancelled successfully', 'success');
+            
+            // Reload page after a short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Show error message
+            showSweetAlert('An error occurred while cancelling the product. Please try again.', 'error');
+            
+            // Reset button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+}
+
+/// Fix for the Single Return Form Fetch Handler
+function setupSingleReturnForm() {
+    if (!singleReturnForm) return;
+    
+    singleReturnForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate form
+        const reason = document.getElementById('singleReturnReason').value;
+        
+        if (!reason) {
+            brownTheme.fire({
+                title: 'Missing Information',
+                text: 'Please select a reason for return.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+        submitBtn.disabled = true;
+        
+        // Get form data
+        const productId = document.getElementById('single-return-product-id').value;
+        const returnReason = document.getElementById('singleReturnReason').value;
+        const returnDetails = document.getElementById('singleReturnDetails').value;
+        const orderId = getOrderId();
+        
+        // Prepare request data
+        const requestData = {
+            productIds: productId,
+            returnReason: returnReason,
+            returnDetails: returnDetails
+        };
+        
+        console.log('Return Request Data:', requestData);
+        
+        // Send Fetch request to the correct endpoint
+        fetch(`/orders/${orderId}/single-product/return`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(requestData),
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(singleReturnForm.closest('.modal'));
+            modal.hide();
+            
+            // Show success message
+            showSweetAlert(data.message || 'Return request submitted successfully', 'success');
+            
+            // Reload page after a short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Show error message
+            showSweetAlert('An error occurred while submitting the return request. Please try again.', 'error');
+            
+            // Reset button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+}
+
+// 3. Bulk Cancel Form Fetch Handler
+function setupBulkCancelForm() {
+    if (!bulkCancelForm) return;
+    
+    bulkCancelForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate form
+        const reason = document.getElementById('bulkCancelReason').value;
+        if (!reason) {
+            brownTheme.fire({
+                title: 'Missing Information',
+                text: 'Please select a reason for cancellation.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+        submitBtn.disabled = true;
+        
+        // Get data
+        const productIds = document.getElementById('bulk-cancel-product-ids').value;
+        const cancelReason = document.getElementById('bulkCancelReason').value;
+        const cancelDetails = document.getElementById('bulkCancelDetails').value;
+        const orderId = getOrderId();
+        
+        // Prepare request data
+        const requestData = {
+            productIds: productIds,
+            cancelReason: cancelReason,
+            cancelDetails: cancelDetails
+        };
+        // Send Fetch request
+        fetch(`/orders/${orderId}/multiple-products/cancel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(requestData),
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(bulkCancelForm.closest('.modal'));
+            modal.hide();
+            
+            // Show success message
+            showSweetAlert(data.message || 'Selected products cancelled successfully', 'success');
+            
+            // Reload page after a short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Show error message
+            showSweetAlert('An error occurred while cancelling the products. Please try again.', 'error');
+            
+            // Reset button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+}
+
+// 4. Bulk Return Form Fetch Handler
+// Fixed Bulk Return Form Fetch Handler
+function setupBulkReturnForm() {
+    if (!bulkReturnForm) return;
+    
+    bulkReturnForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate form
+        const reason = document.getElementById('bulkReturnReason').value;
+        
+        if (!reason) {
+            brownTheme.fire({
+                title: 'Missing Information',
+                text: 'Please select a reason for return.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+        submitBtn.disabled = true;
+        
+        // Get data
+        const productIds = document.getElementById('bulk-return-product-ids').value;
+        const returnReason = document.getElementById('bulkReturnReason').value;
+        const returnDetails = document.getElementById('bulkReturnDetails').value;
+        const orderId = getOrderId();
+        
+        // Prepare request data
+        const requestData = {
+            productIds: productIds,
+            returnReason: returnReason,
+            returnDetails: returnDetails
+        };
+
+
+        
+        console.log('Bulk Return Request Data:', requestData);
+        
+        // Send Fetch request - use the same endpoint pattern as other bulk operations
+        fetch(`/orders/${orderId}/multiple-products/return`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(requestData),
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(bulkReturnForm.closest('.modal'));
+            modal.hide();
+            
+            // Show success message
+            showSweetAlert(data.message || 'Return requests submitted successfully', 'success');
+            
+            // Reload page after a short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Show error message
+            showSweetAlert('An error occurred while submitting the return requests. Please try again.', 'error');
+            
+            // Reset button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+}
+
+// Order Status Progress Bar Update
+function updateProgressBar() {
+    const orderStatus = document.querySelector('.status-badge').textContent.toLowerCase();
+    const steps = document.querySelectorAll('.step');
+    
+    if (!steps.length) return;
+    
+    // Define the status order
+    const statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+    const statusIndex = statusOrder.indexOf(orderStatus);
+    
+    if (statusIndex === -1) return;
+    
+    // Calculate progress percentage
+    const progressPercent = (statusIndex / (statusOrder.length - 1)) * 100;
+    
+    // Update the progress bar
+    const progressBar = document.querySelector('.step-progress');
+    if (progressBar) {
+        progressBar.style.width = `${progressPercent}%`;
+    }
+}
+
+// Call progress bar update
+updateProgressBar();
+    </script>
+</body>
+</html>

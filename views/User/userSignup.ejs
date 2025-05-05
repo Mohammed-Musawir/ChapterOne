@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Chapter One</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-brown: #8B4513;
+            --secondary-brown: #A67B5B;
+            --light-brown: #D2B48C;
+            --cream: #FFF8E7;
+            --dark-brown: #3E2723;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background-color: var(--cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .signup-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .signup-title {
+            color: var(--dark-brown);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .form-control {
+            border-color: var(--light-brown);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-brown);
+            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-brown);
+            border-color: var(--primary-brown);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-brown);
+            border-color: var(--secondary-brown);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--secondary-brown);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .btn-google {
+            background-color: white;
+            color: #757575;
+            border: 1px solid #DDD;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-google:hover {
+            background-color: #F5F5F5;
+            transform: translateY(-2px);
+        }
+
+        .google-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .btn-google img {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .divider:not(:empty)::before {
+            margin-right: .25em;
+        }
+
+        .divider:not(:empty)::after {
+            margin-left: .25em;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .login-link a {
+            color: var(--primary-brown);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .login-link a:hover {
+            color: var(--dark-brown);
+            text-decoration: underline;
+        }
+
+        /* Placeholder styling for input fields */
+input::placeholder {
+    color: #999; /* Light gray color for placeholder text */
+    font-style: italic; /* Italicize placeholder text */
+    opacity: 1; /* Ensure full visibility (some browsers reduce opacity by default) */
+    font-size: 0.9rem; /* Slightly smaller font size */
+    transition: opacity 0.3s ease, color 0.3s ease; /* Smooth transition for focus effects */
+}
+
+/* Placeholder styling for focused input fields */
+input:focus::placeholder {
+    color: #ccc; /* Lighter color when the input is focused */
+    opacity: 0.7; /* Reduce opacity slightly when focused */
+}
+
+/* Placeholder styling for textarea */
+textarea::placeholder {
+    color: #999;
+    font-style: italic;
+    opacity: 1;
+    font-size: 0.9rem;
+    transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+textarea:focus::placeholder {
+    color: #ccc;
+    opacity: 0.7;
+}
+
+.back-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        
+        .back-home a {
+            color: var(--primary-brown);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .back-home a:hover {
+            color: var(--dark-brown);
+        }
+        
+        .back-icon {
+            margin-right: 5px;
+        }
+
+        /* Custom SweetAlert styles that match your theme */
+        .swal2-popup {
+            font-family: 'Georgia', serif;
+            border-radius: 10px;
+        }
+        
+        .swal2-title {
+            color: var(--dark-brown);
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .swal2-icon.swal2-error {
+            border-color: var(--primary-brown);
+            color: var(--primary-brown);
+        }
+        
+        .swal2-icon.swal2-warning {
+            border-color: var(--secondary-brown);
+            color: var(--secondary-brown);
+        }
+        
+        .swal2-icon.swal2-success {
+            border-color: var(--primary-brown);
+            color: var(--primary-brown);
+        }
+        
+        .swal2-styled.swal2-confirm {
+            background-color: var(--primary-brown);
+        }
+        
+        .swal2-styled.swal2-confirm:hover {
+            background-color: var(--secondary-brown);
+        }
+    </style>
+</head>
+<body>
+
+    <% if (massege && massege.trim() !== "") { %>
+        <script>
+            Swal.fire({
+                icon: 'error',  // change to 'success' or 'warning' based on context
+                title: 'Oops...',
+                text: '<%= massege %>'
+            });
+        </script>
+    <% } %>
+
+    <div class="back-home">
+        <a href="/">
+            <i class="fas fa-arrow-left back-icon"></i> Back to Page
+        </a>
+    </div>
+    <div class="signup-container">
+        
+        <h2 class="signup-title">Create Your Account</h2>
+        <form id="signupForm" action="/signup" method="post">
+            <div class="mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Type here" required>
+            </div>
+            <div class="mb-3">
+                <label for="lastName" class="form-label" >Last Name</label>
+                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Type here" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-control" id="email" placeholder="Type here" required>
+            </div>
+            <div class="mb-3">
+                <label for="mobile" class="form-label">Mobile Number</label>
+                <input type="tel" name="mobileNumber" class="form-control" id="mobile" placeholder="Type Mobileno:" required>
+            </div>
+            <label for="password" class="form-label">Password</label>
+            <div class="mb-3 password-container">
+                <input type="password" name="password" class="form-control" id="password" placeholder="Type Password" required>
+                <span class="password-toggle" onclick="togglePassword('password')">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <div class="mb-3 password-container ">
+                <input type="password" name="confirmPassword" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
+                <span class="password-toggle" onclick="togglePassword('confirmPassword')">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
+            <div class="d-grid gap-2 mb-3">
+                <button type="submit" class="btn btn-primary">Sign Up</button>
+            </div>
+            
+            <div class="divider">or</div>
+            
+            <a href="/auth/google/signup" type="button" class="btn btn-google">
+                <i class="fab fa-google google-icon"></i> Continue with Google
+            </a>
+
+            
+
+            <div class="login-link">
+                Already have an account? <a href="/login" style="color: var(--primary-brown);">Log In</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Add SweetAlert2 JS -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.js"></script>
+    <script>
+
+  
+
+        // Password toggle functionality
+        document.querySelectorAll('.password-container input').forEach(input => {
+            const toggle = input.nextElementSibling; // Get the eye button
+
+            input.addEventListener('input', () => {
+                if (input.value.trim() !== '') {
+                    toggle.style.display = 'block'; // Show Eye
+                } else {
+                    toggle.style.display = 'none'; // Hide Eye
+                }
+            });
+            
+            // Initially hide the toggle buttons
+            toggle.style.display = 'none';
+        });
+
+        function togglePassword(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const icon = event.currentTarget.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Check for error messages on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for message from controller (based on your controller code)
+            const controllerMessage = "<%= typeof massege !== 'undefined' ? massege : '' %>";
+            
+            if (controllerMessage && controllerMessage !== '') {
+                Swal.fire({
+                    title: 'Alert!',
+                    text: controllerMessage,
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        popup: 'swal2-popup',
+                        title: 'swal2-title',
+                        confirmButton: 'swal2-styled swal2-confirm'
+                    }
+                });
+            }
+        });
+    </script> -->
+
+
+    <!-- Replace the script section at the bottom of your HTML file with this: -->
+
+<script>
+    // Password toggle functionality
+    document.querySelectorAll('.password-container input').forEach(input => {
+        const toggle = input.nextElementSibling; // Get the eye button
+
+        input.addEventListener('input', () => {
+            if (input.value.trim() !== '') {
+                toggle.style.display = 'block'; // Show Eye
+            } else {
+                toggle.style.display = 'none'; // Hide Eye
+            }
+        });
+        
+        // Initially hide the toggle buttons
+        toggle.style.display = 'none';
+    });
+
+    function togglePassword(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        const icon = event.currentTarget.querySelector('i');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    // Check for error messages on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Parse URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorType = urlParams.get('error');
+        const errorMessage = urlParams.get('message');
+        
+        // Check for user exists error from Google OAuth
+        if (errorType === 'userExists') {
+            Swal.fire({
+                title: 'Account Already Exists',
+                text: errorMessage || 'A user with this email already exists. Please log in instead.',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#8B4513',
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    confirmButton: 'swal2-styled swal2-confirm'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Optionally redirect to login page
+                    // window.location.href = '/login';
+                }
+            });
+        } 
+        // Check for general signup errors
+        else if (errorType === 'signupFailed') {
+            Swal.fire({
+                title: 'Signup Failed',
+                text: errorMessage || 'There was a problem with your signup. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#8B4513',
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    confirmButton: 'swal2-styled swal2-confirm'
+                }
+            });
+        }
+        
+        // Check for any server-side messages (from your EJS template)
+        const controllerMessage = "<%= typeof message !== 'undefined' ? message : '' %>";
+        if (controllerMessage && controllerMessage !== '' && controllerMessage !== "<%= typeof message !== 'undefined' ? message : '' %>") {
+            Swal.fire({
+                title: 'Alert!',
+                text: controllerMessage,
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#8B4513',
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    confirmButton: 'swal2-styled swal2-confirm'
+                }
+            });
+        }
+    });
+</script>
+
+
+
+</body>
+</html>

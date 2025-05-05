@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/User/userHome.css">
+    <style>
+      /* Include your CSS styles here */
+      :root {
+            --primary-brown: #5D4037;
+            --secondary-brown: #795548;
+            --accent-cream: #F4ECD8;
+            --text-color: #3E2723;
+            --soft-shadow: rgba(0,0,0,0.1);
+        }
+
+        * {
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--accent-cream);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px var(--soft-shadow);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-brown);
+            font-weight: 700;
+            font-size: 2rem;
+            letter-spacing: 1px;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--secondary-brown);
+            font-weight: 600;
+            position: relative;
+            margin-right: 15px;
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary-brown);
+            transition: width 0.3s;
+        }
+
+        .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }    /* Include your CSS styles here */
+    
+        .btn-sign-in {
+            background-color: transparent;
+            color: var(--primary-brown);
+            border: 2px solid var(--primary-brown);
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 5px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sign-in:hover {
+            background-color: var(--primary-brown);
+            color: white;
+        }
+
+        .btn-sign-up {
+            background-color: var(--primary-brown);
+            color: white;
+            border: 2px solid var(--primary-brown);
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sign-up:hover {
+            background-color: var(--secondary-brown);
+            border-color: var(--secondary-brown);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">ChapterOne</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <a href="/login" class="btn btn-sign-in">Sign In</a>
+                    <a href="/signup" class="btn btn-sign-up">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </nav>

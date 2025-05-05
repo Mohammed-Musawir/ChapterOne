@@ -1,0 +1,333 @@
+<%- include('../Partials/user/Landingpage/header', { title: 'ChapterOne | Discover Your Story' }) %>
+
+<style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap');
+
+:root {
+    --primary-brown: #5D4037;
+    --secondary-brown: #795548;
+    --accent-cream: #F4ECD8;
+    --text-color: #3E2723;
+    --soft-shadow: rgba(0,0,0,0.1);
+}
+
+* {
+    transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: var(--accent-cream);
+    color: var(--text-color);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    background-color: white;
+    box-shadow: 0 2px 10px var(--soft-shadow);
+    padding: 15px 0;
+}
+
+.navbar-brand {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-brown);
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: 1px;
+}
+
+.navbar-nav .nav-link {
+    color: var(--secondary-brown);
+    font-weight: 600;
+    position: relative;
+    margin-right: 15px;
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background-color: var(--primary-brown);
+    transition: width 0.3s;
+}
+
+.navbar-nav .nav-link:hover::after {
+    width: 100%;
+}
+
+.password-container {
+    background-color: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 10px 30px var(--soft-shadow);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-brown);
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.form-control {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.form-control:focus {
+    border-color: var(--primary-brown);
+    box-shadow: 0 0 0 0.2rem rgba(93, 64, 55, 0.25);
+}
+
+.password-label {
+    text-align: left;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.btn-reset {
+    background-color: var(--primary-brown);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 5px;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-reset:hover {
+    background-color: var(--secondary-brown);
+}
+
+.btn-back {
+    color: var(--primary-brown);
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+    font-weight: 600;
+}
+
+.btn-back:hover {
+    color: var(--secondary-brown);
+}
+
+.footer {
+    background-color: var(--primary-brown);
+    color: white;
+    padding: 30px 0;
+    margin-top: auto;
+}
+
+.footer a {
+    color: var(--accent-cream);
+    text-decoration: none;
+    margin-right: 15px;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: white;
+}
+
+.info-text {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.icon-password {
+    font-size: 3rem;
+    color: var(--primary-brown);
+    margin-bottom: 20px;
+}
+
+.content-section {
+    padding: 120px 0 80px;
+    flex: 1;
+}
+
+.password-requirements {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+}
+
+.password-requirements ul {
+    padding-left: 20px;
+    margin-bottom: 0;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+}
+
+.password-field-wrapper {
+    position: relative;
+}
+</style>
+
+    <!-- Reset Password Section -->
+    <section class="content-section">
+        <div class="container">
+            <div class="password-container text-center">
+                <div class="icon-password">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2 class="page-title">Reset Password</h2>
+                <p class="info-text">Create a new password for your account.</p>
+                
+                <div class="password-requirements">
+                    <p class="mb-2"><strong>Your password should:</strong></p>
+                    <ul class="text-start">
+                        <li>Be at least 8 characters long</li>
+                        <li>Include at least one uppercase letter</li>
+                        <li>Include at least one number</li>
+                        <li>Include at least one special character</li>
+                    </ul>
+                </div>
+                
+                <form action="/reset-password" method="post">
+                    <div class="mb-3">
+                        <label for="newPassword" class="password-label">New Password</label>
+                        <div class="password-field-wrapper">
+                            <input type="password" class="form-control" name="password" id="newPassword">
+                            <button type="button" class="password-toggle" id="toggleNew">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="password-label">Confirm Password</label>
+                        <div class="password-field-wrapper">
+                            <input type="password" class="form-control" name="confirmPassword" id="confirmPassword">
+                            <button type="button" class="password-toggle" id="toggleConfirm">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-reset">Reset Password</button>
+                </form>
+                
+                <a href="#" class="btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Back
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+  // Replace your form submission code with this
+document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle visibility code remains the same
+    const toggleNew = document.getElementById('toggleNew');
+    const toggleConfirm = document.getElementById('toggleConfirm');
+    const newPassword = document.getElementById('newPassword');
+    const confirmPassword = document.getElementById('confirmPassword');
+    
+    toggleNew.addEventListener('click', function() {
+        togglePasswordVisibility(newPassword, this);
+    });
+    
+    toggleConfirm.addEventListener('click', function() {
+        togglePasswordVisibility(confirmPassword, this);
+    });
+    
+    function togglePasswordVisibility(inputElement, button) {
+        if (inputElement.type === 'password') {
+            inputElement.type = 'text';
+            button.innerHTML = '<i class="far fa-eye-slash"></i>';
+        } else {
+            inputElement.type = 'password';
+            button.innerHTML = '<i class="far fa-eye"></i>';
+        }
+    }
+    
+    // Get the form by its position in the document
+    const resetForm = document.querySelector('form[action="/reset-password"]');
+    
+    resetForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const password = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        try {
+            const response = await fetch('/reset-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password, confirmPassword })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                // Success - show sweet alert and redirect
+                Swal.fire({
+                    title: 'Success!',
+                    text: data.message,
+                    icon: 'success',
+                    confirmButtonText: 'Login Now',
+                    confirmButtonColor: '#5D4037'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+            } else {
+                // Error - show sweet alert with the error message from the server
+                Swal.fire({
+                    title: 'Error!',
+                    text: data.message || 'Something went wrong. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'Try Again',
+                    confirmButtonColor: '#5D4037'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Something went wrong. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#5D4037'
+            });
+        }
+    });
+});
+    </script>
+
+<%- include('../Partials/user/Landingpage/footer') %>
+
+
+

@@ -1,0 +1,486 @@
+<%- include('../Partials/admin/adminHeader') %>
+
+<div class="container-fluid py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-md-11">
+      <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-gradient-brown position-relative py-4">
+          <h4 class="text-white mb-0 fw-bold">
+            <i class="fas fa-ticket-alt me-2"></i>Edit Coupon
+          </h4>
+          <div class="position-absolute card-shape"></div>
+        </div>
+        <div class="card-body p-5">
+          <form id="editCouponForm" action="/admin/updateCoupon" method="POST">
+            <!-- Hidden field for coupon ID -->
+            <input type="hidden" id="couponId" name="couponId" value="<%= coupon._id %>">
+            
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="form-floating mb-1">
+                  <input 
+                    type="text" 
+                    class="form-control input-brown" 
+                    id="couponCode" 
+                    name="couponCode" 
+                    placeholder=" "
+                    value="<%= coupon.couponCode %>"
+                    required
+                  >
+                  <label for="couponCode" class="text-muted">Coupon Code*</label>
+                </div>
+                <small class="text-muted ps-2">This code will be used by customers to apply the discount</small>
+              </div>
+            </div>
+
+            <!-- Second Row - Discount and Minimum Amount -->
+            <div class="row g-4 mt-3">
+              <div class="col-md-6">
+                <div class="form-floating mb-1">
+                  <input 
+                    type="number" 
+                    class="form-control input-brown" 
+                    id="offerPrice" 
+                    name="offerPrice"
+                    placeholder=" " 
+                    min="1" 
+                    step="1"
+                    value="<%= coupon.offerPrice %>" 
+                    required
+                  >
+                  <label for="offerPrice" class="text-muted">Discount Amount (₹)*</label>
+                </div>
+                <small class="text-muted ps-2">Amount to be discounted from order total</small>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="form-floating mb-1">
+                  <input 
+                    type="number" 
+                    class="form-control input-brown"  
+                    id="minAmount" 
+                    name="minAmount" 
+                    placeholder=" "
+                    min="0" 
+                    step="1"
+                    value="<%= coupon.minAmount %>" 
+                    required
+                  >
+                  <label for="minAmount" class="text-muted">Minimum Purchase Amount (₹)*</label>
+                </div>
+                <small class="text-muted ps-2">Minimum cart value required to use this coupon</small>
+              </div>
+            </div>
+
+            <!-- Third Row - Start and Expiry Dates -->
+            <div class="row g-4 mt-3">
+              <div class="col-md-6">
+                <div class="form-floating mb-1">
+                  <input 
+                    type="date" 
+                    class="form-control input-brown" 
+                    id="startDate" 
+                    name="startDate"
+                    value="<%= new Date(coupon.startDate).toISOString().split('T')[0] %>" 
+                    required
+                  >
+                  <label for="startDate" class="text-muted">Start Date*</label>
+                </div>
+                <small class="text-muted ps-2">Date when coupon becomes active</small>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="form-floating mb-1">
+                  <input 
+                    type="date" 
+                    class="form-control input-brown" 
+                    id="expireDate" 
+                    name="expireDate"
+                    value="<%= new Date(coupon.expireDate).toISOString().split('T')[0] %>" 
+                    required
+                  >
+                  <label for="expireDate" class="text-muted">Expiry Date*</label>
+                </div>
+                <small class="text-muted ps-2">Date when coupon expires</small>
+              </div>
+            </div>
+
+
+            <div class="d-flex justify-content-end mt-5 pt-2">
+              <a href="/admin/coupon" class="btn btn-outline-secondary me-3 px-4">
+                <i class="fas fa-times me-1"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-brown px-3">
+                <i class="fas fa-save me-1"></i>Update Coupon
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --brown-100: #f5f0e8;
+    --brown-200: #e6d7c3;
+    --brown-300: #d4bea2;
+    --brown-400: #c1a68c;
+    --brown-500: #b08d6c;
+    --brown-600: #9a7b5f;
+    --brown-700: #846a51;
+    --brown-800: #6b5440;
+    --brown-900: #524030;
+  }
+  
+  .bg-gradient-brown {
+    background: linear-gradient(135deg, var(--brown-700), var(--brown-500)) !important;
+  }
+  
+  .bg-brown {
+    background-color: var(--brown-600) !important;
+  }
+  
+  .text-brown {
+    color: var(--brown-700) !important;
+  }
+  
+  .btn-brown {
+    background-color: var(--brown-600);
+    color: white;
+    border-radius: 8px;
+    padding: 12px 28px;
+    transition: all 0.3s;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(154, 123, 95, 0.3);
+  }
+  
+  .btn-brown:hover {
+    background-color: var(--brown-700);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(154, 123, 95, 0.5);
+  }
+  
+  .btn-outline-secondary {
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  
+  .btn-outline-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card {
+    margin-top: 80px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.08) !important;
+    transition: all 0.35s;
+  }
+  
+  .card:hover {
+    box-shadow: 0 18px 40px rgba(0,0,0,0.12) !important;
+    transform: translateY(-5px);
+  }
+  
+  .card-header {
+    padding: 1.7rem 2.2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card-shape {
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, var(--brown-400) 0%, transparent 70%);
+    opacity: 0.25;
+    top: -100px;
+    right: -70px;
+    border-radius: 50%;
+    z-index: 0;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: var(--brown-400);
+    box-shadow: 0 0 0 0.25rem rgba(176, 141, 108, 0.25);
+  }
+  
+  .form-floating > .form-control,
+  .form-floating > .form-control:focus,
+  .form-floating > .form-select {
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+    height: calc(3.7rem + 2px);
+    border-width: 1.5px;
+    border-radius: 8px;
+  }
+  
+  .form-floating > label {
+    padding: 1rem 0.85rem;
+    font-weight: 500;
+  }
+  
+  .input-brown {
+    border-color: var(--brown-200);
+    transition: all 0.3s ease;
+  }
+  
+  .input-brown:focus {
+    border-color: var(--brown-400);
+    box-shadow: 0 0 0 0.25rem rgba(176, 141, 108, 0.2);
+  }
+  
+  .form-floating > .form-control::placeholder {
+    color: rgba(0, 0, 0, 0.35);
+  }
+  
+  small.text-muted {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+  
+  .form-floating:hover + small.text-muted,
+  .form-control:focus + label + small.text-muted,
+  .form-select:focus + label + small.text-muted {
+    opacity: 1;
+  }
+  
+  /* For date inputs - clean up the native date picker appearance */
+  input[type="date"] {
+    position: relative;
+  }
+  
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 1;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    filter: opacity(0.6);
+    transition: all 0.3s ease;
+  }
+  
+  input[type="date"]:hover::-webkit-calendar-picker-indicator,
+  input[type="date"]:focus::-webkit-calendar-picker-indicator {
+    filter: opacity(1);
+  }
+  
+  /* Input animation effects */
+  .form-control, .form-select {
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:hover, .form-select:hover {
+    border-color: var(--brown-300);
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add animation to form elements with staggered delay
+  const formElements = document.querySelectorAll('.form-control, .form-select, .btn');
+  formElements.forEach((element, index) => {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(20px)';
+    element.style.transition = 'all 0.5s ease';
+    
+    setTimeout(() => {
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    }, 100 + (index * 80));
+  });
+  
+  // Enhanced form validation with SweetAlert and Fetch API
+  const form = document.getElementById('editCouponForm');
+  form.addEventListener('submit', function(event) { 
+    event.preventDefault();
+    
+    // Get all form values
+    const couponCode = document.getElementById('couponCode').value.trim();
+    const startDate = new Date(document.getElementById('startDate').value);
+    const expireDate = new Date(document.getElementById('expireDate').value);
+    const offerPrice = parseFloat(document.getElementById('offerPrice').value);
+    const minAmount = parseFloat(document.getElementById('minAmount').value);
+    
+
+    
+    if (!/^[A-Z0-9]+$/.test(couponCode)) {
+      Swal.fire({
+        title: 'Invalid Code Format',
+        text: 'Coupon code should be 3-15 characters long and contain only uppercase letters, numbers, underscores or hyphens',
+        icon: 'error',
+        confirmButtonColor: '#9a7b5f',
+        background: '#fff',
+        iconColor: '#dc3545',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        }
+      });
+      return;
+    }
+    
+    // Check if expiry date is after start date
+    if (expireDate <= startDate) {
+      Swal.fire({
+        title: 'Invalid Dates',
+        text: 'Expiry date must be after start date',
+        icon: 'error',
+        confirmButtonColor: '#9a7b5f',
+        background: '#fff',
+        iconColor: '#dc3545',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        }
+      });
+      return;
+    }
+    
+    // Check if offer price is less than minimum amount
+    if (offerPrice >= minAmount && minAmount > 0) {
+      Swal.fire({
+        title: 'Invalid Amounts',
+        text: 'Discount amount should be less than minimum purchase amount',
+        icon: 'warning',
+        confirmButtonColor: '#9a7b5f',
+        background: '#fff',
+        iconColor: '#f8bb86',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        }
+      });
+      return;
+    }
+    
+    // Check for reasonable discount amount
+    if (offerPrice > 5000) {
+      Swal.fire({
+        title: 'Confirm High Discount',
+        text: 'You are setting a discount of ₹' + offerPrice + '. Is this correct?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#9a7b5f',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, update it!',
+        background: '#fff',
+        iconColor: '#9a7b5f',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          submitFormWithFetch();
+        }
+      });
+      return;
+    }
+    
+    // Submit the form with fetch if all validation passes
+    Swal.fire({
+      title: 'Updating Coupon',
+      text: 'Your coupon is being updated...',
+      timer: 1500,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      background: '#fff',
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      }
+    }).then(() => {
+      submitFormWithFetch();
+    });
+  });
+  
+  // Function to submit form using fetch API
+  function submitFormWithFetch() {
+    // Create an object with the form data
+    const formData = {
+      couponId: document.getElementById('couponId').value,
+      couponCode: document.getElementById('couponCode').value.trim(),
+      offerPrice: document.getElementById('offerPrice').value,
+      minAmount: document.getElementById('minAmount').value,
+      startDate: document.getElementById('startDate').value,
+      expireDate: document.getElementById('expireDate').value
+    };
+    
+    // Log the data for debugging
+    console.log('Sending data:', formData);
+    
+    fetch(form.action, {
+      method: 'POST',
+      body: JSON.stringify(formData), // Convert the object to JSON string
+      headers: {
+        'Content-Type': 'application/json', // Set content type to JSON
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.success) {
+        Swal.fire({
+          title: 'Success!',
+          text: data.message || 'Coupon updated successfully!',
+          icon: 'success',
+          confirmButtonColor: '#9a7b5f',
+          background: '#fff',
+          iconColor: '#28a745',
+          confirmButtonText: 'View Coupons',
+          showConfirmButton: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = '/admin/coupon';
+          }
+        });
+      } else {
+        throw new Error(data.message || 'Error updating coupon');
+      }
+    })
+    .catch(error => {
+      // Show error message
+      Swal.fire({
+        title: 'Error!',
+        text: error.message || 'There was a problem updating the coupon',
+        icon: 'error',
+        confirmButtonColor: '#9a7b5f',
+        background: '#fff',
+        iconColor: '#dc3545'
+      });
+      console.error('Error:', error);
+    });
+  }
+  
+  // Add beautiful focus effect to form fields
+  const formControls = document.querySelectorAll('.form-control, .form-select');
+  formControls.forEach(control => {
+    control.addEventListener('focus', function() {
+      this.parentElement.style.transform = 'translateY(-3px)';
+      this.parentElement.style.transition = 'transform 0.3s ease';
+    });
+    
+    control.addEventListener('blur', function() {
+      this.parentElement.style.transform = 'translateY(0)';
+    });
+  });
+});
+
+// Add link for SweetAlert and Animate.css in header
+document.head.insertAdjacentHTML('beforeend', 
+  '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />' +
+  '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.8/sweetalert2.min.css" />'
+);
+
+// Create and append script element
+const sweetAlertScript = document.createElement('script');
+sweetAlertScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.8/sweetalert2.all.min.js';
+document.head.appendChild(sweetAlertScript);
+</script>
+
+<%- include('../Partials/admin/adminFooter') %>

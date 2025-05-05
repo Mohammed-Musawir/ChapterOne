@@ -1,0 +1,685 @@
+<%- include("../partials/admin/adminHeader") %>
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Color variables */
+:root {
+    --primary-color: #A67C52; /* Warm light brown as primary color */
+    --secondary-color: #8C6D4F; /* Darker brown for hover effects */
+    --accent-color: #D4B996; /* Light accent brown */
+    --light-accent: #F5EFE6; /* Very light brown/off-white for backgrounds */
+    --text-dark: #4A3F35; /* Dark brown for text */
+    --text-medium: #7D6E63; /* Medium brown for secondary text */
+    --success-color: #6B8E6B; /* Muted green that works with brown */
+    --danger-color: #B56B6B; /* Muted red that works with brown */
+    --warning-color: #D4AA70; /* Amber/gold for warnings */
+    --info-color: #7590A7; /* Muted blue that works with brown */
+    --white: #FFFFFF;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(166, 124, 82, 0.08);
+}
+
+body {
+    background-color: var(--light-accent);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-dark);
+}
+
+.content-main {
+    padding: 25px;
+}
+
+/* Header Styling */
+.content-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+.content-title:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 60px;
+    background-color: var(--primary-color);
+}
+
+.text-muted {
+    color: var(--text-medium);
+}
+
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    background-color: var(--white);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 6px 16px rgba(166, 124, 82, 0.12);
+    transform: translateY(-3px);
+}
+
+.card-header {
+    background-color: var(--white);
+    border-bottom: 1px solid rgba(166, 124, 82, 0.1);
+    padding: 18px 20px;
+}
+
+.card-body {
+    padding: 22px;
+}
+
+/* Edit Form Styling */
+.edit-category-container {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 28px;
+    height: 100%;
+    border-top: 4px solid var(--primary-color);
+    max-width: 800px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.form-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 22px;
+    color: var(--primary-color);
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.form-title:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 40px;
+    background-color: var(--primary-color);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(166, 124, 82, 0.2);
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: var(--white);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(166, 124, 82, 0.15);
+    outline: none;
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Switch styling */
+.form-switch {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.switch-label {
+    margin-bottom: 0;
+    margin-right: 15px;
+    min-width: 100px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--success-color);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--success-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.status-text {
+    margin-left: 15px;
+    font-weight: 500;
+}
+
+.status-active {
+    color: var(--success-color);
+}
+
+.status-inactive {
+    color: var(--danger-color);
+}
+
+/* Button Styles */
+.btn {
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(166, 124, 82, 0.2);
+}
+
+.btn-secondary {
+    background-color: #E2D5C8;
+    color: var(--text-dark);
+}
+
+.btn-secondary:hover {
+    background-color: #D4C5B6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(166, 124, 82, 0.1);
+}
+
+.btn-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* Alerts */
+.alert {
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.alert-success {
+    background-color: rgba(107, 142, 107, 0.15);
+    color: var(--success-color);
+    border-left: 4px solid var(--success-color);
+}
+
+.alert-danger {
+    background-color: rgba(181, 107, 107, 0.15);
+    color: var(--danger-color);
+    border-left: 4px solid var(--danger-color);
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    list-style: none;
+    background-color: rgba(166, 124, 82, 0.05);
+    border-radius: var(--border-radius);
+}
+
+.breadcrumb-item + .breadcrumb-item {
+    padding-left: 0.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    padding-right: 0.5rem;
+    color: var(--text-medium);
+    content: "/";
+}
+
+.breadcrumb-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-medium);
+}
+
+/* Error Messages */
+.error-message {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: -12px;
+    margin-bottom: 12px;
+    display: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .content-title {
+        font-size: 1.4rem;
+    }
+    
+    .form-title {
+        font-size: 1.2rem;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+    </style>
+</head>
+
+<body>
+    <section class="content-main">
+        <div class="content-header">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/category">Categories</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Category</li>
+                </ol>
+            </nav>
+            <div>
+                <h2 class="content-title">Edit Category</h2>
+                <p class="text-muted">Update category information</p>
+            </div>
+        </div>
+
+        <!-- Alert Messages (initially hidden) -->
+        <div id="success-alert" class="alert alert-success" style="display: none;">
+            <i class="fas fa-check-circle me-2"></i> <span id="success-message"></span>
+        </div>
+        <div id="error-alert" class="alert alert-danger" style="display: none;">
+            <i class="fas fa-exclamation-circle me-2"></i> <span id="error-message"></span>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="edit-category-container">
+            <div class="form-header mb-4">
+                <h4 class="form-title">Edit Category Details</h4>
+            </div>
+            <form id="editCategoryForm" action="/admin/updateCategory/<%= category._id %>" method="POST">
+                <div class="mb-3">
+                    <label for="category_name" class="form-label">Category Name</label>
+                    <input type="text" name="categoryName" placeholder="Enter category name" class="form-control" id="category_name" value="<%= category.name %>" required />
+                    <div id="name-error" class="error-message"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea placeholder="Enter category description" name="categoryDescription" class="form-control" id="categoryDescription" required><%= category.description %></textarea>
+                    <div id="description-error" class="error-message"></div>
+                </div>
+                
+                <div class="form-switch mb-4">
+                    <label class="switch-label form-label">Status</label>
+                    <label class="switch">
+                        <input type="checkbox" name="isListed" id="categoryStatus" <%= category.isListed ? 'checked' : '' %>>
+                        <span class="slider"></span>
+                    </label>
+                    <span id="statusText" class="status-text <%= category.isListed ? 'status-active' : 'status-inactive' %>">
+                        <%= category.isListed ? 'Active' : 'Inactive' %>
+                    </span>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-save me-2"></i> Update Category
+                    </button>
+                    <a href="/admin/category" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Categories
+                    </a>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        // Toggle status text based on switch
+document.getElementById('categoryStatus').addEventListener('change', function() {
+    const statusText = document.getElementById('statusText');
+    if (this.checked) {
+        statusText.textContent = 'Active';
+        statusText.classList.remove('status-inactive');
+        statusText.classList.add('status-active');
+    } else {
+        statusText.textContent = 'Inactive';
+        statusText.classList.remove('status-active');
+        statusText.classList.add('status-inactive');
+    }
+    
+    // Submit the form to update status
+    submitFormWithCurrentValues();
+});
+
+// Function to submit form with current values
+async function submitFormWithCurrentValues() {
+    // Get form values
+    const categoryName = document.getElementById('category_name').value.trim();
+    const description = document.getElementById('categoryDescription').value.trim();
+    const isListed = document.getElementById('categoryStatus').checked;
+    
+    // Get the form action URL
+    const formAction = document.getElementById('editCategoryForm').action;
+    
+    try {
+        const response = await fetch(formAction, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                categoryName,
+                categoryDescription: description,
+                isListed
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Show a small success notification
+            Swal.fire({
+                title: 'Status Updated',
+                text: `Category status changed successfully`,
+                icon: 'success',
+                timer: 1500,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false
+            });
+        } else {
+            // Show error message
+            Swal.fire({
+                title: 'Error',
+                text: result.message || 'Failed to update status',
+                icon: 'error',
+                timer: 2000,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        // Show error message
+        Swal.fire({
+            title: 'Error',
+            text: 'An unexpected error occurred',
+            icon: 'error',
+            timer: 2000,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+}
+
+// Form submission with validation
+document.getElementById('editCategoryForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    // Reset error messages
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Get form values
+    const categoryName = document.getElementById('category_name').value.trim();
+    const description = document.getElementById('categoryDescription').value.trim();
+    const isListed = document.getElementById('categoryStatus').checked;
+    
+    // Validation
+    let isValid = true;
+    
+    if (categoryName.length < 2) {
+        document.getElementById('name-error').textContent = 'Category name must be at least 2 characters';
+        document.getElementById('name-error').style.display = 'block';
+        isValid = false;
+    }
+    
+    if (description.length < 10) {
+        document.getElementById('description-error').textContent = 'Description must be at least 10 characters';
+        document.getElementById('description-error').style.display = 'block';
+        isValid = false;
+    }
+    
+    if (!isValid) return;
+    
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                categoryName,
+                categoryDescription: description,
+                isListed
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Category updated successfully',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = '/admin/category';
+            });
+        } else {
+            // Show error message
+            document.getElementById('error-message').textContent = result.message || 'Something went wrong';
+            document.getElementById('error-alert').style.display = 'block';
+            
+            // Auto-hide alert after 5 seconds
+            setTimeout(() => {
+                document.getElementById('error-alert').style.display = 'none';
+            }, 5000);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('error-message').textContent = 'An unexpected error occurred';
+        document.getElementById('error-alert').style.display = 'block';
+    }
+});
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- <script>
+        // Toggle status text based on switch
+        document.getElementById('categoryStatus').addEventListener('change', function() {
+            const statusText = document.getElementById('statusText');
+            if (this.checked) {
+                statusText.textContent = 'Active';
+                statusText.classList.remove('status-inactive');
+                statusText.classList.add('status-active');
+            } else {
+                statusText.textContent = 'Inactive';
+                statusText.classList.remove('status-active');
+                statusText.classList.add('status-inactive');
+            }
+        });
+
+        // Form submission with validation
+        document.getElementById('editCategoryForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            // Reset error messages
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Get form values
+            const categoryName = document.getElementById('category_name').value.trim();
+            const description = document.getElementById('categoryDescription').value.trim();
+            const isListed = document.getElementById('categoryStatus').checked;
+            
+            // Validation
+            let isValid = true;
+            
+            if (categoryName.length < 2) {
+                document.getElementById('name-error').textContent = 'Category name must be at least 2 characters';
+                document.getElementById('name-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (description.length < 10) {
+                document.getElementById('description-error').textContent = 'Description must be at least 10 characters';
+                document.getElementById('description-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        categoryName,
+                        categoryDescription: description,
+                        isListed
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Category updated successfully',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '/admin/category';
+                    });
+                } else {
+                    // Show error message
+                    document.getElementById('error-message').textContent = result.message || 'Something went wrong';
+                    document.getElementById('error-alert').style.display = 'block';
+                    
+                    // Auto-hide alert after 5 seconds
+                    setTimeout(() => {
+                        document.getElementById('error-alert').style.display = 'none';
+                    }, 5000);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('error-message').textContent = 'An unexpected error occurred';
+                document.getElementById('error-alert').style.display = 'block';
+            }
+        });
+    </script> -->
+
+<%- include("../partials/admin/adminFooter") %>
+</body>

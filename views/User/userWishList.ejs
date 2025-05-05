@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChapterOne | My Wishlist</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Google Fonts - Playfair Display & Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+         /* Additional CSS for offer badges */
+         .offer-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--primary-brown); /* Changed from #ff5722 to use your theme color */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    z-index: 2;
+}
+        
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            margin-right: 8px;
+            font-size: 0.9em;
+        }
+        
+        .offer-price {
+            color: #ff5722;
+            font-weight: bold;
+        }
+        
+        .wishlist-book-img {
+            position: relative;
+        }
+        
+        .btn.disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        :root {
+            --primary-brown: #8B5A2B;
+            --secondary-brown: #A67C52;
+            --light-brown: #D2B48C;
+            --cream: #F5F5DC;
+            --off-white: #FAF9F6;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .wishlist-hero-section {
+            background: linear-gradient(135deg, var(--light-brown) 0%, var(--secondary-brown) 100%);
+            padding: 4rem 0;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wishlist-hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(255,255,255,0.1)' fill-rule='evenodd'/%3E%3C/svg%3E") repeat;
+            opacity: 0.3;
+        }
+
+        .wishlist-hero-section h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .wishlist-hero-section p {
+            font-size: 1.2rem;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .wishlist-container {
+            background-color: var(--off-white);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-brown);
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--secondary-brown);
+        }
+
+        .wishlist-book-card {
+            position: relative;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: white;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wishlist-book-content {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+        }
+
+        .wishlist-img-container {
+            width: 120px;
+            min-width: 120px;
+            padding: 15px 0 15px 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .wishlist-book-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .wishlist-book-img {
+            width: 100%;
+            height: auto;
+            max-height: 160px;
+            object-fit: contain;
+            transition: all 0.5s ease;
+        }
+
+        .wishlist-book-card:hover .wishlist-book-img {
+            transform: scale(1.05);
+        }
+
+        .wishlist-book-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        .card-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+
+        .remove-item-btn {
+            background-color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            color: #dc3545;
+            transition: all 0.3s ease;
+        }
+
+        .remove-item-btn:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            color: #333;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 2.8rem;
+        }
+
+        .book-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative; /* Added for offer badge positioning */
+}
+
+        .book-author {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .book-price {
+            font-weight: 700;
+            color: var(--primary-brown);
+            font-size: 1.2rem;
+            margin-bottom: 1.25rem;
+            margin-top: auto;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: auto;
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--primary-brown);
+            color: white;
+        }
+
+        .add-to-cart-btn,
+        .view-details-btn {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: var(--secondary-brown);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .view-details-btn {
+            background-color: transparent;
+            border: 1px solid var(--primary-brown);
+            color: var(--primary-brown);
+        }
+
+        .view-details-btn:hover {
+            background-color: var(--light-brown);
+            color: white;
+            border-color: var(--light-brown);
+            transform: translateY(-2px);
+        }
+
+        .clear-wishlist-btn {
+            background-color: transparent;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .clear-wishlist-btn:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .empty-wishlist {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .empty-wishlist-icon {
+            font-size: 4.5rem;
+            color: var(--light-brown);
+            margin-bottom: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .empty-wishlist h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-brown);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .empty-wishlist p {
+            color: #666;
+            max-width: 500px;
+            margin: 0 auto 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .browse-books-btn {
+            background-color: var(--primary-brown);
+            color: white;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            font-size: 1rem;
+        }
+
+        .browse-books-btn:hover {
+            background-color: var(--secondary-brown);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .recommendations-section {
+            background: linear-gradient(to bottom, var(--cream) 0%, rgba(245, 245, 220, 0.7) 100%);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+            /* background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a67c52' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E"); */
+
+        }
+
+        .recommendations-section::before {
+            /* content: '      '; */
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a67c52' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+            border-radius: 12px;
+        }
+
+        .recommendations-section .section-title {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            display: block;
+        }
+
+        .recommendations-section .section-title::after {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+        }
+
+        /* Book card styles */
+        .book-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: contain;
+            padding: 1rem;
+            transition: all 0.5s ease;
+        }
+
+        .book-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .book-card .book-info {
+            padding: 1.25rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .book-card h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            color: #333;
+            height: 3.1rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;  
+            -webkit-box-orient: vertical;
+            margin-bottom: 0.75rem;
+        }
+
+        .book-card .book-author {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.75rem;
+        }
+
+        .book-card .book-price {
+            margin-top: auto;
+            margin-bottom: 0.75rem;
+        }
+
+        .book-card .book-buttons {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0 1.25rem 1.25rem 1.25rem;
+        }
+
+        .book-card .btn {
+            flex: 1;
+            padding: 0.5rem 0;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--secondary-brown);
+            transition: all 0.3s ease;
+            padding: 0.5rem 1.5rem;
+            position: relative;
+        }
+
+        .nav-button::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background-color: var(--primary-brown);
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            color: var(--primary-brown);
+        }
+
+        .nav-button:hover::after {
+            width: 50%;
+        }
+
+        .nav-button i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-button span {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        hr {
+            opacity: 0.1;
+            margin: 1.5rem 0;
+        }
+
+        .btn i {
+            margin-right: 5px;
+        }
+        .swal2-popup {
+        border-radius: 12px;
+        padding: 2rem;
+        font-family: 'Montserrat', sans-serif;
+    }
+    
+    .swal2-title {
+        font-family: 'Playfair Display', serif;
+        color: #8B5A2B;
+        font-weight: 600;
+    }
+    
+    .swal2-content {
+        color: #666;
+        font-size: 1rem;
+    }
+    
+    .swal2-styled.swal2-confirm {
+        background-color: #8B5A2B;
+        color: white;
+        border-radius: 6px;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: none;
+    }
+    
+    .swal2-styled.swal2-confirm:hover {
+        background-color: #A67C52;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .swal2-styled.swal2-cancel {
+        background-color: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        border-radius: 6px;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    
+    .swal2-styled.swal2-cancel:hover {
+        background-color: #dc3545;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .swal2-icon.swal2-success {
+        border-color: #8B5A2B;
+        color: #8B5A2B;
+    }
+    
+    .swal2-icon.swal2-success .swal2-success-ring {
+        border-color: #D2B48C;
+    }
+    
+    .swal2-icon.swal2-success [class^=swal2-success-line] {
+        background-color: #8B5A2B;
+    }
+    
+    .swal2-icon.swal2-error {
+        border-color: #dc3545;
+    }
+    
+    .swal2-icon.swal2-error [class^=swal2-x-mark-line] {
+        background-color: #dc3545;
+    }
+    
+    .swal2-icon.swal2-warning {
+        border-color: #A67C52;
+        color: #A67C52;
+    }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .wishlist-hero-section {
+                padding: 3rem 0;
+            }
+            
+            .wishlist-hero-section h1 {
+                font-size: 2.5rem;
+            }
+            
+            .wishlist-container {
+                padding: 1.5rem;
+            }
+            
+            .recommendations-section {
+                padding: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .wishlist-img-container {
+                width: 100px;
+                min-width: 100px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .book-card .book-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head> 
+<body>
+    <!-- Wishlist Hero Section -->
+    <div class="wishlist-hero-section container-fluid">
+        <div class="container">
+            <h1>My Wishlist</h1>
+            <p class="lead">Keep track of books you love and want to read next.</p>
+        </div>
+    </div>
+
+    <!-- Wishlist Content -->
+    <div class="container mt-5 mb-5">
+        <div class="wishlist-container">
+            <div id="wishlist-content">
+                <% if (wishlist?.books && wishlist.books.length > 0) { %>
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="section-title">Your Saved Books</h3>
+                                <button class="btn clear-wishlist-btn">Clear Wishlist</button>
+                            </div>
+                            <hr>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <% wishlist.books.forEach(item => { %>
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="wishlist-book-card">
+                                    <div class="card-actions">
+                                        <button class="remove-item-btn" data-id="<%= item.product._id %>">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="wishlist-book-content">
+                                        <div class="wishlist-img-container">
+                                            <img src="<%= item.product.productImages[0] %>" alt="<%= item.product.name %>" class="wishlist-book-img">
+                                        </div>
+                                        <div class="wishlist-book-details">
+                                            <h5 class="card-title"><%= item.product.name %></h5>
+                                            <p class="book-author"><%= item.product.writer %></p>
+                                            <p class="book-price">
+                                                <% if (item.product.offerPrice) { %>
+                                                    <span class="original-price">₹<%= item.product.salePrice %></span>
+                                                    <span class="offer-price">₹<%= item.product.offerPrice %></span>
+                                                    <% if (item.product.offerPercentage) { %>
+                                                        <span class="offer-badge"><%= item.product.offerPercentage %>% OFF</span>
+                                                    <% } %>
+                                                <% } else { %>
+                                                    ₹<%= item.product.salePrice %>
+                                                <% } %>
+                                            </p>
+                                            <div class="action-buttons">
+                                                <button class="btn add-to-cart-btn <%= item.isInCart ? 'disabled' : '' %>" data-id="<%= item.product._id %>">
+                                                    <i class="fas fa-shopping-cart"></i> <%= item.isInCart ? 'In Cart' : 'Add to Cart' %>
+                                                </button>
+                                                <a href="/bookPage/<%= item.product._id %>" class="btn view-details-btn">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-wishlist">
+                        <div class="text-center">
+                            <i class="far fa-heart empty-wishlist-icon"></i>
+                            <h3>No items in wishlist</h3>
+                            <p>Your wishlist is currently empty. Explore our collection to discover books you'll love.</p>
+                            <a href="/" class="btn browse-books-btn mt-3">
+                                <i class="fas fa-book-open me-2"></i> Browse More
+                            </a>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Section -->
+    <div class="container mt-5 mb-5">
+        <div class="recommendations-section">
+            <h2 class="section-title">You Might Also Like</h2>
+            <div class="row" id="recommended-books">
+                <% if (typeof recommendedBooks !== 'undefined' && recommendedBooks.length > 0) { %>
+                    <% recommendedBooks.forEach(book => { %>
+                        <div class="col-md-3 mb-4">
+                            <div class="book-card">
+                                <img src="<%= book.productImages[0] %>" alt="<%= book.name %>" class="img-fluid">
+                                <div class="book-info">
+                                    <h5><%= book.name %></h5>
+                                    <p class="book-author"><%= book.writer %></p>
+                                    <p class="fw-bold book-price">
+                                        <% if (book.offerPrice) { %>
+                                            <span class="original-price">₹<%= book.salePrice %></span>
+                                            <span class="offer-price">₹<%= book.offerPrice %></span>
+                                            <% if (book.offerPercentage) { %>
+                                                <span class="offer-badge"><%= book.offerPercentage %>% OFF</span>
+                                            <% } %>
+                                        <% } else { %>
+                                            ₹<%= book.salePrice %>
+                                        <% } %>
+                                    </p>
+                                </div>
+                                <div class="book-buttons">
+                                    <button class="btn add-to-cart-btn <%= book.isInCart ? 'disabled' : '' %>" data-id="<%= book._id %>">
+                                        <i class="fas fa-shopping-cart"></i> <%= book.isInCart ? 'In Cart' : 'Add' %>
+                                    </button>
+                                    <a href="/bookPage/<%= book._id %>" class="btn view-details-btn">
+                                        <i class="fas fa-eye"></i> Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="col-12 text-center">
+                        <p>No recommendations available at the moment.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="nav-buttons">
+        <a href="/" class="nav-button">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="/cart" class="nav-button">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Cart</span>
+        </a>
+        <a href="/account" class="nav-button">
+            <i class="fas fa-user"></i>
+            <span>Account</span>
+        </a>
+    </div>
+
+    <!-- Add some padding to account for fixed nav buttons -->
+    <div style="height: 80px;"></div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Event delegation for dynamically added elements
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-item-btn') || 
+                    event.target.closest('.remove-item-btn')) {
+                    const button = event.target.classList.contains('remove-item-btn') ? 
+                                event.target : event.target.closest('.remove-item-btn');
+                    const itemId = button.getAttribute('data-id');
+                    removeFromWishlist(itemId);
+                }
+    
+                if (event.target.classList.contains('add-to-cart-btn') || 
+                    event.target.closest('.add-to-cart-btn')) {
+                    const button = event.target.classList.contains('add-to-cart-btn') ? 
+                                event.target : event.target.closest('.add-to-cart-btn');
+                    const itemId = button.getAttribute('data-id');
+                    addToCart(itemId);
+                }
+    
+                if (event.target.classList.contains('clear-wishlist-btn')) {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This will remove all books from your wishlist.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, clear it!',
+                        cancelButtonText: 'Cancel',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            clearWishlist();
+                        }
+                    });
+                }
+            });
+        });
+    
+        // Function to remove item from wishlist
+        function removeFromWishlist(itemId) {
+            fetch(`/wishlist/remove/${itemId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Removed!',
+                        text: 'Book has been removed from your wishlist.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to remove book from wishlist.',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again.',
+                    icon: 'error'
+                });
+            });
+        }
+    
+        // Function to clear wishlist
+        function clearWishlist() {
+            fetch('/wishlist/clear', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Cleared!',
+                        text: 'Your wishlist has been cleared.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to clear wishlist.',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again.',
+                    icon: 'error'
+                });
+            });
+        }
+    
+        // Function to add item to cart
+        function addToCart(itemId) {
+            fetch('/cart/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ bookId: itemId }) 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Added to Cart!',
+                        text: 'Book has been added to your cart.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        didClose: () => {
+                        window.location.reload();
+                    }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to add book to cart.',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again.',
+                    icon: 'error'
+                });
+            });
+        }
+    </script>
+</body>
+</html>

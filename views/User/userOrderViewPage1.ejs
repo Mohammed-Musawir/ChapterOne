@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChapterOne | Order Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-brown: #8B5A2B;
+            --secondary-brown: #A67C52;
+            --light-brown: #D2B48C;
+            --dark-brown: #654321;
+            --accent-gold: #D4AF37;
+            --soft-shadow: rgba(0, 0, 0, 0.05);
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .dashboard-sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            position: fixed;
+            height: 100vh;
+            box-shadow: var(--card-shadow);
+            padding: 25px 0;
+            overflow-y: auto;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-brown);
+            margin: 0;
+        }
+
+        .user-profile .profile-image img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 3px solid var(--light-brown);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+
+        .nav-link1 {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link1.active {
+            background-color: rgba(139, 90, 43, 0.1);
+            color: var(--primary-brown);
+            border-left-color: var(--primary-brown);
+        }
+
+        .nav-link1:hover {
+            background-color: rgba(139, 90, 43, 0.1);
+            color: var(--primary-brown);
+            border-left-color: var(--primary-brown);
+        }
+
+        .nav-link1 i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .dashboard-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-header h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-brown);
+            margin: 0;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            color: var(--secondary-brown);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Table Styles */
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 5px;
+        }
+
+        .custom-table th {
+            color: #888;
+            font-weight: 500;
+            padding: 12px 15px;
+            border: none;
+        }
+
+        .custom-table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.delivered {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .status-badge.processing {
+            background-color: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+
+        .status-badge.pending {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .status-badge.shipped {
+            background-color: rgba(142, 68, 173, 0.1);
+            color: #8e44ad;
+        }
+        
+        .status-badge.cancelled {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .action-btn {
+            color: var(--primary-brown);
+            width: 30px;
+            height: 30px;
+            background-color: rgba(139, 90, 43, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary-brown);
+            color: white;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-container {
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb-item a {
+            color: var(--secondary-brown);
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--primary-brown);
+            font-weight: 500;
+        }
+
+        /* Order Details */
+        .order-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            flex: 1;
+            min-width: 200px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            padding: 15px;
+        }
+
+        .summary-item h6 {
+            color: #888;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .summary-item p {
+            color: var(--dark-brown);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 15px 0;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-title {
+            font-weight: 500;
+            color: var(--dark-brown);
+            margin-bottom: 5px;
+        }
+
+        .product-meta {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            font-weight: 500;
+            color: var(--primary-brown);
+        }
+
+        .order-totals {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 15px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            color: #555;
+        }
+
+        .total-row.final {
+            font-weight: 600;
+            color: var(--primary-brown);
+            font-size: 18px;
+            padding-top: 10px;
+            border-top: 1px dashed #f0f0f0;
+        }
+
+        .address-box {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .address-label {
+            font-weight: 500;
+            color: var(--primary-brown);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .address-label i {
+            margin-right: 8px;
+        }
+
+        .address-content {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .tracking-info {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .tracking-label {
+            font-weight: 500;
+            color: var(--primary-brown);
+            margin-bottom: 5px;
+        }
+
+        .tracking-number {
+            background-color: rgba(139, 90, 43, 0.1);
+            color: var(--primary-brown);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            color: var(--primary-brown);
+            background-color: rgba(139, 90, 43, 0.1);
+            padding: 8px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary-brown);
+            color: white;
+        }
+
+        .back-btn i {
+            margin-right: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .timeline {
+            position: relative;
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #eee;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid var(--primary-brown);
+            z-index: 1;
+        }
+
+        .timeline-dot.active {
+            background-color: var(--primary-brown);
+        }
+
+        .timeline-content {
+            padding-bottom: 10px;
+            padding-left: 10px;
+        }
+
+        .timeline-date {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--dark-brown);
+            margin-bottom: 5px;
+        }
+
+        .timeline-text {
+            color: #555;
+            font-size: 14px;
+        }
+
+        /* Toggle Button */
+        .toggle-sidebar {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 100;
+            background-color: var(--primary-brown);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin-bottom: 25px;
+        }
+
+        .back-home-btn {
+            color: var(--primary-brown);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            padding: 6px 12px;
+            border: 1px solid var(--primary-brown);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            width: fit-content;
+        }
+
+        .back-home-btn:hover {
+            background-color: var(--primary-brown);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-home-btn i {
+            margin-right: 6px;
+            font-size: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .dashboard-sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .dashboard-content {
+                margin-left: 0;
+            }
+            
+            .toggle-sidebar {
+                display: flex;
+            }
+            
+            .order-summary {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .product-image {
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+        }
+        .content-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            color: var(--secondary-brown);
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Flipkart-style Order Timeline */
+        .order-stepper {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 30px 0;
+            padding: 0;
+        }
+        
+        .order-stepper::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            color: #888;
+            font-size: 20px;
+        }
+        
+        .step.active .step-icon {
+            background-color: var(--primary-brown);
+            border-color: var(--primary-brown);
+            color: white;
+        }
+        
+        .step.completed .step-icon {
+            background-color: var(--light-brown);
+            border-color: var(--light-brown);
+            color: white;
+        }
+        
+        .step-label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .step.active .step-label {
+            color: var(--primary-brown);
+            font-weight: 600;
+        }
+        
+        .step.completed .step-label {
+            color: var(--secondary-brown);
+        }
+        
+        .step-date {
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+        }
+        
+        .step-progress {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            height: 2px;
+            background-color: var(--primary-brown);
+            z-index: 1;
+        }
+        
+        /* Step detail section */
+        .step-details {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #e0e0e0;
+        }
+        
+        .step-detail-item {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .step-detail-item.active {
+            display: block;
+        }
+        
+        .step-detail-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .step-detail-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-brown);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .step-detail-title {
+            font-weight: 600;
+            color: var(--dark-brown);
+            margin: 0;
+        }
+        
+        .step-detail-date {
+            font-size: 13px;
+            color: #888;
+            margin-top: 2px;
+        }
+        
+        .step-detail-content {
+            padding-left: 55px;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .order-stepper {
+                flex-direction: column;
+                margin-left: 20px;
+            }
+            
+            .order-stepper::before {
+                top: 0;
+                bottom: 0;
+                left: 25px;
+                width: 2px;
+                height: auto;
+            }
+            
+            .step {
+                flex-direction: row;
+                align-items: flex-start;
+                margin-bottom: 30px;
+                width: 100%;
+            }
+            
+            .step-icon {
+                margin-right: 15px;
+                margin-bottom: 0;
+            }
+            
+            .step-text {
+                text-align: left;
+            }
+            
+            .step-label {
+                text-align: left;
+            }
+            
+            .step-date {
+                text-align: left;
+            }
+            
+            .step-progress {
+                top: 0;
+                left: 25px;
+                width: 2px;
+                height: 0%;
+            }
+        }
+        .order-stepper .special-status {
+                width: 100%;
+                justify-content: center;
+            }
+
+        .step-progress.cancelled {
+        background-color: #ffcccb !important;
+        }
+
+        .special-status .step-icon i {
+        color: #dc3545;
+        }
+
+        .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons .btn {
+        flex: 1;
+        padding: 10px;
+        min-width: 120px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+    }
+
+    .modal-content {
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #eee;
+        background-color: rgba(139, 90, 43, 0.05);
+    }
+
+    .modal-header .modal-title {
+        color: var(--dark-brown);
+        font-family: 'Playfair Display', serif;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #eee;
+    }
+
+    /* For mobile responsiveness */
+    @media (max-width: 576px) {
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .action-buttons .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+    </style>
+</head>
+<body>
+    
+    <div class="dashboard-container">
+        <!-- Mobile Toggle Button (visible on small screens) -->
+        <button class="toggle-sidebar d-lg-none">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Sidebar -->
+        <div class="dashboard-sidebar">
+            <div class="logo-container">
+                <a href="/" class="back-home-btn">
+                    <i class="fas fa-home me-1"></i> Back To Home
+                </a>
+            </div>
+            <div class="logo-container">
+                <h3 class="logo-text">ChapterOne</h3>
+            </div>
+            
+            <div class="user-profile text-center mb-4">
+                <div class="profile-image">
+                    <img src="<%= user.profileImage || '/images/default-avatar.jpg' %>" alt="Profile Picture" class="rounded-circle">
+                </div>
+                <h5 class="mt-3"><%= user.name %></h5>
+                <p class="text-muted small"><%= user.email %></p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="/account" class="nav-link1 <%= activePage === 'dashboard' ? 'active' : '' %>">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/profile" class="nav-link1 <%= activePage === 'profile' ? 'active' : '' %>">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/edit-profile" class="nav-link1 <%= activePage === 'edit-profile' ? 'active' : '' %>">
+                            <i class="fas fa-user-edit"></i>
+                            <span>Edit Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/change-password" class="nav-link1 <%= activePage === 'change-password' ? 'active' : '' %>">
+                            <i class="fas fa-lock"></i>
+                            <span>Change Password</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/change-email" class="nav-link1 <%= activePage === 'change-email' ? 'active' : '' %>">
+                            <i class="fas fa-envelope"></i>
+                            <span>Change Email</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/orders" class="nav-link1 <%= activePage === 'orders' ? 'active' : '' %>">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/wallet" class="nav-link1 <%= activePage === 'wallet' ? 'active' : '' %>">
+                            <i class="fas fa-wallet"></i>
+                            <span>Wallet</span>
+                        </a>
+                    </li>
+                    <li class="mt-4">
+                        <a href="/logout" class="nav-link1 text-danger">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="breadcrumb-container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/account/orders">Orders</a></li>
+                    <% if (order) { %>
+                        <li class="breadcrumb-item active">Order #<%= order.orderId %></li>
+                    <% } else { %>
+                        <li class="breadcrumb-item active">Order not found</li>
+                    <% } %>
+                </ol>
+            </nav>
+            
+            <div class="dashboard-header">
+                <h2>Order Details</h2>
+                <a href="/account/orders" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Orders
+                </a>
+            </div>
+            
+            <!-- Order Summary Cards -->
+            <div class="order-summary">
+                <div class="summary-item">
+                    <h6>Order Number</h6>
+                    <p>#<%= order.orderId %></p>
+                </div>
+                <div class="summary-item">
+                    <h6>Order Date</h6>
+                    <p><%= new Date(order.orderedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                </div>
+                <div class="summary-item">
+                    <h6>Payment Method</h6>
+                    <p><%= order.paymentMethod %></p>
+                </div>
+                <div class="summary-item">
+                    <h6>Order Status</h6>
+                    <p><span class="status-badge <%= order.orderStatus.toLowerCase() %>"><%= order.orderStatus %></span></p>
+                </div>
+            </div>
+            
+            <!-- Shipping Address -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h5>Shipping Address</h5>
+                </div>
+                <div class="card-body">
+                    <div class="address-content">
+                        <strong><%= order.shippingAddress.addressType %></strong><br>
+                        <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.pin_code %><br>
+                        <%= order.shippingAddress.landmark %><br>
+                        Phone: <%= order.shippingAddress.alternative_no %>
+                    </div>
+                    <% if(order.trackingNumber) { %>
+                    <div class="tracking-info">
+                        <div class="tracking-label">Tracking Number:</div>
+                        <div class="tracking-number"><%= order.trackingNumber %></div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Order Timeline Card -->         
+            <div class="content-card">             
+                <div class="card-header">                 
+                    <h5>Order Timeline</h5>             
+                </div>             
+                <div class="card-body">                 
+                    <!-- Dynamic Order Stepper -->                 
+                    <div class="order-stepper-container">                     
+                        <div class="order-stepper">
+                            <%
+                            // Define status steps based on order status
+                            let statusSteps = [];
+                            let progressWidth = 0;
+                            
+                            if (order.orderStatus === 'cancelled') {
+                                statusSteps = ['Order Placed', 'Cancelled'];
+                                progressWidth = 100; // Full progress for cancelled
+                            } else if (order.orderStatus === 'returned') {
+                                statusSteps = ['Order Placed', 'Delivered', 'Returned'];
+                                progressWidth = 100; // Full progress for returned
+                            } else {
+                                // Normal flow
+                                statusSteps = ['Order Placed', 'Processing', 'Shipped', 'Delivered'];
+                                
+                                // Map orderStatus to index
+                                const statusMap = {
+                                    'pending': 0,
+                                    'processing': 1,
+                                    'shipped': 2,
+                                    'delivered': 3
+                                };
+                                
+                                const currentStatusIndex = statusMap[order.orderStatus] || 0;
+                                progressWidth = currentStatusIndex >= 0 ? (currentStatusIndex / (statusSteps.length - 1) * 100) : 0;
+                            }
+                            %>
+                            
+                            <div class="step-progress"></div>
+                            
+                            <% statusSteps.forEach((step, index) => {
+                                let icon = '';
+                                switch(step) {
+                                    case 'Order Placed': icon = 'fa-receipt'; break;
+                                    case 'Processing': icon = 'fa-box'; break;
+                                    case 'Shipped': icon = 'fa-truck'; break;
+                                    case 'Delivered': icon = 'fa-box-open'; break;
+                                    case 'Cancelled': icon = 'fa-times-circle'; break;
+                                    case 'Returned': icon = 'fa-undo'; break;
+                                    default: icon = 'fa-circle';
+                                }
+                                
+                                // Determine if step is completed or active
+                                let statusClass = '';
+                                let currentStep = false;
+                                
+                                if (order.orderStatus === 'cancelled' && step === 'Cancelled') {
+                                    statusClass = 'active';
+                                    currentStep = true;
+                                } else if (order.orderStatus === 'returned' && step === 'Returned') {
+                                    statusClass = 'active';
+                                    currentStep = true;
+                                } else {
+                                    // For normal flow
+                                    const stepIndexMap = {
+                                        'Order Placed': 0,
+                                        'Processing': 1,
+                                        'Shipped': 2,
+                                        'Delivered': 3
+                                    };
+                                    
+                                    const orderStatusIndexMap = {
+                                        'pending': 0,
+                                        'processing': 1,
+                                        'shipped': 2,
+                                        'delivered': 3
+                                    };
+                                    
+                                    const stepIndex = stepIndexMap[step];
+                                    const orderStatusIndex = orderStatusIndexMap[order.orderStatus];
+                                    
+                                    if (stepIndex < orderStatusIndex) {
+                                        statusClass = 'completed';
+                                    } else if (stepIndex === orderStatusIndex) {
+                                        statusClass = 'active';
+                                        currentStep = true;
+                                    }
+                                }
+                                
+                                // Display appropriate date or status
+                                let displayDate = 'Processing';
+                                if (order.orderedDate && step === 'Order Placed') {
+                                    displayDate = new Date(order.orderedDate).toLocaleString('en-US', { 
+                                        month: 'short', 
+                                        day: 'numeric', 
+                                        hour: 'numeric', 
+                                        minute: 'numeric', 
+                                        hour12: true 
+                                    });
+                                } else if (currentStep) {
+                                    displayDate = 'In Progress';
+                                } else if (!statusClass) {
+                                    displayDate = 'Upcoming';
+                                }
+                            %>
+                            <div class="step <%= statusClass %>">
+                                <div class="step-icon">
+                                    <i class="fas <%= statusClass === 'completed' ? 'fa-check' : icon %>"></i>
+                                </div>
+                                <div class="step-text">
+                                    <div class="step-label"><%= step %></div>
+                                    <div class="step-date"><%= displayDate %></div>
+                                </div>
+                            </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h5>Order Items</h5>
+                </div>
+                <div class="card-body">
+                    <% order.products.forEach(item => { %>
+                    <div class="product-item">
+                        <img src="<%= item.product.productImages[0] %>" alt="<%= item.title %>" class="product-image">
+                        <div class="product-details">
+                            <div class="product-title"><%= item.product.name %></div>
+                            <div class="product-meta">Author: <%= item.product.writer %></div>
+                            <div class="product-meta"> Qty: <%= item.quantity %></div>
+                            <div class="product-price">₹<%= item.product.salePrice.toFixed(2) %></div>
+                        </div>
+                    </div>
+                    <% }); %>
+                    
+                    <div class="order-totals">
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <span>₹<%= order.subtotal.toFixed(2) %></span>
+                        </div>
+                        <div class="total-row">
+                            <span>Shipping:</span>
+                            <span>₹60</span>
+                        </div>
+                        <div class="total-row final">
+                            <span>Total:</span>
+                            <span>₹<%= order.totalAmount.toFixed(2) %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-outline-secondary" id="downloadInvoiceBtn">Download Invoice</button>
+                
+                <% if (order.orderStatus === 'delivered') { %>
+                    <button class="btn btn-danger" id="returnOrderBtn">Return Order</button>
+                <% } else if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'returned') { %>
+                    <button class="btn btn-danger" id="cancelOrderBtn">Cancel Order</button>
+                <% } %>
+                
+                <% if (order.orderStatus === 'shipped' || order.orderStatus === 'processing') { %>
+                    <a href="/account/orders/<%= order.orderNumber %>/track" class="btn" style="background-color: var(--primary-brown); color: white;">Track Order</a>
+                <% } else if (order.orderStatus === 'delivered') { %>
+                    <a href="/account/orders/<%= order.orderNumber %>/review" class="btn" style="background-color: var(--primary-brown); color: white;">Write Review</a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Return Order Modal -->
+    <div class="modal fade" id="returnConfirmModal" tabindex="-1" aria-labelledby="returnConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="returnConfirmModalLabel">Return Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Please complete the information below to initiate your return request.</p>
+                    
+                    <div class="mb-3">
+                        <label for="returnReason" class="form-label">Return Reason</label>
+                        <select class="form-select" id="returnReason" required>
+                            <option value="">Select a reason</option>
+                            <option value="damaged">Item damaged or defective</option>
+                            <option value="wrong_item">Wrong item received</option>
+                            <option value="not_as_described">Item not as described</option>
+                            <option value="quality_issues">Quality not as expected</option>
+                            <option value="other">Other reason</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a reason for your return.</div>
+                    </div>
+                    
+                    <div class="mb-3" id="otherReasonContainer" style="display: none;">
+                        <label for="otherReason" class="form-label">Please specify your reason</label>
+                        <textarea class="form-control" id="otherReason" rows="3" placeholder="Please provide details about why you're returning this order..."></textarea>
+                        <div class="invalid-feedback">Please provide a detailed explanation.</div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <small>Your return request will be processed within 24-48 hours. Once approved, you'll receive instructions for returning the item.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmReturnBtn">Submit Return Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cancel Order Modal -->
+    <div class="modal fade" id="cancelConfirmModal" tabindex="-1" aria-labelledby="cancelConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelConfirmModalLabel">Cancel Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Are you sure you want to cancel this order?</p>
+                    
+                    <div class="mb-3">
+                        <label for="cancelReason" class="form-label">Cancellation Reason</label>
+                        <select class="form-select" id="cancelReason" required>
+                            <option value="">Select a reason</option>
+                            <option value="change_of_mind">Change of mind</option>
+                            <option value="found_better_price">Found a better price elsewhere</option>
+                            <option value="ordered_by_mistake">Ordered by mistake</option>
+                            <option value="takes_too_long">Delivery takes too long</option>
+                            <option value="other">Other reason</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a reason for cancellation.</div>
+                    </div>
+                    
+                    <div class="mb-3" id="otherCancelReasonContainer" style="display: none;">
+                        <label for="otherCancelReason" class="form-label">Please specify your reason</label>
+                        <textarea class="form-control" id="otherCancelReason" rows="3" placeholder="Please provide details about why you're cancelling this order..."></textarea>
+                        <div class="invalid-feedback">Please provide a detailed explanation.</div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <small>Please note: Orders that have already been shipped cannot be cancelled. If your order is processing, you may still cancel it.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Keep Order</button>
+                    <button type="button" class="btn btn-danger" id="confirmCancelBtn">Cancel Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+  <% if (typeof scripts !== 'undefined') { %>
+      <% scripts.forEach(script => { %>
+          <script src="<%= script %>"></script>
+      <% }); %>
+  <% } %>
+
+
+</body>

@@ -1,0 +1,1379 @@
+<%- include("../partials/admin/adminHeader") %>
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Color variables */
+:root {
+    --primary-color: #A67C52; /* Warm light brown as primary color */
+    --secondary-color: #8C6D4F; /* Darker brown for hover effects */
+    --accent-color: #D4B996; /* Light accent brown */
+    --light-accent: #F5EFE6; /* Very light brown/off-white for backgrounds */
+    --text-dark: #4A3F35; /* Dark brown for text */
+    --text-medium: #7D6E63; /* Medium brown for secondary text */
+    --success-color: #6B8E6B; /* Muted green that works with brown */
+    --danger-color: #B56B6B; /* Muted red that works with brown */
+    --warning-color: #D4AA70; /* Amber/gold for warnings */
+    --info-color: #7590A7; /* Muted blue that works with brown */
+    --white: #FFFFFF;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(166, 124, 82, 0.08);
+}
+
+body {
+    background-color: var(--light-accent);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-dark);
+}
+
+.content-main { 
+    padding: 25px;
+}
+
+/* Header Styling */
+.content-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+.content-title:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 60px;
+    background-color: var(--primary-color);
+}
+
+.text-muted {
+    color: var(--text-medium);
+}
+
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    background-color: var(--white);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 6px 16px rgba(166, 124, 82, 0.12);
+    transform: translateY(-3px);
+}
+
+.card-header {
+    background-color: var(--white);
+    border-bottom: 1px solid rgba(166, 124, 82, 0.1);
+    padding: 18px 20px;
+}
+
+.card-body {
+    padding: 22px;
+}
+
+/* Stats Cards */
+.category-stat {
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    text-align: center;
+    margin-bottom: 25px;
+    border-left: 4px solid var(--primary-color);
+    transition: transform 0.3s ease;
+}
+
+.category-stat:hover {
+    transform: translateY(-3px);
+}
+
+.stat-title {
+    font-size: 0.95rem;
+    color: var(--text-medium);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Search Bar */
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.search-form {
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    height: 50px;
+    padding: 0 20px;
+    border: 1px solid rgba(166, 124, 82, 0.2);
+    border-radius: 25px;
+    box-shadow: 0 2px 5px rgba(166, 124, 82, 0.05);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: var(--white);
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(166, 124, 82, 0.15);
+    outline: none;
+}
+
+.search-buttons {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+}
+
+.btn-search, .btn-clear {
+    border: none;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-search {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-radius: 0 25px 25px 0;
+}
+
+.btn-clear {
+    background-color: rgba(166, 124, 82, 0.05);
+    color: var(--text-medium);
+    margin-right: 2px;
+    border-radius: 0;
+}
+
+.btn-search:hover {
+    background-color: var(--secondary-color);
+}
+
+.btn-clear:hover {
+    background-color: rgba(166, 124, 82, 0.1);
+}
+
+/* Form Styling */
+.category-form-container {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 28px;
+    height: 100%;
+    border-top: 4px solid var(--primary-color);
+}
+
+.form-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 22px;
+    color: var(--primary-color);
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.form-title:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 40px;
+    background-color: var(--primary-color);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(166, 124, 82, 0.2);
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: var(--white);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(166, 124, 82, 0.15);
+    outline: none;
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Button Styles */
+.btn {
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(166, 124, 82, 0.2);
+}
+
+.btn-warning {
+    background-color: var(--warning-color);
+    color: var(--white);
+}
+
+.btn-warning:hover {
+    background-color: #C19A60;
+    transform: translateY(-2px);
+}
+
+.btn-outline-warning {
+    background-color: transparent;
+    border: 1px solid var(--warning-color);
+    color: var(--warning-color);
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--warning-color);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-info {
+    background-color: var(--info-color);
+    color: var(--white);
+}
+
+.btn-info:hover {
+    background-color: #61798D;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    color: var(--white);
+}
+
+.btn-success:hover {
+    background-color: #5A7A5A;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background-color: #A15C5C;
+    transform: translateY(-2px);
+}
+
+.btn-outline-danger {
+    background-color: transparent;
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--danger-color);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-outline-success {
+    background-color: transparent;
+    border: 1px solid var(--success-color);
+    color: var(--success-color);
+}
+
+.btn-outline-success:hover {
+    background-color: var(--success-color);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* Table Styling */
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    background-color: var(--white);
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--text-dark);
+}
+
+.table thead {
+    background-color: rgba(166, 124, 82, 0.05);
+}
+
+.table th {
+    padding: 18px 16px; /* Increased padding */
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(166, 124, 82, 0.1);
+    color: var(--primary-color);
+}
+
+.table td {
+    padding: 16px 16px; /* More consistent horizontal padding */
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(166, 124, 82, 0.06);
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .table th, .table td {
+        padding: 14px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Badge Styles */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-success {
+    background-color: rgba(107, 142, 107, 0.15);
+    color: var(--success-color);
+}
+
+.badge-danger {
+    background-color: rgba(181, 107, 107, 0.15);
+    color: var(--danger-color);
+}
+
+.offer-badge {
+    background-color: rgba(212, 170, 112, 0.15);
+    color: var(--warning-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 35px;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(166, 124, 82, 0.1);
+}
+
+.pagination li {
+    display: inline-block;
+}
+
+.pagination a, .pagination span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 15px;
+    text-decoration: none;
+    background-color: var(--white);
+    border: 1px solid rgba(166, 124, 82, 0.1);
+    border-right: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.pagination li:last-child a, .pagination li:last-child span {
+    border-right: 1px solid rgba(166, 124, 82, 0.1);
+}
+
+.pagination a:hover {
+    background-color: rgba(166, 124, 82, 0.05);
+    color: var(--primary-color);
+}
+
+.pagination .active span, .pagination .active a {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+
+/* Error Messages */
+.error-message {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: -12px;
+    margin-bottom: 12px;
+    display: none;
+}
+
+/* Action Buttons */
+.action-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    color: var(--white);
+}
+
+.edit-btn {
+    background-color: var(--info-color);
+}
+
+.edit-btn:hover {
+    background-color: #61798D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(117, 144, 167, 0.2);
+}
+
+.delete-btn {
+    background-color: var(--danger-color);
+}
+
+.delete-btn:hover {
+    background-color: #A15C5C;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(181, 107, 107, 0.2);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .search-form {
+        max-width: 100%;
+    }
+    
+    .btn-group .btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .content-title {
+        font-size: 1.4rem;
+    }
+    
+    .form-title {
+        font-size: 1.1rem;
+    }
+    
+    .table th, .table td {
+        padding: 12px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .pagination a, .pagination span {
+        min-width: 38px;
+        height: 38px;
+        padding: 0 12px;
+    }
+    
+    .category-stat {
+        padding: 15px;
+    }
+    
+    .stat-value {
+        font-size: 1.6rem;
+    }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.category-stat, .card, .table-container {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Additional refinements */
+.btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.alert-info {
+    background-color: rgba(117, 144, 167, 0.1);
+    color: var(--info-color);
+    border: none;
+    border-left: 4px solid var(--info-color);
+    border-radius: var(--border-radius);
+}
+
+/* Sweet Alert customization */
+.swal2-popup {
+    border-radius: var(--border-radius);
+    padding: 30px;
+}
+
+.swal2-title {
+    color: var(--primary-color) !important;
+}
+
+.swal2-confirm {
+    background-color: var(--primary-color) !important;
+}
+
+.swal2-styled.swal2-confirm:focus {
+    box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.3) !important;
+}
+    </style>
+</head>
+
+<body>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title">Product Categories</h2>
+                <p class="text-muted">Manage your product categories efficiently</p>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="category-stat">
+                    <div class="stat-title">Total Categories</div>
+                    <div class="stat-value"><%= totalCategories || cat.length %></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="category-stat">
+                    <div class="stat-title">Active Categories</div>
+                    <div class="stat-value"><%= cat.filter(c => c.isListed).length %></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="category-stat">
+                    <div class="stat-title">Categories With Offers</div>
+                    <div class="stat-value"><%= cat.filter(c => c.hasOffer).length %></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="category-stat">
+                    <div class="stat-title">Inactive Categories</div>
+                    <div class="stat-value"><%= cat.filter(c => !c.isListed).length %></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-container">
+            <form action="/admin/category/" method="get" class="search-form">
+                <input type="text" class="search-input" placeholder="Search categories..." name="search" id="searchInput" value="<%= search || '' %>" />
+                <div class="search-buttons">
+                    <button class="btn-clear" type="button" id="clearButton" title="Clear search">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button class="btn-search" type="submit" id="searchButton" title="Search categories">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+            
+        <div class="row">
+            <!-- Category Form -->
+            <div class="col-lg-4 col-md-12 mb-4">
+                <div class="category-form-container">
+                    <h4 class="form-title">Add New Category</h4>
+                    <form id="categoryForm">
+                        <div class="mb-3">
+                            <label for="product_name" class="form-label">Category Name</label>
+                            <input type="text" name="categoryName" placeholder="Enter category name" class="form-control" id="product_name"  />
+                            <div id="name-error" class="error-message"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea placeholder="Enter category description" name="categoryDiscription" class="form-control" id="descriptionId" ></textarea>
+                            <div id="description-error" class="error-message"></div>
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-plus-circle me-2"></i> Create Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Category Table -->
+            <div class="col-lg-8 col-md-12">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="15%">Name</th>
+                                <th width="25%">Description</th>
+                                <th width="10%">Offer</th>
+                                <th width="10%">Status</th>
+                                <th width="25%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% cat.forEach((category, index) => { %>
+                            <tr id="row-<%= category._id %>">
+                                
+                                <td><%= (currentPage - 1) * itemsPerPage + index + 1 %></td>
+                                <td>
+                                    <span class="fw-bold"><%= category.name %></span>
+                                </td>
+                                <td>
+                                    <span class="text-muted"><%= category.description %></span> 
+                                </td>
+
+                                <td>
+                                    <% if (category.hasOffer && category.discountPercentage > 0) { %>
+                                        <span class="offer-badge"><%= category.discountPercentage %>% OFF</span>
+                                    <% } else { %>
+                                        <span class="text-muted">No offer</span>
+                                    <% } %>
+                                </td>
+
+                                <td>
+                                    <% if (category.isListed) { %>
+                                        <span class="badge badge-success">Active</span>
+                                    <% } else { %>
+                                        <span class="badge badge-danger">Inactive</span>
+                                    <% } %>
+                                </td>
+                                
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <% if (!category.hasOffer || category.discountPercentage == 0) { %>
+                                            <button type="button" class="btn btn-warning btn-sm me-1" onclick="addOffer('<%= category._id %>')">
+                                                <i class="fas fa-tag me-1"></i> Add Offer
+                                            </button>
+                                        <% } else { %>
+                                            <% if (category.offerActive) { %>
+                                                <button type="button" class="btn btn-outline-danger btn-sm me-1" onclick="toggleOfferStatus('<%= category.offerId %>', '<%= category._id %>', false)">
+                                                    <i class="fas fa-power-off me-1"></i> Deactivate Offer
+                                                </button>
+                                            <% } else { %>
+                                                <button type="button" class="btn btn-outline-success btn-sm me-1" onclick="toggleOfferStatus('<%= category.offerId %>', '<%= category._id %>', true)">
+                                                    <i class="fas fa-power-off me-1"></i> Activate Offer
+                                                </button>
+                                            <% } %>
+                                            <button type="button" class="btn btn-outline-warning btn-sm me-1" onclick="removeOffer('<%= category._id %>')">
+                                                <i class="fas fa-trash-alt me-1"></i> Remove Offer
+                                            </button>
+                                        <% } %>
+                                        
+                                        <% if (category.isListed) { %>
+                                            <button type="button" class="btn btn-outline-danger btn-sm me-1" onclick="changeCategoryStatus('<%= category._id %>', true)">
+                                                <i class="fas fa-eye-slash me-1"></i> Deactivate
+                                            </button>
+                                            
+                                        <% } else { %>
+                                            <button type="button" class="btn btn-outline-success btn-sm me-1" onclick="changeCategoryStatus('<%= category._id %>', false)">
+                                                <i class="fas fa-eye me-1"></i> Activate
+                                            </button>
+                                            
+                                        <% } %>
+                                        
+                                        <a href="/admin/editCategory/<%= category._id %>" class="btn btn-info btn-sm me-1">
+                                            <i class="fas fa-edit me-1"></i> Edit
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            
+                            <% if (cat.length === 0) { %>
+                            <tr>
+                                <td colspan="6" class="text-center py-4">
+                                    <div class="alert alert-info mb-0">
+                                        <i class="fas fa-info-circle me-2"></i> No categories found. Create a new category to get started.
+                                    </div>
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <ul class="pagination">
+                        <% if (currentPage > 1) { %>
+                        <li>
+                            <a href="?page=<%= currentPage - 1 %>&search=<%= search || '' %>" aria-label="Previous">
+                                <i class="fas fa-chevron-left"></i> Prev
+                            </a>
+                        </li>
+                        <% } %>
+                        
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <% if (i === currentPage) { %>
+                            <li class="active"><span><%= i %></span></li>
+                            <% } else { %>
+                            <li><a href="?page=<%= i %>&search=<%= search || '' %>"><%= i %></a></li>
+                            <% } %>
+                        <% } %>
+                        
+                        <% if (currentPage < totalPages) { %>
+                        <li>
+                            <a href="?page=<%= currentPage + 1 %>&search=<%= search || '' %>" aria-label="Next">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Add Offer Modal - Styled to match theme -->
+<div class="modal fade" id="addOfferModal" tabindex="-1" aria-labelledby="addOfferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 8px; border-top: 4px solid var(--primary-color);">
+            <div class="modal-header" style="background-color: var(--white); border-bottom: 1px solid rgba(166, 124, 82, 0.1);">
+                <h5 class="modal-title" id="addOfferModalLabel" style="color: var(--primary-color); font-weight: 600;">Add Category Offer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 22px;">
+                <!-- Removed the form tag here -->
+                <input type="hidden" id="categoryId" name="categoryId">
+                
+                <div class="mb-3">
+                    <label for="offerName" class="form-label" style="font-weight: 500; color: var(--text-dark);">Offer Name</label>
+                    <input type="text" class="form-control" id="offerName" placeholder="Enter offer name" required style="padding: 12px 16px; border: 1px solid rgba(166, 124, 82, 0.2); border-radius: 8px;">
+                    <div class="invalid-feedback">Please enter an offer name.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="discountPercentage" class="form-label" style="font-weight: 500; color: var(--text-dark);">Discount Percentage (%)</label>
+                    <input type="number" class="form-control" id="discountPercentage" min="1" max="100" placeholder="Enter discount percentage" required style="padding: 12px 16px; border: 1px solid rgba(166, 124, 82, 0.2); border-radius: 8px;">
+                    <div class="form-text text-muted" style="font-size: 0.85rem;">Enter a value between 1-90</div>
+                    <div class="invalid-feedback">Please enter a valid discount percentage (1-90).</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="endDate" class="form-label" style="font-weight: 500; color: var(--text-dark);">End Date</label>
+                    <input type="datetime-local" class="form-control" id="endDate" required style="padding: 12px 16px; border: 1px solid rgba(166, 124, 82, 0.2); border-radius: 8px;">
+                    <div class="invalid-feedback">Please select an end date.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label" style="font-weight: 500; color: var(--text-dark);">Description</label>
+                    <textarea class="form-control" id="description" rows="3" placeholder="Enter offer description" style="padding: 12px 16px; border: 1px solid rgba(166, 124, 82, 0.2); border-radius: 8px;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid rgba(166, 124, 82, 0.1); padding: 16px 22px;">
+                <button type="button" class="btn" style="background-color: var(--light-accent); color: var(--text-medium); border-radius: 8px; padding: 10px 18px; font-weight: 500;" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </button>
+                <button type="button" class="btn" id="saveOfferBtn" style="background-color: var(--primary-color); color: var(--white); border-radius: 8px; padding: 10px 18px; font-weight: 500;">
+                    <i class="fas fa-save me-1"></i> Save Offer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script>
+        // Enhanced Add Category Validation
+document.getElementById("categoryForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const name = document.getElementById("product_name").value;
+    const description = document.getElementById("descriptionId").value;
+
+    // Validate category name
+    if (!name.trim()) {
+        document.getElementById("name-error").textContent = "Category name cannot be empty";
+        showErrorAlert("Category name cannot be empty or contain only spaces");
+        return;
+    } else {
+        document.getElementById("name-error").textContent = "";
+    }
+
+    // Validate first letter is uppercase
+    if (name.charAt(0) !== name.charAt(0).toUpperCase()) {
+        document.getElementById("name-error").textContent = "Category name must start with a capital letter";
+        showErrorAlert("Category name must start with a capital letter");
+        return;
+    }
+    
+    // Validate name doesn't contain numbers
+    if (/\d/.test(name)) {
+        document.getElementById("name-error").textContent = "Category name cannot contain numbers";
+        showErrorAlert("Category name cannot contain numbers");
+        return;
+    }
+
+    document.getElementById("name-error").textContent = "";
+    // Validate description
+    if (!description.trim()) {
+        document.getElementById("description-error").textContent = "Description cannot be empty";
+        showErrorAlert("Description cannot be empty or contain only spaces");
+        return;
+    } else {
+        document.getElementById("description-error").textContent = "";
+    }
+
+    try {
+        const response = await fetch("/admin/addCategory", {
+            method: "POST",
+            body: JSON.stringify({ categoryName: name, categoryDiscription: description }),
+            headers: { "Content-Type": "application/json" }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            Swal.fire({
+                title: "Success!",
+                text: "Category added successfully!",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'swal-theme-popup',
+                    title: 'swal-theme-title',
+                    confirmButton: 'swal-theme-button'
+                }
+            }).then(() => {
+                location.reload(); // Refresh to show the new category
+            });
+        } else {
+            showErrorAlert(data.message || "Failed to add category");
+        }
+    } catch (error) {
+        console.error("Error adding category:", error);
+        showErrorAlert("Something went wrong!");
+    }
+});
+
+// Add offer modal function with enhanced validation
+function addOffer(categoryId) {
+    // Set the category ID in the hidden input
+    document.getElementById('categoryId').value = categoryId;
+    
+    // Set minimum date to today for the end date picker
+    const today = new Date();
+    const formattedDate = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
+    document.getElementById('endDate').min = formattedDate;
+    
+    // Calculate default end date (30 days from now)
+    const defaultEndDate = new Date();
+    defaultEndDate.setDate(today.getDate() + 30);
+    document.getElementById('endDate').value = defaultEndDate.toISOString().slice(0, 16);
+    
+    // Reset form fields
+    document.getElementById('offerName').value = '';
+    document.getElementById('discountPercentage').value = '';
+    document.getElementById('description').value = '';
+    
+    // Reset any validation styling
+    const inputs = document.querySelectorAll('#addOfferModal .form-control');
+    inputs.forEach(input => {
+        input.classList.remove('is-invalid');
+    });
+    
+    // Open the modal
+    const addOfferModal = new bootstrap.Modal(document.getElementById('addOfferModal'));
+    addOfferModal.show();
+}
+
+// Enhanced Save Offer validation
+document.getElementById('saveOfferBtn').addEventListener('click', function() {
+    // Validate the inputs with enhanced checks
+    let isValid = true;
+    
+    // Get form elements
+    const offerName = document.getElementById('offerName');
+    const discountPercentage = document.getElementById('discountPercentage');
+    const endDate = document.getElementById('endDate');
+    const description = document.getElementById('description');
+    const categoryId = document.getElementById('categoryId').value;
+    
+    // Reset validation states
+    [offerName, discountPercentage, endDate, description].forEach(input => {
+        input.classList.remove('is-invalid');
+    });
+    
+    // Check offer name
+    if (!offerName.value.trim()) {
+        offerName.classList.add('is-invalid');
+        isValid = false;
+        showErrorAlert("Offer name cannot be empty or contain only spaces");
+        return;
+    }
+    
+    // Check if offer name contains numbers
+    if (/\d/.test(offerName.value)) {
+        offerName.classList.add('is-invalid');
+        isValid = false;
+        showErrorAlert("Offer name cannot contain numbers");
+        return;
+    }
+    
+    // Check description (shouldn't be completely numeric)
+    if (description.value.trim() && /^\d+$/.test(description.value.trim())) {
+        description.classList.add('is-invalid');
+        isValid = false;
+        showErrorAlert("Description cannot consist of only numbers");
+        return;
+    }
+    
+    // Check discount percentage - enhanced validation
+    const discount = Number(discountPercentage.value);
+    if (isNaN(discount) || !discountPercentage.value.trim()) {
+        discountPercentage.classList.add('is-invalid');
+        isValid = false;
+        showErrorAlert("Discount percentage must be a valid number");
+        return;
+    } else if (discount < 1) {
+        discountPercentage.classList.add('is-invalid');
+        isValid = false;
+        showErrorAlert("Discount percentage cannot be less than 1%");
+        return;
+    } else if (discount > 90) {
+        discountPercentage.classList.add('is-invalid');
+        isValid = false;
+        showErrorAlert("Discount percentage cannot exceed 90%");
+        return;
+    }
+    
+    // Check end date
+    if (!endDate.value) {
+        endDate.classList.add('is-invalid');
+        isValid = false;
+        showErrorAlert("End date is required");
+        return;
+    }
+    
+    // Validate that end date is in the future
+    const selectedDate = new Date(endDate.value);
+    const now = new Date();
+    if (selectedDate <= now) {
+        endDate.classList.add('is-invalid');
+        isValid = false;
+        showErrorAlert("End date must be in the future");
+        return;
+    }
+    
+    // Stop if validation failed
+    if (!isValid) {
+        return;
+    }
+    
+    // Prepare data for API
+    const offerData = {
+        name: offerName.value.trim(),
+        offerType: 'category',
+        discountPercentage: Number(discountPercentage.value),
+        category: categoryId,
+        endDate: endDate.value,
+        description: description.value.trim(),
+        isActive: true
+    };
+    
+    // Show loading state
+    const saveButton = document.getElementById('saveOfferBtn');
+    const originalText = saveButton.innerHTML;
+    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+    saveButton.disabled = true;
+    
+    // Send request to add offer
+    fetch('/admin/addCategoryOffer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(offerData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Reset button state
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+        
+        if (data.success) {
+            // Hide the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addOfferModal'));
+            modal.hide();
+            
+            // Show success message
+            Swal.fire({
+                title: 'Success!',
+                text: 'Category offer added successfully!',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'swal-theme-popup',
+                    title: 'swal-theme-title',
+                    confirmButton: 'swal-theme-button'
+                }
+            }).then(() => {
+                location.reload(); // Refresh to show the new offer
+            });
+        } else {
+            showErrorAlert(data.message || 'Failed to add offer');
+        }
+    })
+    .catch(error => {
+        // Reset button state
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+        
+        console.error('Error adding offer:', error);
+        showErrorAlert('Something went wrong!');
+    });
+});
+
+// Function for changing category status (activate/deactivate)
+function changeCategoryStatus(id, status) {
+    fetch(`/admin/updateCategoryStatus/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({isListed: !status})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            Swal.fire({
+                title: "Success!",
+                text: status ? "Category deactivated!" : "Category activated!",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'swal-theme-popup',
+                    title: 'swal-theme-title',
+                    confirmButton: 'swal-theme-button'
+                }
+            }).then(() => {
+                location.reload(); // Refresh page to update status
+            });
+        } else {
+            showErrorAlert(data.message || "Failed to update status");
+        }
+    })
+    .catch(error => {
+        console.error("Error updating category status:", error);
+        showErrorAlert("Something went wrong!");
+    });
+}
+
+// Remove offer function
+function removeOffer(categoryId) {
+    Swal.fire({
+        title: 'Remove Offer?',
+        text: 'Are you sure you want to remove this category offer?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#B56B6B',
+        cancelButtonColor: '#8C6D4F',
+        confirmButtonText: 'Yes, remove it!',
+        customClass: {
+            popup: 'swal-theme-popup',
+            title: 'swal-theme-title',
+            confirmButton: 'swal-theme-button',
+            cancelButton: 'swal-theme-cancel-button'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Send request to remove the offer
+            fetch(`/admin/removeCategoryOffer/${categoryId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Offer removed successfully!',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'swal-theme-popup',
+                            title: 'swal-theme-title',
+                            confirmButton: 'swal-theme-button'
+                        }
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    showErrorAlert(data.message || 'Failed to remove offer');
+                }
+            })
+            .catch(error => {
+                console.error('Error removing offer:', error);
+                showErrorAlert('Something went wrong!');
+            });
+        }
+    });
+}
+
+// Clear search function
+document.getElementById("clearButton").addEventListener("click", function() {
+    document.getElementById("searchInput").value = "";
+    // Submit the form to refresh with no search term
+    document.querySelector(".search-form").submit();
+});
+
+// Helper function for themed error alerts
+function showErrorAlert(message) {
+    Swal.fire({
+        title: 'Error!',
+        text: message,
+        icon: 'error',
+        confirmButtonColor: '#B56B6B',
+        customClass: {
+            popup: 'swal-theme-popup',
+            title: 'swal-theme-title',
+            confirmButton: 'swal-theme-button'
+        }
+    });
+}
+
+
+function toggleOfferStatus(offerId, categoryId, isActive) {
+    Swal.fire({
+        title: isActive ? 'Activate Offer?' : 'Deactivate Offer?',
+        text: isActive ? 'Are you sure you want to activate this offer?' : 'Are you sure you want to deactivate this offer?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: isActive ? '#4CAF50' : '#B56B6B',
+        cancelButtonColor: '#8C6D4F',
+        confirmButtonText: isActive ? 'Yes, activate it!' : 'Yes, deactivate it!',
+        customClass: {
+            popup: 'swal-theme-popup',
+            title: 'swal-theme-title',
+            confirmButton: 'swal-theme-button',
+            cancelButton: 'swal-theme-cancel-button'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Send request to update the offer status
+            fetch('/admin/toggleCategoryOfferStatus', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    offerId: offerId,
+                    categoryId: categoryId,
+                    isActive: isActive
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: isActive ? 'Offer activated successfully!' : 'Offer deactivated successfully!',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'swal-theme-popup',
+                            title: 'swal-theme-title',
+                            confirmButton: 'swal-theme-button'
+                        }
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    showErrorAlert(data.message || 'Failed to update offer status');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating offer status:', error);
+                showErrorAlert('Something went wrong!');
+            });
+        }
+    });
+}
+// Add custom CSS for SweetAlert theme
+const style = document.createElement('style');
+style.textContent = `
+    .swal-theme-popup {
+        border-radius: 8px;
+        border-top: 4px solid var(--primary-color, #8C6D4F);
+        padding: 20px;
+    }
+    .swal-theme-title {
+        color: var(--primary-color, #8C6D4F);
+        font-weight: 600;
+    }
+    .swal-theme-button {
+        background-color: var(--primary-color, #8C6D4F) !important;
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 10px 24px;
+    }
+    .swal-theme-cancel-button {
+        background-color: var(--light-accent, #f5f5f5) !important;
+        color: var(--text-medium, #666);
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 10px 24px;
+    }
+    .error-message {
+        color: #B56B6B;
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+`;
+document.head.appendChild(style);
+
+// Add input event listeners for real-time validation
+document.getElementById('offerName').addEventListener('input', function() {
+    if (this.value.trim() === '') {
+        this.classList.add('is-invalid');
+        document.querySelector('#offerName + .invalid-feedback').textContent = "Offer name cannot be empty";
+    } else if (/\d/.test(this.value)) {
+        // Check if the input contains any digits
+        this.classList.add('is-invalid');
+        document.querySelector('#offerName + .invalid-feedback').textContent = "Offer name cannot contain numbers";
+    } else {
+        this.classList.remove('is-invalid');
+    }
+});
+
+document.getElementById('discountPercentage').addEventListener('input', function() {
+    const value = Number(this.value);
+    if (isNaN(value) || value < 1 || value > 90) {
+        this.classList.add('is-invalid');
+    } else {
+        this.classList.remove('is-invalid');
+    }
+});
+
+document.getElementById('description').addEventListener('input', function() {
+    if (/^\d+$/.test(this.value.trim())) {
+        this.classList.add('is-invalid');
+        // Add error message if not already present
+        if (!document.querySelector('#description + .invalid-feedback')) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback';
+            errorDiv.textContent = "Description cannot consist of only numbers";
+            this.after(errorDiv);
+        } else {
+            document.querySelector('#description + .invalid-feedback').textContent = "Description cannot consist of only numbers";
+        }
+    } else {
+        this.classList.remove('is-invalid');
+    }
+});
+
+document.getElementById('endDate').addEventListener('input', function() {
+    const selectedDate = new Date(this.value);
+    const now = new Date();
+    if (!this.value || selectedDate <= now) {
+        this.classList.add('is-invalid');
+    } else {
+        this.classList.remove('is-invalid');
+    }
+});
+
+document.getElementById('product_name').addEventListener('input', function() {
+    if (this.value.trim() === '') {
+        document.getElementById('name-error').textContent = "Category name cannot be empty";
+    } else if (/\d/.test(this.value)) {
+        document.getElementById('name-error').textContent = "Category name cannot contain numbers";
+    } else {
+        document.getElementById('name-error').textContent = "";
+    }
+});
+
+document.getElementById('descriptionId').addEventListener('input', function() {
+    if (this.value.trim() === '') {
+        document.getElementById('description-error').textContent = "Description cannot be empty";
+    } else {
+        document.getElementById('description-error').textContent = "";
+    }
+});
+    </script>
+</body>
+       

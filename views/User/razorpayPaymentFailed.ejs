@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8B7355;
+            --secondary: #D2B48C;
+            --light: #F5F5DC;
+            --border: #E6D7C3;
+            --accent: #654321;
+            --error: #CD5C5C;
+            --success: #8FBC8F;
+            --text-dark: #333;
+            --text-light: #777;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .payment-failure-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(139, 115, 85, 0.15);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 30px;
+            position: relative;
+        }
+        
+        .card-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .card-header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .header-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 32px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .error-message {
+            background-color: rgba(205, 92, 92, 0.1);
+            border-left: 4px solid var(--error);
+            padding: 15px 20px;
+            margin: 10px 0 25px;
+            border-radius: 4px;
+        }
+        
+        .error-message h3 {
+            color: var(--error);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .error-message p {
+            color: var(--text-light);
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .order-details {
+            background-color: rgba(210, 180, 140, 0.15);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .order-details h3 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        
+        .detail-label {
+            color: var(--text-light);
+        }
+        
+        .detail-value {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #543210;
+            box-shadow: 0 4px 12px rgba(101, 67, 33, 0.25);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(101, 67, 33, 0.05);
+        }
+        
+        .support-message {
+            margin-top: 25px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .support-message a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .support-message a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .payment-failure-card {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .card-header {
+                padding: 20px;
+            }
+            
+            .card-body {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="payment-failure-card">
+            <div class="card-header">
+                <h1>Payment Failed</h1>
+                <p>We couldn't process your payment</p>
+                <div class="header-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="error-message">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Transaction Error</h3>
+                    <p>Your payment was declined. This could be due to insufficient funds, network issues, or bank restrictions.</p>
+                </div>
+                
+                <div class="order-details">
+                    <h3><i class="fas fa-shopping-bag"></i> Order Information</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Order ID:</span>
+                        <span class="detail-value" id="orderId">ORD-<%= Math.floor(100000 + Math.random() * 900000) %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Amount:</span>
+                        <span class="detail-value" id="orderAmount">₹<%= Math.floor(1000 + Math.random() * 9000) %>.00</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date:</span>
+                        <span class="detail-value" id="orderDate"><%= new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Method:</span>
+                        <span class="detail-value">RazorPay</span>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="retry-payment" class="btn btn-primary">
+                        <i class="fas fa-redo"></i> Retry Payment
+                    </button>
+                    <button id="cancel-order" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Cancel Order
+                    </button>
+                </div>
+                
+                <p class="support-message">
+                    Need help? Contact our <a href="/contact">customer support</a> team or call us at +91 98765 43210
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const themeColors = {
+                primary: '#8B7355',
+                secondary: '#D2B48C',
+                light: '#F5F5DC',
+                border: '#E6D7C3',
+                accent: '#654321',
+                error: '#CD5C5C',
+                success: '#8FBC8F'
+            };
+            
+            document.getElementById('retry-payment').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                showLoadingSpinner('Processing', 'Setting up payment gateway...');
+                
+                setTimeout(() => {
+                    Swal.close();
+                    // Redirect to checkout page
+                    window.location.href = '/checkout';
+                }, 1500);
+            });
+            
+            document.getElementById('cancel-order').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                Swal.fire({
+                    title: 'Cancel Order?',
+                    text: 'Are you sure you want to cancel this order?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: themeColors.error,
+                    cancelButtonColor: themeColors.secondary,
+                    confirmButtonText: 'Yes, cancel it!',
+                    background: themeColors.light
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showLoadingSpinner('Processing', 'Cancelling your order...');
+                        
+                        setTimeout(() => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Order Cancelled',
+                                text: 'Your order has been cancelled successfully!',
+                                confirmButtonColor: themeColors.primary,
+                                background: themeColors.light
+                            }).then(() => {
+                                // Redirect to cart page
+                                window.location.href = '/cart';
+                            });
+                        }, 1500);
+                    }
+                });
+            });
+            
+            function showLoadingSpinner(title, text = '') {
+                return Swal.fire({
+                    title: title,
+                    text: text,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                    background: themeColors.light
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<%- include('../Partials/admin/adminHeader') %>
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card bg-white shadow-lg border-0 mb-4">
+        <div class="card-header bg-gradient-brown d-flex justify-content-between align-items-center">
+          <h4 class="text-white mb-0">
+            <i class="fas fa-ticket-alt me-2"></i>Coupon Management
+          </h4>
+          <a href="/admin/addCoupon" class="btn btn-light btn-sm d-flex align-items-center">
+            <i class="fas fa-plus me-1"></i> Add New Coupon
+          </a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light"> 
+                <tr>
+                  <th class="text-brown px-3">Coupon Code</th>
+                  <th class="text-brown">Offer Amount</th>
+                  <th class="text-brown">Min. Purchase</th>
+                  <th class="text-brown">Start Date</th>
+                  <th class="text-brown">Expiry Date</th>
+                  <th class="text-brown">Usage Count</th>
+                  <th class="text-brown text-center">Status</th>
+                  <th class="text-brown text-end px-3">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (coupons && coupons.length > 0) { %>
+                  <% coupons.forEach(coupon => { %>
+                    <tr>
+                      <td class="px-3 fw-medium"><%= coupon.couponCode %></td>
+                      <td>₹<%= coupon.offerPrice.toFixed(2) %></td>
+                      <td>₹<%= coupon.minAmount.toFixed(2) %></td>
+                      <td><%= new Date(coupon.startDate).toLocaleDateString() %></td>
+                      <td><%= new Date(coupon.expireDate).toLocaleDateString() %></td>
+                      <td>
+                        <span class="badge bg-light-brown text-brown-800 rounded-pill px-3 py-2">
+                          <% if (coupon.usedBy && coupon.usedBy.length > 0) { %>
+                            <%= coupon.usedBy.length %>
+                          <% } else { %>
+                            0
+                          <% } %>
+                        </span>
+                      </td>
+                      <td class="text-center">
+                        <button type="button" 
+                                class="btn btn-sm status-btn <%= coupon.isBlocked ? 'btn-inactive' : 'btn-active' %>"
+                                onclick="updateCouponStatus('<%= coupon._id %>', '<%= coupon.isBlocked %>', '<%= coupon.couponCode %>')">
+                          <i class="fas <%= coupon.isBlocked ? 'fa-ban me-1' : 'fa-check-circle me-1' %>"></i>
+                          <%= coupon.isBlocked ? 'Blocked' : 'Active' %>
+                        </button>
+                      </td>
+                      <td class="text-end px-3">
+                        <div class="action-buttons">
+                          <a href="/admin/edit-coupon/<%= coupon._id %>" class="btn btn-edit">
+                            <i class="fas fa-edit"></i>
+                            <span>EDIT</span>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="8" class="text-center py-5">
+                      <div class="empty-state">
+                        <h4 class="text-brown-700 mb-2">No Coupons Available</h4>
+                        <p class="text-muted mb-4">Create your first coupon to attract more customers!</p>
+                        <a href="/admin/addCoupon" class="btn btn-brown">
+                          <i class="fas fa-plus-circle me-2"></i>Add Your First Coupon
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast for displaying messages -->
+<div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11"></div>
+
+<!-- Custom CSS for light brown theme -->
+<style>
+  :root {
+    --brown-100: #f5f0e8;
+    --brown-200: #e6d7c3;
+    --brown-300: #d4bea2;
+    --brown-400: #c1a68c;
+    --brown-500: #b08d6c;
+    --brown-600: #9a7b5f;
+    --brown-700: #846a51;
+    --brown-800: #6b5440;
+    --brown-900: #524030;
+    --green-500: #10b981;
+    --green-600: #059669;
+    --green-100: #d1fae5;
+    --red-500: #ef4444;
+    --red-600: #dc2626;
+    --red-100: #fee2e2;
+  }
+  
+  .bg-brown {
+    background-color: var(--brown-600) !important;
+  }
+  
+  .bg-light-brown {
+    background-color: var(--brown-100) !important;
+  }
+  
+  .bg-gradient-brown {
+    background: linear-gradient(145deg, var(--brown-700), var(--brown-500)) !important;
+  }
+  
+  .text-brown {
+    color: var(--brown-700) !important;
+  }
+
+  .text-brown-800 {
+    color: var(--brown-800) !important;
+  }
+  
+  .btn-brown {
+    background-color: var(--brown-600);
+    color: white;
+    border-radius: 6px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-brown:hover {
+    background-color: var(--brown-700);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  
+  .btn-outline-brown {
+    border: 2px solid var(--brown-600);
+    color: var(--brown-600);
+    background-color: white;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline-brown:hover {
+    background-color: var(--brown-600);
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  .card {
+    margin-top: 70px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08) !important;
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12) !important;
+  }
+  
+  .card-header {
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem;
+    background-color: var(--brown-100);
+    border-radius: 12px;
+    margin: 10px;
+  }
+  
+  .empty-state-image {
+    width: 120px;
+    height: auto;
+    opacity: 0.8;
+  }
+  
+  .table {
+    border: 1px solid var(--brown-200);
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .table th, 
+  .table td {
+    border: 1px solid var(--brown-200);
+    vertical-align: middle;
+    padding: 0.85rem 1rem;
+  }
+  
+  .table thead th {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    border-bottom: 2px solid var(--brown-300);
+  }
+  
+  .table tbody tr:hover {
+    background-color: var(--brown-100);
+  }
+
+  /* Action Buttons Styling */
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 100%;
+  }
+  
+  .action-buttons .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+  
+  .action-buttons .btn i {
+    margin-right: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .btn-edit {
+    background-color: var(--brown-600);
+    color: white;
+    border: none;
+    min-width: 84px;
+  }
+  
+  .btn-edit:hover {
+    background-color: var(--brown-700);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .btn-delete {
+    background-color: white;
+    color: var(--red-600);
+    border: 1px solid var(--red-600);
+    min-width: 84px;
+  }
+  
+  .btn-delete:hover {
+    background-color: var(--red-500);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border-color: transparent;
+  }
+  
+  /* Status Button Styling */
+  .status-btn {
+    min-width: 86px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 500;
+    border: none;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .btn-active {
+    background-color: var(--green-100);
+    color: var(--green-600);
+  }
+  
+  .btn-active:hover {
+    background-color: var(--green-500);
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  .btn-inactive {
+    background-color: var(--red-100);
+    color: var(--red-600);
+  }
+  
+  .btn-inactive:hover {
+    background-color: var(--red-500);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Badge styling */
+  .badge {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* Toast styling */
+  .toast {
+    background-color: white;
+    border-radius: 8px;
+    border-left: 4px solid var(--brown-600);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .toast-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--brown-200);
+  }
+
+  .toast-body {
+    padding: 12px 15px;
+  }
+
+  /* Responsive handling for smaller screens */
+  @media (max-width: 991.98px) {
+    .action-buttons {
+      flex-direction: row;
+      width: 100%;
+    }
+    
+    .action-buttons .btn {
+      padding: 5px 10px;
+      font-size: 0.75rem;
+    }
+    
+    .action-buttons .btn i {
+      margin-right: 4px;
+    }
+  }
+  
+  @media (max-width: 767.98px) {
+    .action-buttons .btn span {
+      display: none;
+    }
+    
+    .action-buttons .btn i {
+      margin-right: 0;
+      font-size: 1rem;
+    }
+    
+    .action-buttons .btn {
+      min-width: auto;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+    }
+    
+    .empty-state {
+      padding: 2rem 1rem;
+    }
+    
+    .empty-state-image {
+      width: 90px;
+    }
+  }
+  
+  /* SweetAlert Custom Styling */
+  .swal2-popup {
+    border-radius: 12px;
+    font-family: inherit;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  }
+  
+  .swal2-title {
+    color: var(--brown-800);
+    font-weight: 600;
+  }
+  
+  .swal2-html-container {
+    color: var(--brown-700);
+    font-size: 1.05rem;
+  }
+  
+  .swal2-confirm {
+    background-color: var(--brown-600) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    padding: 12px 24px !important;
+  }
+  
+  .swal2-confirm:hover {
+    background-color: var(--brown-700) !important;
+  }
+  
+  .swal2-cancel {
+    background-color: #6c757d !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    padding: 12px 24px !important;
+  }
+  
+  .swal2-success-ring {
+    border-color: var(--green-500) !important;
+  }
+  
+  .swal2-success-line-tip,
+  .swal2-success-line-long {
+    background-color: var(--green-500) !important;
+  }
+  
+  .swal2-error {
+    border-color: var(--red-500) !important;
+  }
+</style>
+
+<!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- JavaScript for handling deletion and status updates -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Make these functions globally available
+
+  window.updateCouponStatus = updateCouponStatus;
+  
+  // Check for URL parameters to display toast messages
+  const urlParams = new URLSearchParams(window.location.search);
+  const message = urlParams.get('message');
+  const status = urlParams.get('status');
+  
+  if (message) {
+    showToast(message, status || 'success');
+  }
+});
+
+// Function to show toast message
+function showToast(message, type = 'success') {
+  const iconClass = type === 'success' ? 'fa-check-circle text-success' : 'fa-exclamation-circle text-danger';
+  const title = type === 'success' ? 'Success' : 'Error';
+  
+  const toastHtml = `
+    <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-header">
+          <i class="fas ${iconClass} me-2"></i>
+          <strong class="me-auto">${title}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          ${message}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  const container = document.getElementById('toastContainer');
+  container.innerHTML = toastHtml;
+  
+  const toastElement = container.querySelector('.toast');
+  const toast = new bootstrap.Toast(toastElement, {
+    delay: 3000
+  });
+  
+  toast.show();
+}
+
+
+// Function to update coupon status
+function updateCouponStatus(couponId, isBlocked, couponCode) {
+  const newStatus = isBlocked === 'true' ? 'active' : 'blocked';
+  const isActive = newStatus === 'active';
+  const statusIcon = isActive ? 'success' : 'warning';
+  const iconClass = isActive ? 'fa-check-circle' : 'fa-ban';
+  
+  Swal.fire({
+    title: 'Confirm Status Change',
+    html: `Are you sure you want to set coupon <strong>"${couponCode}"</strong> to <strong>${newStatus}</strong>?`,
+    icon: statusIcon,
+    showCancelButton: true,
+    confirmButtonText: `<i class="fas ${iconClass} me-2"></i>Update Status`,
+    cancelButtonText: '<i class="fas fa-times me-2"></i>Cancel',
+    confirmButtonColor: '#9a7b5f',
+    cancelButtonColor: '#6c757d',
+    backdrop: `rgba(132, 106, 81, 0.4)`
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Show loading state
+      Swal.fire({
+        title: 'Updating...',
+        html: 'Please wait',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      fetch(`/admin/coupon-update-status/${couponId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          isActive: isActive
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            title: 'Updated!',
+            text: `Coupon ${newStatus} successfully!`,
+            icon: 'success',
+            confirmButtonColor: '#9a7b5f',
+            timer: 2000,
+            timerProgressBar: true
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: data.message || 'Failed to update coupon status',
+            icon: 'error',
+            confirmButtonColor: '#9a7b5f'
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'An error occurred. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#9a7b5f'
+        });
+      });
+    }
+  });
+}
+
+// Handle network errors globally
+window.addEventListener('error', function(event) {
+  if (event && event.target && (event.target.tagName === 'SCRIPT' || event.target.tagName === 'LINK')) {
+    showToast('Network resource failed to load. Please check your connection.', 'error');
+  }
+});
+</script>
+
+<%- include('../Partials/admin/adminFooter') %>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+        .below-order-item-forEach {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .below-order-item-forEach:last-child {
+            border-bottom: none;
+        }
+
+        :root {
+            --primary-color: #8B7355;
+            --secondary-color: #D2B48C;
+            --light-color: #F5F5DC;
+            --border-color: #E6D7C3;
+            --accent-color: #654321;
+            --error-color: #CD5C5C;
+            --success-color: #8FBC8F;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .text-success {
+            color: #28a745 !important;
+            font-weight: 500;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-color);
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .confirmation-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(139, 115, 85, 0.15);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--secondary-color);
+            opacity: 0;
+            animation: confetti-fall 4s ease-in-out infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(500px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            padding: 30px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .success-animation {
+            margin-bottom: 20px;
+        }
+
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 2;
+            stroke: #fff;
+            stroke-miterlimit: 10;
+            margin: 0 auto 20px;
+            box-shadow: inset 0px 0px 0px var(--secondary-color);
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        }
+
+        .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: var(--secondary-color);
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes scale {
+
+            0%,
+            100% {
+                transform: none;
+            }
+
+            50% {
+                transform: scale3d(1.1, 1.1, 1);
+            }
+        }
+
+        @keyframes fill {
+            100% {
+                box-shadow: inset 0px 0px 0px 30px var(--secondary-color);
+            }
+        }
+
+        .confirmation-title {
+            font-family: 'Playfair Display', serif;
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        .confirmation-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .order-number {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 30px;
+            color: white;
+            font-weight: 500;
+            animation: fadeInUp 1s ease-out 0.6s forwards;
+            opacity: 0;
+        }
+
+        .card-body {
+            padding: 40px;
+        }
+
+        .order-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-out 1s forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .info-box {
+            background-color: rgba(210, 180, 140, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .info-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .info-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-icon {
+            color: var(--primary-color);
+        }
+
+        .info-content {
+            color: #555;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background-color: var(--success-color);
+            color: white;
+            margin-top: 5px;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 30px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            animation: fadeInUp 1s ease-out 1.3s forwards;
+            opacity: 0;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(101, 67, 33, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(139, 115, 85, 0.2);
+        }
+
+        .illustration {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .delivery-truck {
+            width: 120px;
+            height: 80px;
+            position: relative;
+            animation: drive 10s infinite linear;
+        }
+
+        @keyframes drive {
+            0% {
+                transform: translateX(600px);
+            }
+
+            100% {
+                transform: translateX(-600px);
+            }
+        }
+
+        .truck-body {
+            width: 100px;
+            height: 40px;
+            background-color: var(--primary-color);
+            border-radius: 5px 5px 0 0;
+            position: absolute;
+            bottom: 20px;
+            left: 10px;
+        }
+
+        .truck-cabin {
+            width: 30px;
+            height: 30px;
+            background-color: var(--accent-color);
+            border-radius: 5px 0 0 0;
+            position: absolute;
+            bottom: 20px;
+            left: -20px;
+        }
+
+        .wheel {
+            width: 20px;
+            height: 20px;
+            background-color: #333;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            animation: rotate 1s infinite linear;
+        }
+
+        .wheel-1 {
+            left: -10px;
+        }
+
+        .wheel-2 {
+            right: 20px;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .message {
+            text-align: center;
+            margin: 30px 0;
+            font-style: italic;
+            color: #666;
+            animation: fadeIn 1s ease-out 1.5s forwards;
+            opacity: 0;
+        }
+
+        .cost-breakdown {
+            margin-top: 15px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 15px;
+        }
+
+        /* Improved styles for price display */
+        .item-price-display {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .offer-price {
+            color: var(--success-color);
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .discount-badge {
+            display: inline-block;
+            background-color: var(--success-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 6px;
+            border-radius: 3px;
+            margin-top: 3px;
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-name {
+            font-weight: 500;
+        }
+
+        .item-quantity {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                margin: 20px auto;
+            }
+
+            .card-header {
+                padding: 20px;
+            }
+
+            .confirmation-title {
+                font-size: 1.8rem;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body> 
+    <div class="container">
+        <div class="confirmation-card">
+            <!-- Confetti Animation Elements -->
+            <div class="confetti" style="left: 10%; animation-delay: 0.1s; background-color: #8B7355;"></div>
+            <div class="confetti" style="left: 20%; animation-delay: 0.7s; background-color: #D2B48C;"></div>
+            <div class="confetti" style="left: 30%; animation-delay: 0.4s; background-color: #8B7355;"></div>
+            <div class="confetti" style="left: 40%; animation-delay: 0.9s; background-color: #D2B48C;"></div>
+            <div class="confetti" style="left: 50%; animation-delay: 0.2s; background-color: #8B7355;"></div>
+            <div class="confetti" style="left: 60%; animation-delay: 0.8s; background-color: #D2B48C;"></div>
+            <div class="confetti" style="left: 70%; animation-delay: 0.5s; background-color: #8B7355;"></div>
+            <div class="confetti" style="left: 80%; animation-delay: 1s; background-color: #D2B48C;"></div>
+            <div class="confetti" style="left: 90%; animation-delay: 0.3s; background-color: #8B7355;"></div>
+
+            <div class="card-header">
+                <div class="success-animation">
+                    <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                    </svg>
+                </div>
+                <h1 class="confirmation-title">
+                    <%= order.confirmationTitle || 'Order Successful!' %>
+                </h1>
+                <p class="confirmation-subtitle">
+                    <%= order.confirmationSubtitle || 'Thank you for shopping with us. Your order has been received.' %>
+                </p>
+                <div class="order-number">Order #<%= order.orderNumber %></div>
+            </div>
+
+            <div class="card-body">
+                <div class="order-info">
+                    <div class="info-box">
+                        <h3 class="info-title">
+                            <i class="fas fa-calendar-day info-icon"></i>
+                            Order Date
+                        </h3>
+                        <p class="info-content">
+                            <%= order.orderDate %>
+                        </p>
+                    </div>
+
+                    <div class="info-box">
+                        <h3 class="info-title">
+                            <i class="fas fa-truck info-icon"></i>
+                            Delivery Date
+                        </h3>
+                        <p class="info-content">
+                            <%= order.deliveryDate %>
+                        </p>
+                    </div>
+
+                    <div class="info-box">
+                        <h3 class="info-title">
+                            <i class="fas fa-spinner info-icon"></i>
+                            Order Status
+                        </h3>
+                        <p class="info-content">
+                            <span class="status-badge" style="background-color: var(--success-color)">
+                                <%= order.status && order.status.label ? order.status.label : 'Processing' %>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="info-box">
+                    <h3 class="info-title">
+                        <i class="fas fa-map-marker-alt info-icon"></i>
+                        Delivery Address
+                    </h3>
+                    <div class="info-content">
+                        <p><strong><%= order.address.fullName %></strong></p>
+                        <p><strong><%= order.address.addressType %></strong></p>
+                        <p>
+                            <%= order.address.houseNumber %>, 
+                            <%= order.address.street %>
+                        </p>
+                        <p><%= order.address.landmark %></p>
+                        <p>
+                            <%= order.address.city %>, 
+                            <%= order.address.state %> <%= order.address.pincode %>
+                        </p>
+                        <p>Phone: <%= order.address.alternative_no %></p>
+                    </div>
+                </div>
+
+<!-- Order Summary Section -->
+<% if (order.items && order.items.length > 0) { %>
+    <div class="divider"></div>
+    <div class="info-box">
+        <h3 class="info-title">
+            <i class="fas fa-shopping-basket info-icon"></i>
+            Order Summary
+        </h3>
+        <div class="info-content">
+            <% order.items.forEach(function(item) { %>
+                <div class="below-order-item-forEach">
+                    <div class="item-details">
+                        <span class="item-name"><%= item.name %></span>
+                        <span class="item-quantity">Qty: <%= item.quantity %></span>
+                    </div>
+                    <div class="item-price-display">
+                        <div class="item-price">₹<%= item.price.toFixed(2) %></div>
+                    </div>
+                </div>
+            <% }); %>
+            
+            <div class="cost-breakdown">
+                <% if (order.coupon && order.coupon.couponCode) { %>
+                    <div class="below-order-item-forEach">
+                        <span>Coupon Applied (<%= order.coupon.couponCode %>)</span>
+                        <span class="text-success">-₹<%= order.coupon.discount.toFixed(2) %></span>
+                    </div>
+                <% } %>
+                
+                <div class="below-order-item-forEach">
+                    <span>GST (<%= order.gstRate %>%)</span>
+                    <span>₹<%= order.gstAmount ? order.gstAmount.toFixed(2) : '0.00' %></span>
+                </div>
+                
+                <div class="below-order-item-forEach">
+                    <span>Shipping Cost</span>
+                    <span class="<%= order.shippingCost === 0 ? 'text-success' : '' %>">
+                        <%= order.shippingCost === 0 ? 'FREE' : `₹${order.shippingCost.toFixed(2)}` %>
+                    </span>
+                </div>
+                
+                <div class="divider" style="margin: 15px 0;"></div>
+                
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem;">
+                    <span>Total</span>
+                    <span>₹<%= order.totalAmount.toFixed(2) %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+                <div class="illustration">
+                    <div class="delivery-truck">
+                        <div class="truck-cabin"></div>
+                        <div class="truck-body"></div>
+                        <div class="wheel wheel-1"></div>
+                        <div class="wheel wheel-2"></div>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <%= order.message
+                        || "We're preparing your books with care. You'll receive an email with tracking information once your order ships."
+                    %>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="/orders/<%= order.orderNumber %>" class="btn btn-primary">
+                        <i class="fas fa-file-alt"></i> View Order Details
+                    </a>
+                    <a href="/shop" class="btn btn-outline">
+                        <i class="fas fa-shopping-bag"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create more confetti dynamically
+        document.addEventListener('DOMContentLoaded', function () {
+            const card = document.querySelector('.confirmation-card');
+            const colors = ['#8B7355', '#D2B48C', '#F5F5DC', '#654321'];
+
+            for (let i = 0; i < 30; i++) {
+                createConfetti(card, colors);
+            }
+
+            // Create truck wheel rotation animation
+            const wheels = document.querySelectorAll('.wheel');
+            wheels.forEach(wheel => {
+                wheel.style.animation = 'rotate 1s infinite linear';
+            });
+        });
+
+        function createConfetti(parent, colors) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+
+            // Random position
+            const left = Math.random() * 100;
+            confetti.style.left = `${left}%`;
+
+            // Random delay
+            const delay = Math.random() * 5;
+            confetti.style.animationDelay = `${delay}s`;
+
+            // Random color
+            const colorIndex = Math.floor(Math.random() * colors.length);
+            confetti.style.backgroundColor = colors[colorIndex];
+
+            // Random size
+            const size = Math.random() * 8 + 5;
+            confetti.style.width = `${size}px`;
+            confetti.style.height = `${size}px`;
+
+            parent.appendChild(confetti);
+        }
+    </script>
+</body>
+
+</html>

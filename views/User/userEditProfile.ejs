@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChapterOne | Edit Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css">
+    <!-- Add Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <style>
+        :root {
+            --primary-brown: #8B5A2B;
+            --secondary-brown: #A67C52;
+            --light-brown: #D2B48C;
+            --dark-brown: #654321;
+            --accent-gold: #D4AF37;
+            --soft-shadow: rgba(0, 0, 0, 0.05);
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .dashboard-sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            position: fixed;
+            height: 100vh;
+            box-shadow: var(--card-shadow);
+            padding: 25px 0;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin-bottom: 25px;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-brown);
+            margin: 0;
+        }
+
+        .back-home-btn {
+            color: var(--primary-brown);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            padding: 6px 12px;
+            border: 1px solid var(--primary-brown);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .back-home-btn:hover {
+            background-color: var(--primary-brown);
+            color: white;
+        }
+
+        .user-profile .profile-image img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 3px solid var(--light-brown);
+            border-radius: 50%;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+
+        .nav-link1 {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link1.active {
+            background-color: rgba(139, 90, 43, 0.1);
+            color: var(--primary-brown);
+            border-left-color: var(--primary-brown);
+        }
+
+        .nav-link1:hover {
+            background-color: rgba(139, 90, 43, 0.1);
+            color: var(--primary-brown);
+            border-left-color: var(--primary-brown);
+        }
+
+        .nav-link1 i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .dashboard-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-header h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-brown);
+            margin: 0;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            color: var(--secondary-brown);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .primary-btn {
+            background-color: var(--primary-brown);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .primary-btn:hover {
+            background-color: var(--dark-brown);
+            color: white;
+        }
+
+        /* Profile Edit Styles */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-pic-container {
+            position: relative;
+            margin-right: 20px;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--light-brown);
+        }
+
+        .change-pic-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-brown);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .change-pic-btn:hover {
+            background-color: var(--dark-brown);
+        }
+
+        .profile-info h3 {
+            margin: 0;
+            color: var(--dark-brown);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .profile-info p {
+            margin: 5px 0 0;
+            color: #888;
+        }
+
+        .form-label {
+            color: var(--dark-brown);
+            font-weight: 500;
+        }
+
+        .form-control:focus {
+            border-color: var(--light-brown);
+            box-shadow: 0 0 0 0.25rem rgba(139, 90, 43, 0.25);
+        }
+
+        .form-control:disabled {
+            background-color: rgba(139, 90, 43, 0.05);
+            border-color: rgba(139, 90, 43, 0.1);
+            color: #666;
+        }
+
+        .email-change-link {
+            color: var(--primary-brown);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .email-change-link:hover {
+            color: var(--dark-brown);
+            text-decoration: underline;
+        }
+
+        .profile-image-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+
+        #profileImagePreview {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--light-brown);
+        }
+
+        /* Cropper Modal Styles */
+        .cropper-container {
+            max-height: 400px;
+            margin-bottom: 15px;
+        }
+
+        #image-crop-canvas {
+            max-width: 100%;
+            display: block;
+        }
+
+        .cropper-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .cropper-buttons button {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .crop-btn {
+            background-color: var(--primary-brown);
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .crop-btn:hover {
+            background-color: var(--dark-brown);
+        }
+
+        .cancel-crop-btn {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .crop-controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .crop-control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            color: var(--primary-brown);
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .crop-control-btn:hover {
+            background-color: var(--light-brown);
+            color: white;
+        }
+
+        /* SweetAlert2 Custom Styles */
+        .swal2-styled.swal2-confirm {
+            background-color: var(--primary-brown) !important;
+        }
+
+        .swal2-styled.swal2-confirm:focus {
+            box-shadow: 0 0 0 3px rgba(139, 90, 43, 0.5) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .dashboard-sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .dashboard-content {
+                margin-left: 0;
+            }
+            
+            .toggle-sidebar {
+                display: block;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 100;
+                background-color: var(--primary-brown);
+                color: white;
+                border: none;
+                width: 40px;
+                height: 40px;
+                border-radius: 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cropper Modal -->
+    <div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cropperModalLabel">Crop Profile Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="cropper-container">
+                        <img id="image-crop-canvas" src="">
+                    </div>
+                    <div class="crop-controls">
+                        <button type="button" class="crop-control-btn" id="rotateLeftBtn" title="Rotate Left">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button type="button" class="crop-control-btn" id="rotateRightBtn" title="Rotate Right">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button type="button" class="crop-control-btn" id="zoomInBtn" title="Zoom In">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button type="button" class="crop-control-btn" id="zoomOutBtn" title="Zoom Out">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button type="button" class="crop-control-btn" id="resetBtn" title="Reset">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn primary-btn" id="cropImageBtn">Apply Crop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Mobile Toggle Button (visible on small screens) -->
+        <button class="toggle-sidebar d-lg-none">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Sidebar -->
+        <div class="dashboard-sidebar">
+            <div class="logo-container">
+                <a href="/" class="back-home-btn">
+                    <i class="fas fa-home me-1"></i> Back To Home
+                </a>
+            </div>
+            <div class="logo-container">
+                <h3 class="logo-text">ChapterOne</h3>
+            </div>
+            
+            <div class="user-profile text-center mb-4">
+                <div class="profile-image">
+                    <img src="<%= user.profileImage %>" alt="Profile Picture">
+                </div>
+                <h5 class="mt-3"><%= user.name %></h5>
+                <p class="text-muted small"><%= user.email %></p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="/account" class="nav-link1">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/profile" class="nav-link1">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/edit-profile" class="nav-link1 active">
+                            <i class="fas fa-user-edit"></i>
+                            <span>Edit Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                       
+                        <% if (!user.googleId) { %>
+                            <a href="/account/change-password" class="nav-link1">
+                                <i class="fas fa-lock"></i>
+                                <span>Change Password</span>
+                            </a>
+                        <% } %>
+                    </li>
+                    <li>
+                        <% if (!user.googleId) { %>
+                            <a href="/account/change-email" class="nav-link1">
+                                <i class="fas fa-envelope"></i>
+                                <span>Change Email</span>
+                            </a>
+                            <% } %>
+                    </li>
+                    <li>
+                        <a href="/account/orders" class="nav-link1">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/wallet" class="nav-link1">
+                            <i class="fas fa-wallet"></i>
+                            <span>Wallet</span>
+                        </a>
+                    </li>
+                    <li class="mt-4">
+                        <a href="/logout" class="nav-link1 text-danger">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <div class="dashboard-header">
+                <h2>Edit Profile</h2>
+                <a href="/account/profile" class="back-home-btn">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Profile
+                </a>
+            </div>
+            
+            <!-- Edit Profile Form -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h5>Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <form id="editProfileForm" action="/account/edit-profile" method="POST" enctype="multipart/form-data">
+                        <!-- Profile Image Upload -->
+                        <div class="text-center mb-4">
+                            <div class="profile-image-wrapper">
+                                <img src="<%= user.profileImage %>" alt="Profile Picture" id="profileImagePreview">
+                                <label for="profileImage" class="change-pic-btn">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                            </div>
+                            <input type="file" name="profileImage" id="profileImage" class="d-none" accept="image/*">
+                            <!-- Hidden input to store cropped image data -->
+                            <input type="hidden" name="croppedImage" id="croppedImage">
+                            <p class="small text-muted mt-2">Click on the camera icon to change profile picture</p>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstname" class="form-label">First Name*</label>
+                                <input type="text" class="form-control" id="firstname" name="firstname" value="<%= user.firstname %>" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastname" class="form-label">Last Name*</label>
+                                <input type="text" class="form-control" id="lastname" name="lastname" value="<%= user.lastname %>" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" value="<%= user.email %>" disabled>
+                                <div class="form-text">
+                                    <% if (!user.googleId) { %>
+                                        <a href="/account/change-email" class="email-change-link">
+                                            <i class="fas fa-envelope me-1"></i> Click here to change your email address
+                                        </a>
+                                        <% } %>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile" class="form-label">Phone Number*</label>
+                                <input type="tel" class="form-control" id="mobile" placeholder="Optional..." name="mobile" value="<%= user.mobile %>">
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-outline-secondary me-2" onclick="location.href='/account/profile'">Cancel</button>
+                            <button type="submit" class="primary-btn">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Add SweetAlert2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+    <!-- Add Cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle sidebar on mobile
+            document.querySelector('.toggle-sidebar')?.addEventListener('click', function() {
+                document.querySelector('.dashboard-sidebar').classList.toggle('active');
+            });
+            
+            // Initialize variables for Cropper.js
+            let cropper;
+            const cropperModal = new bootstrap.Modal(document.getElementById('cropperModal'));
+            const cropCanvas = document.getElementById('image-crop-canvas');
+            const cropImageBtn = document.getElementById('cropImageBtn');
+            const profileImage = document.getElementById('profileImage');
+            const profileImagePreview = document.getElementById('profileImagePreview');
+            const croppedImageInput = document.getElementById('croppedImage');
+            
+            // Cropper control buttons
+            const rotateLeftBtn = document.getElementById('rotateLeftBtn');
+            const rotateRightBtn = document.getElementById('rotateRightBtn');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            // Handle profile image change
+            profileImage.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        // Set image src for cropper
+                        cropCanvas.src = e.target.result;
+                        
+                        // Show the cropper modal
+                        cropperModal.show();
+                        
+                        // Initialize cropper after modal is shown
+                        cropperModal._element.addEventListener('shown.bs.modal', function() {
+                            // Destroy previous cropper if exists
+                            if (cropper) {
+                                cropper.destroy();
+                            }
+                            
+                            // Initialize Cropper.js
+                            cropper = new Cropper(cropCanvas, {
+                                aspectRatio: 1, // 1:1 ratio for profile picture
+                                viewMode: 1,    // Restrict the crop box to not exceed the size of the canvas
+                                dragMode: 'move', // Allow moving the image
+                                guides: true,
+                                center: true,
+                                movable: true,
+                                rotatable: true,
+                                scalable: true,
+                                zoomable: true,
+                                minCropBoxWidth: 100,
+                                minCropBoxHeight: 100,
+                                responsive: true,
+                                autoCropArea: 0.8, // 80% of the cropper will be selected
+                            });
+                        }, { once: true });
+                    };
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Cropper controls
+            rotateLeftBtn.addEventListener('click', function() {
+                if (cropper) cropper.rotate(-90);
+            });
+            
+            rotateRightBtn.addEventListener('click', function() {
+                if (cropper) cropper.rotate(90);
+            });
+            
+            zoomInBtn.addEventListener('click', function() {
+                if (cropper) cropper.zoom(0.1);
+            });
+            
+            zoomOutBtn.addEventListener('click', function() {
+                if (cropper) cropper.zoom(-0.1);
+            });
+            
+            resetBtn.addEventListener('click', function() {
+                if (cropper) cropper.reset();
+            });
+            
+            // Handle crop button click
+            cropImageBtn.addEventListener('click', function() {
+                // Get cropped canvas
+                const canvas = cropper.getCroppedCanvas({
+                    width: 300,    // Set width to desired size
+                    height: 300,   // Set height to desired size
+                    minWidth: 100,
+                    minHeight: 100,
+                    maxWidth: 4096,
+                    maxHeight: 4096,
+                    fillColor: '#fff',
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
+                });
+                
+                // Convert canvas to blob
+                canvas.toBlob(function(blob) {
+                    // Create a URL for the blob
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Set the cropped image preview
+                    profileImagePreview.src = url;
+                    
+                    // Create a new file with the blob data
+                    const fileName = profileImage.files[0].name;
+                    const fileType = profileImage.files[0].type;
+                    
+                    // Convert canvas to base64 data URL and store in hidden input
+                    croppedImageInput.value = canvas.toDataURL(fileType);
+                    
+                    // Close the modal
+                    cropperModal.hide();
+                    
+                    // Destroy the cropper instance to free memory
+                    cropper.destroy();
+                    cropper = null;
+                }, profileImage.files[0].type || 'image/png');
+            });
+            
+            // Reset cropper when modal is closed
+            document.getElementById('cropperModal').addEventListener('hidden.bs.modal', function() {
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+            });
+            
+            // Form submission with validation
+            const editProfileForm = document.getElementById('editProfileForm');
+            
+            editProfileForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Basic form validation
+                const firstname = document.getElementById('firstname').value.trim();
+                const lastname = document.getElementById('lastname').value.trim();
+                const mobile = document.getElementById('mobile').value.trim();
+                
+                if (!firstname || !lastname ) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Please fill all required fields',
+                        icon: 'error',
+                        confirmButtonColor: '#8B5A2B'
+                    });
+                    return;
+                }
+                
+                // Show loading state
+                Swal.fire({
+                    title: 'Saving changes...',
+                    text: 'Please wait',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Submit form data with AJAX
+                const formData = new FormData(this);
+                
+                fetch('/account/edit-profile', {
+    method: 'POST',
+    body: formData,
+    credentials: 'same-origin'
+})
+.then(response => response.json()) // Convert response to JSON
+.then(data => {
+    if (data.success) {
+        // Show success message
+        Swal.fire({
+            title: 'Success!',
+            text: 'Your profile has been updated successfully.',
+            icon: 'success',
+            confirmButtonColor: '#8B5A2B'
+        }).then(() => {
+            // Redirect to profile page
+            window.location.href = '/account/profile';
+        });
+    } else {
+        // Show backend error message
+        Swal.fire({
+            title: 'Error!',
+            text: data.message || 'Failed to update profile. Please try again.',
+            icon: 'error',
+            confirmButtonColor: '#8B5A2B'
+        });
+    }
+})
+.catch(error => {
+    console.error('Error updating profile:', error);
+    
+    // Show generic error message if request fails
+    Swal.fire({
+        title: 'Error!',
+        text: 'Something went wrong. Please try again later.',
+        icon: 'error',
+        confirmButtonColor: '#8B5A2B'
+    });
+});
+
+            });
+        });
+    </script>
+</body>
+</html>

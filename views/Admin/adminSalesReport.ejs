@@ -1,0 +1,1071 @@
+<%- include("../partials/admin/adminHeader") %>
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        /* Color variables */
+        :root {
+            --primary-color: #A67C52; /* Warm light brown as primary color */
+            --secondary-color: #8C6D4F; /* Darker brown for hover effects */
+            --accent-color: #D4B996; /* Light accent brown */
+            --light-accent: #F5EFE6; /* Very light brown/off-white for backgrounds */
+            --text-dark: #4A3F35; /* Dark brown for text */
+            --text-medium: #7D6E63; /* Medium brown for secondary text */
+            --success-color: #6B8E6B; /* Muted green that works with brown */
+            --danger-color: #B56B6B; /* Muted red that works with brown */
+            --warning-color: #D4AA70; /* Amber/gold for warnings */
+            --info-color: #7590A7; /* Muted blue that works with brown */
+            --white: #FFFFFF;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(166, 124, 82, 0.08);
+        }
+
+        body {
+            background-color: var(--light-accent);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+        }
+
+        .content-main {
+            margin-top: 10px; 
+            padding: 25px;
+        }
+
+        /* Header Styling */
+        .content-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        .content-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3px;
+            width: 60px;
+            background-color: var(--primary-color);
+        }
+
+        .text-muted {
+            color: var(--text-medium);
+        }
+
+        /* Card Styling */
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            background-color: var(--white);
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 16px rgba(166, 124, 82, 0.12);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            background-color: var(--white);
+            border-bottom: 1px solid rgba(166, 124, 82, 0.1);
+            padding: 18px 20px;
+        }
+
+        .card-body {
+            padding: 22px;
+        }
+
+        /* Stats Cards */
+        .sales-stat {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .sales-stat:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-title {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Filter Controls */
+        .filter-container {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .filter-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .period-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .period-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: var(--light-accent);
+            color: var(--text-medium);
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-btn:hover {
+            background-color: rgba(166, 124, 82, 0.1);
+        }
+
+        .period-btn.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .date-range-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .date-input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .date-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(166, 124, 82, 0.2);
+            background-color: var(--white);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Table Styling */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            background-color: var(--white);
+            margin-bottom: 30px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            color: var(--text-dark);
+        }
+
+        .table thead {
+            background-color: rgba(166, 124, 82, 0.05);
+        }
+
+        .table th {
+            padding: 18px 16px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(166, 124, 82, 0.1);
+            color: var(--primary-color);
+        }
+
+        .table td {
+            padding: 16px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(166, 124, 82, 0.06);
+            font-size: 0.95rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(166, 124, 82, 0.2);
+        }
+
+        .btn-outline-primary {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background-color: #5A7A5A;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: var(--white);
+        }
+
+        .btn-info:hover {
+            background-color: #61798D;
+            transform: translateY(-2px);
+        }
+
+        .download-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Category Filter */
+        .category-filter {
+            margin-bottom: 20px;
+        }
+
+        .category-select {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(166, 124, 82, 0.2);
+            background-color: var(--white);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .date-range-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .date-input-group {
+                width: 100%;
+            }
+            
+            .filter-actions {
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .period-filters {
+                flex-direction: column;
+            }
+            
+            .period-btn {
+                width: 100%;
+            }
+            
+            .sales-stat {
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-accent);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* No Data Message */
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-medium);
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        .no-data p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Spinner -->
+    <div class="spinner-container" id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title">Sales Report</h2>
+                <p class="text-muted">Analyze your sales data by category and time period</p>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-container">
+            <h4 class="filter-title">Report Filters</h4>
+            
+            <!-- Time Period Filters -->
+            <div class="period-filters">
+                <button class="period-btn" data-period="daily">Daily</button>
+                <button class="period-btn" data-period="weekly">Weekly</button>
+                <button class="period-btn active" data-period="monthly">Monthly</button>
+                <button class="period-btn" data-period="yearly">Yearly</button>
+                <button class="period-btn" data-period="custom">Custom Range</button>
+            </div>
+            
+            <!-- Date Range Picker -->
+            <div class="date-range-container" id="dateRangeContainer" style="display: none;">
+                <div class="date-input-group">
+                    <label class="date-label">Start Date</label>
+                    <input type="text" id="startDate" class="date-input" placeholder="Select start date">
+                </div>
+                <div class="date-input-group">
+                    <label class="date-label">End Date</label>
+                    <input type="text" id="endDate" class="date-input" placeholder="Select end date">
+                </div>
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="category-filter">
+                <label class="date-label">Filter by Category</label>
+                <select id="categoryFilter" class="category-select">
+                    <option value="">All Categories</option>
+                    <% if (locals.categories && categories.length > 0) { %>
+                        <% categories.forEach(category => { %>
+                            <option value="<%= category._id %>"><%= category.name %></option>
+                        <% }); %>
+                    <% } %>
+                </select>
+            </div>
+            
+            <!-- Filter Actions -->
+            <div class="filter-actions">
+                <button id="applyFilters" class="btn btn-primary">
+                    <i class="fas fa-filter"></i> Apply Filters
+                </button>
+                <button id="resetFilters" class="btn btn-outline-primary">
+                    <i class="fas fa-redo"></i> Reset Filters
+                </button>
+                <button id="downloadExcel" class="btn btn-success download-btn">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </button>
+                <button id="downloadPdf" class="btn btn-info download-btn">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="sales-stat">
+                    <div class="stat-title">Total Orders</div>
+                    <div class="stat-value" id="totalOrders">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="sales-stat">
+                    <div class="stat-title">Total Sales</div>
+                    <div class="stat-value" id="totalSales">₹0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="sales-stat">
+                    <div class="stat-title">Total Discounts</div>
+                    <div class="stat-value" id="totalDiscounts">₹0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="sales-stat">
+                    <div class="stat-title">Net Revenue</div>
+                    <div class="stat-value" id="netRevenue">₹0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Report Table -->
+        <div class="table-container">
+            <table class="table" id="salesTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Order ID</th>
+                        <th>Category</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Discount</th>
+                        <th>Coupon</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    <!-- Table data will be populated by JavaScript -->
+                </tbody>
+            </table>
+            
+            <!-- No Data Message -->
+            <div class="no-data" id="noDataMessage" style="display: none;">
+                <i class="fas fa-chart-bar"></i>
+                <p>No sales data available for the selected filters.</p>
+                <button class="btn btn-outline-primary" id="changeFiltersBtn">
+                    <i class="fas fa-filter"></i> Change Filters
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        // Initialize date pickers
+        flatpickr("#startDate", {
+            dateFormat: "Y-m-d",
+            maxDate: "today"
+        });
+        
+        flatpickr("#endDate", {
+            dateFormat: "Y-m-d",
+            maxDate: "today"
+        });
+        
+        // Global variables to store current filter state
+        let currentFilters = {
+            period: 'monthly',
+            startDate: null,
+            endDate: null,
+            category: ''
+        };
+        
+        // Current sales data
+        let currentSalesData = [];
+        
+        // DOM Elements
+        const periodButtons = document.querySelectorAll('.period-btn');
+        const dateRangeContainer = document.getElementById('dateRangeContainer');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const applyFiltersBtn = document.getElementById('applyFilters');
+        const resetFiltersBtn = document.getElementById('resetFilters');
+        const downloadExcelBtn = document.getElementById('downloadExcel');
+        const downloadPdfBtn = document.getElementById('downloadPdf');
+        const salesTableBody = document.getElementById('salesTableBody');
+        const noDataMessage = document.getElementById('noDataMessage');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const changeFiltersBtn = document.getElementById('changeFiltersBtn');
+        
+        // Stats elements
+        const totalOrdersEl = document.getElementById('totalOrders');
+        const totalSalesEl = document.getElementById('totalSales');
+        const totalDiscountsEl = document.getElementById('totalDiscounts');
+        const netRevenueEl = document.getElementById('netRevenue');
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up period button click handlers
+            periodButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    periodButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Update current period
+                    currentFilters.period = this.dataset.period;
+                    
+                    // Show/hide date range inputs for custom period
+                    if (currentFilters.period === 'custom') {
+                        dateRangeContainer.style.display = 'flex';
+                    } else {
+                        dateRangeContainer.style.display = 'none';
+                        
+                        // Set default date range based on period
+                        setDefaultDateRange(currentFilters.period);
+                    }
+                });
+            });
+            
+            // Apply filters button click handler
+            applyFiltersBtn.addEventListener('click', function() {
+                if (currentFilters.period === 'custom') {
+                    // Validate custom date range
+                    if (!startDateInput.value || !endDateInput.value) {
+                        showErrorAlert('Please select both start and end dates for custom range');
+                        return;
+                    }
+                    
+                    // Check if end date is after start date
+                    const startDate = new Date(startDateInput.value);
+                    const endDate = new Date(endDateInput.value);
+                    
+                    if (endDate < startDate) {
+                        showErrorAlert('End date must be after start date');
+                        return;
+                    }
+                    
+                    currentFilters.startDate = startDateInput.value;
+                    currentFilters.endDate = endDateInput.value;
+                }
+                
+                // Update category filter
+                currentFilters.category = categoryFilter.value;
+                
+                // Fetch sales data with current filters
+                fetchSalesData();
+            });
+            
+            // Reset filters button click handler
+            resetFiltersBtn.addEventListener('click', function() {
+                // Reset period to monthly
+                periodButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelector('[data-period="monthly"]').classList.add('active');
+                currentFilters.period = 'monthly';
+                
+                // Hide custom date range
+                dateRangeContainer.style.display = 'none';
+                
+                // Reset date inputs
+                startDateInput.value = '';
+                endDateInput.value = '';
+                
+                // Reset category filter
+                categoryFilter.value = '';
+                
+                // Set default date range for monthly
+                setDefaultDateRange('monthly');
+                
+                // Update category filter
+                currentFilters.category = '';
+                
+                // Fetch sales data with reset filters
+                fetchSalesData();
+            });
+            
+            // Download Excel button click handler
+            downloadExcelBtn.addEventListener('click', function() {
+                if (currentSalesData.length === 0) {
+                    showErrorAlert('No data available to download');
+                    return;
+                }
+                
+                downloadExcel();
+            });
+            
+            // Download PDF button click handler
+            downloadPdfBtn.addEventListener('click', function() {
+                if (currentSalesData.length === 0) {
+                    showErrorAlert('No data available to download');
+                    return;
+                }
+                
+                downloadPDF();
+            });
+            
+            // Change filters button click handler
+            changeFiltersBtn.addEventListener('click', function() {
+                noDataMessage.style.display = 'none';
+                document.querySelector('.filter-container').scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Set default date range for monthly and fetch initial data
+            setDefaultDateRange('monthly');
+            fetchSalesData();
+        });
+        
+        // Function to set default date range based on period
+        function setDefaultDateRange(period) {
+            const today = new Date();
+            let startDate, endDate;
+            
+            switch (period) {
+                case 'daily':
+                    // Today
+                    startDate = formatDate(today);
+                    endDate = formatDate(today);
+                    break;
+                    
+                case 'weekly':
+                    // Last 7 days
+                    startDate = formatDate(new Date(today.setDate(today.getDate() - 6)));
+                    endDate = formatDate(new Date());
+                    break;
+                    
+                case 'monthly':
+                    // Current month
+                    startDate = formatDate(new Date(today.getFullYear(), today.getMonth(), 1));
+                    endDate = formatDate(new Date());
+                    break;
+                    
+                case 'yearly':
+                    // Current year
+                    startDate = formatDate(new Date(today.getFullYear(), 0, 1));
+                    endDate = formatDate(new Date());
+                    break;
+                    
+                default:
+                    // Default to last 30 days
+                    startDate = formatDate(new Date(today.setDate(today.getDate() - 29)));
+                    endDate = formatDate(new Date());
+            }
+            
+            currentFilters.startDate = startDate;
+            currentFilters.endDate = endDate;
+            
+            // Update date inputs for visual feedback
+            startDateInput.value = startDate;
+            endDateInput.value = endDate;
+        }
+        
+        // Helper function to format date as YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Function to fetch sales data based on current filters
+        function fetchSalesData() {
+            // Show loading spinner
+            loadingSpinner.style.display = 'flex';
+            
+            // Hide no data message
+            noDataMessage.style.display = 'none';
+            
+            // Prepare query parameters
+            const params = new URLSearchParams({
+                period: currentFilters.period,
+                startDate: currentFilters.startDate,
+                endDate: currentFilters.endDate
+            });
+            
+            if (currentFilters.category) {
+                params.append('category', currentFilters.category);
+            }
+            
+            // Fetch data from API
+            fetch(`/admin/getSalesReport?${params.toString()}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    
+                    // Store the data
+                    currentSalesData = data.sales || [];
+                    
+                    // Update stats
+                    updateStats(data.stats);
+                    
+                    // Render table
+                    renderSalesTable(currentSalesData);
+                })
+                .catch(error => {
+                    console.error('Error fetching sales data:', error);
+                    
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    
+                    // Show error message
+                    showErrorAlert('Failed to fetch sales data. Please try again.');
+                    
+                    // Clear table and show no data message
+                    salesTableBody.innerHTML = '';
+                    noDataMessage.style.display = 'block';
+                });
+        }
+        
+        // Function to update stats display
+        function updateStats(stats) {
+            if (!stats) {
+                // Default values if no stats
+                totalOrdersEl.textContent = '0';
+                totalSalesEl.textContent = '₹0';
+                totalDiscountsEl.textContent = '₹0';
+                netRevenueEl.textContent = '₹0';
+                return;
+            }
+            
+            // Format currency values
+            const formatCurrency = value => {
+                return '₹' + parseFloat(value).toLocaleString('en-IN', {
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2
+                });
+            };
+            
+            // Update stats elements
+            totalOrdersEl.textContent = stats.totalOrders || '0';
+            totalSalesEl.textContent = formatCurrency(stats.totalSales || 0);
+            totalDiscountsEl.textContent = formatCurrency(stats.totalDiscounts || 0);
+            netRevenueEl.textContent = formatCurrency(stats.netRevenue || 0);
+        }
+        
+        // Function to render sales table
+        function renderSalesTable(sales) {
+            // Clear existing table content
+            salesTableBody.innerHTML = '';
+            
+            if (!sales || sales.length === 0) {
+                // Show no data message
+                noDataMessage.style.display = 'block';
+                return;
+            }
+            
+            // Format currency values
+            const formatCurrency = value => {
+                return '₹' + parseFloat(value).toLocaleString('en-IN', {
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2
+                });
+            };
+            
+            // Format date
+            const formatDateDisplay = dateString => {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-IN', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            };
+            
+            // Generate table rows
+            sales.forEach((sale, index) => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${formatDateDisplay(sale.date)}</td>
+                    <td>${sale.orderId}</td>
+                    <td>${sale.category}</td>
+                    <td>${sale.product}</td>
+                    <td>${sale.quantity}</td>
+                    <td>${formatCurrency(sale.price)}</td>
+                    <td>${formatCurrency(sale.discount)}</td>
+                    <td>${sale.coupon || 'N/A'}</td>
+                    <td>${formatCurrency(sale.total)}</td>
+                `;
+                
+                salesTableBody.appendChild(row);
+            });
+        }
+        
+        // Function to download Excel file
+        function downloadExcel() {
+            // Show loading spinner
+            loadingSpinner.style.display = 'flex';
+            
+            try {
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                
+                // Format data for Excel
+                const excelData = currentSalesData.map((sale, index) => {
+                    return {
+                        'S.No': index + 1,
+                        'Date': new Date(sale.date).toLocaleDateString(),
+                        'Order ID': sale.orderId,
+                        'Category': sale.category,
+                        'Product': sale.product,
+                        'Quantity': sale.quantity,
+                        'Price': sale.price,
+                        'Discount': sale.discount,
+                        'Coupon': sale.coupon || 'N/A',
+                        'Total': sale.total
+                    };
+                });
+                
+                // Create worksheet
+                const ws = XLSX.utils.json_to_sheet(excelData);
+                
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
+                
+                // Generate filename with date range
+                const filename = `SalesReport_${currentFilters.startDate}_to_${currentFilters.endDate}.xlsx`;
+                
+                // Write and download file
+                XLSX.writeFile(wb, filename);
+                
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                
+                // Show success message
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Excel file downloaded successfully',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } catch (error) {
+                console.error('Error generating Excel:', error);
+                
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                
+                // Show error message
+                showErrorAlert('Failed to generate Excel file. Please try again.');
+            }
+        }
+        
+        // Function to download PDF file
+        function downloadPDF() {
+            // Show loading spinner
+            loadingSpinner.style.display = 'flex';
+            
+            try {
+                // Create new PDF document
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.setTextColor(166, 124, 82); // Primary color
+                doc.text('Sales Report', 14, 22);
+                
+                // Add date range
+                doc.setFontSize(12);
+                doc.setTextColor(125, 110, 99); // Text medium color
+                doc.text(`Period: ${currentFilters.startDate} to ${currentFilters.endDate}`, 14, 30);
+                
+                // Add category filter if applied
+                if (currentFilters.category) {
+                    const categoryName = document.querySelector(`#categoryFilter option[value="${currentFilters.category}"]`).textContent;
+                    doc.text(`Category: ${categoryName}`, 14, 38);
+                }
+                
+                // Add stats summary
+                doc.setFontSize(14);
+                doc.setTextColor(74, 63, 53); // Text dark color
+                doc.text('Summary', 14, 50);
+                
+                doc.setFontSize(10);
+                doc.text(`Total Orders: ${document.getElementById('totalOrders').textContent}`, 14, 58);
+                doc.text(`Total Sales: ${document.getElementById('totalSales').textContent}`, 14, 65);
+                doc.text(`Total Discounts: ${document.getElementById('totalDiscounts').textContent}`, 14, 72);
+                doc.text(`Net Revenue: ${document.getElementById('netRevenue').textContent}`, 14, 79);
+                
+                // Format data for table
+                const tableData = [];
+                
+                // Add header row
+                tableData.push([
+                    '#', 'Date', 'Order ID', 'Category', 'Product', 'Qty', 'Price', 'Discount', 'Coupon', 'Total'
+                ]);
+                
+                // Add data rows
+                currentSalesData.forEach((sale, index) => {
+                    tableData.push([
+                        index + 1,
+                        new Date(sale.date).toLocaleDateString(),
+                        sale.orderId,
+                        sale.category,
+                        sale.product,
+                        sale.quantity,
+                        `₹${sale.price}`,
+                        `₹${sale.discount}`,
+                        sale.coupon || 'N/A',
+                        `₹${sale.total}`
+                    ]);
+                });
+                
+                // Add table to PDF
+                doc.autoTable({
+                    startY: 90,
+                    head: [tableData[0]],
+                    body: tableData.slice(1),
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [166, 124, 82],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [245, 239, 230]
+                    },
+                    margin: { top: 90 }
+                });
+                
+                // Generate filename with date range
+                const filename = `SalesReport_${currentFilters.startDate}_to_${currentFilters.endDate}.pdf`;
+                
+                // Save PDF
+                doc.save(filename);
+                
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                
+                // Show success message
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'PDF file downloaded successfully',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                
+                // Show error message
+                showErrorAlert('Failed to generate PDF file. Please try again.');
+            }
+        }
+        
+        // Helper function for error alerts
+        function showErrorAlert(message) {
+            Swal.fire({
+                title: 'Error!',
+                text: message,
+                icon: 'error',
+                confirmButtonColor: '#B56B6B',
+                customClass: {
+                    popup: 'swal-theme-popup',
+                    title: 'swal-theme-title',
+                    confirmButton: 'swal-theme-button'
+                }
+            });
+        }
+        
+        // Add custom CSS for SweetAlert theme
+        const style = document.createElement('style');
+        style.textContent = `
+            .swal-theme-popup {
+                border-radius: 8px;
+                border-top: 4px solid var(--primary-color, #8C6D4F);
+                padding: 20px;
+            }
+            .swal-theme-title {
+                color: var(--primary-color, #8C6D4F);
+                font-weight: 600;
+            }
+            .swal-theme-button {
+                background-color: var(--primary-color, #8C6D4F) !important;
+                color: white;
+                border-radius: 8px;
+                font-weight: 500;
+                padding: 10px 24px;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+<Actions>
+  <Action name="Implement server-side API endpoint" description="Create the backend API endpoint for fetching sales report data" />
+  <Action name="Add chart visualization" description="Add visual charts to display sales trends over time" />
+  <Action name="Implement product-specific filtering" description="Add ability to filter sales by specific products" />
+  <Action name="Add payment method filtering" description="Add ability to filter sales by payment methods" />
+  <Action name="Create printable report view" description="Add a printer-friendly report view option" />
+</Actions>

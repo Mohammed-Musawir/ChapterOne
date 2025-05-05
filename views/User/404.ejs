@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - Chapter One</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-brown: #8B4513;
+            --secondary-brown: #A67B5B;
+            --light-brown: #D2B48C;
+            --cream: #FFF8E7;
+            --dark-brown: #3E2723;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background-color: var(--cream);
+            color: var(--dark-brown);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        .error-container {
+            text-align: center;
+            background-color: white;
+            padding: 4rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .error-title {
+            font-size: 8rem;
+            font-weight: bold;
+            color: var(--primary-brown);
+            margin-bottom: 1rem;
+        }
+        
+        .error-subtitle {
+            font-size: 2rem;
+            color: var(--dark-brown);
+            margin-bottom: 1.5rem;
+        }
+        
+        .error-description {
+            color: var(--secondary-brown);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-brown);
+            border-color: var(--primary-brown);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark-brown);
+            border-color: var(--dark-brown);
+            transform: translateY(-3px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--light-brown);
+            border-color: var(--light-brown);
+            color: var(--dark-brown);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-brown);
+            border-color: var(--secondary-brown);
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container text-center">
+        <div class="error-title">404</div>
+        <h2 class="error-subtitle">Page Not Found</h2>
+        <p class="error-description">
+            Oops! The page you are looking for seems to have wandered off into the pages of an unknown book. 
+            Let's help you find your way back to our library.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/" class="btn btn-primary btn-lg">
+                <i class="fas fa-home me-2"></i>Return to Home
+            </a>
+            <a href="/login" class="btn btn-secondary btn-lg">
+                <i class="fas fa-sign-in-alt me-2"></i>Go to Login
+            </a>
+        </div>
+        <div class="mt-4">
+            <small class="text-muted">
+                <i class="fas fa-book me-2"></i>
+                Perhaps this is a good time to start a new chapter?
+            </small>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

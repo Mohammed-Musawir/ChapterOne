@@ -1,0 +1,333 @@
+<%- include('../Partials/user/Landingpage/header', { title: 'ChapterOne | Discover Your Story' }) %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap');
+
+    :root {
+        --primary-brown: #5D4037;
+        --secondary-brown: #795548;
+        --accent-cream: #F4ECD8;
+        --text-color: #3E2723;
+        --soft-shadow: rgba(0,0,0,0.1);
+    }
+
+    * {
+        transition: all 0.3s ease;
+    }
+
+    body {
+        font-family: 'Open Sans', sans-serif;
+        background-color: var(--accent-cream);
+        color: var(--text-color);
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .navbar {
+        background-color: white;
+        box-shadow: 0 2px 10px var(--soft-shadow);
+        padding: 15px 0;
+    }
+
+    .navbar-brand {
+        font-family: 'Playfair Display', serif;
+        color: var(--primary-brown);
+        font-weight: 700;
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+
+    .navbar-nav .nav-link {
+        color: var(--secondary-brown);
+        font-weight: 600;
+        position: relative;
+        margin-right: 15px;
+    }
+
+    .navbar-nav .nav-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: var(--primary-brown);
+        transition: width 0.3s;
+    }
+
+    .navbar-nav .nav-link:hover::after {
+        width: 100%;
+    }
+
+    .otp-card {
+        background-color: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 10px 30px var(--soft-shadow);
+        max-width: 500px;
+        margin: 100px auto;
+    }
+
+    .otp-title {
+        font-family: 'Playfair Display', serif;
+        color: var(--primary-brown);
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .otp-description {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .otp-inputs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+
+    .otp-input {
+        width: 50px;
+        height: 60px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        background-color: white;
+    }
+
+    .otp-input:focus {
+        border-color: var(--primary-brown);
+        box-shadow: 0 0 0 0.25rem rgba(93, 64, 55, 0.25);
+        outline: none;
+    }
+
+    .btn-verify {
+        background-color: var(--primary-brown);
+        color: white;
+        border: none;
+        padding: 12px 0;
+        border-radius: 8px;
+        font-weight: 600;
+        width: 100%;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-verify:hover {
+        background-color: var(--secondary-brown);
+    }
+
+    .resend-link {
+        text-align: center;
+        color: var(--primary-brown);
+        text-decoration: none;
+        font-weight: 600;
+        display: block;
+    }
+
+    .resend-link:hover {
+        color: var(--secondary-brown);
+    }
+
+    .timer {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+        color: #777;
+    }
+
+    .footer {
+        background-color: var(--primary-brown);
+        color: white;
+        padding: 30px 0;
+        margin-top: auto;
+    }
+
+    .footer a {
+        color: var(--accent-cream);
+        text-decoration: none;
+        margin-right: 15px;
+        transition: color 0.3s ease;
+    }
+
+    .footer a:hover {
+        color: white;
+    }
+    .content-section {
+        padding: 60px 0 80px;
+        flex: 1;
+    }
+</style>
+
+
+<section class="content-section">
+    <div class="container">
+        <div class="otp-card">
+            <h2 class="otp-title">Verify Your Account</h2>
+            <p class="otp-description">We've sent a 6-digit code to your email address. Please enter it below to verify your account.</p>
+            
+            <form action="/verify-otp" method="post">
+                <div class="otp-inputs">
+                    <input type="text" class="otp-input" name="otp1" maxlength="1" autofocus>
+                    <input type="text" class="otp-input" name="otp2" maxlength="1">
+                    <input type="text" class="otp-input" name="otp3" maxlength="1">
+                    <input type="text" class="otp-input" name="otp4" maxlength="1">
+                    <input type="text" class="otp-input" name="otp5" maxlength="1">
+                    <input type="text" class="otp-input" name="otp6" maxlength="1">
+                </div>
+                
+                <button type="submit" class="btn btn-verify">Verify</button>
+            </form>
+            
+            <a href="#" class="resend-link" id="resendOtp">Resend Code</a>
+            <div class="timer">Resend available in <span id="countdown">60</span> seconds</div>
+        </div>
+    </div>
+</section>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                title: 'Verification Failed',
+                text: '<%= message %>',
+                icon: 'error',
+                confirmButtonText: 'Try Again',
+                confirmButtonColor: '#5D4037',
+                background: '#fff',
+                iconColor: '#5D4037'
+            });
+        });
+    </script>
+    <% } %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('.otp-input');
+    const resendLink = document.getElementById('resendOtp');
+    const countdownElement = document.getElementById('countdown');
+    const timerDiv = document.querySelector('.timer');
+    
+    // Calculate expiry time instead of just seconds
+    let expiryTime = sessionStorage.getItem('otpExpiryTime');
+    let seconds;
+    let countdown;
+
+    // If there's no expiry time or it's in the past, set a new one
+    if (!expiryTime || new Date(parseInt(expiryTime)) <= new Date()) {
+        // Initial state - set expiry to 60 seconds from now
+        expiryTime = new Date().getTime() + (60 * 1000);
+        sessionStorage.setItem('otpExpiryTime', expiryTime);
+    }
+
+    // Handle OTP input field navigation
+    inputs.forEach((input, index) => {
+        input.addEventListener('input', function() {
+            if (this.value.length === 1 && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+        });
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && !this.value && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+    });
+
+    // Function to update countdown based on expiry time
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const timeLeft = Math.max(0, Math.floor((expiryTime - now) / 1000));
+        
+        countdownElement.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            timerDiv.style.display = "block";
+            resendLink.style.pointerEvents = "auto";
+            resendLink.style.opacity = "1";
+            sessionStorage.removeItem('otpExpiryTime');
+        } else {
+            resendLink.style.pointerEvents = "none";
+            resendLink.style.opacity = "0.5";
+        }
+    }
+
+    // Function to start the countdown timer
+    function startCountdown() {
+        clearInterval(countdown); // Clear any existing interval
+        
+        // Set new expiry time (60 seconds from now)
+        expiryTime = new Date().getTime() + (60 * 1000);
+        sessionStorage.setItem('otpExpiryTime', expiryTime);
+        
+        timerDiv.style.display = "block";
+        updateCountdown();
+        
+        // Update countdown every second
+        countdown = setInterval(updateCountdown, 1000);
+    }
+
+    // Handle OTP resend
+    resendLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        if (this.style.pointerEvents !== "none") {
+            fetch('/resend-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: 'user@example.com' }) // Replace with dynamic email
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Replace alert with SweetAlert
+                Swal.fire({
+                    title: 'Code Sent!',
+                    text: data.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#5D4037',
+                    background: '#fff',
+                    iconColor: '#5D4037',
+                    customClass: {
+                        title: 'text-primary-brown',
+                        popup: 'swal-custom-popup'
+                    }
+                });
+                
+                startCountdown(); 
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Error SweetAlert
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to resend verification code. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#5D4037',
+                    background: '#fff'
+                });
+            });
+        }
+    });
+
+    // Start countdown on page load by calculating remaining time
+    updateCountdown();
+    if (parseInt(countdownElement.textContent) > 0) {
+        countdown = setInterval(updateCountdown, 1000);
+    }
+});
+</script>
+
+<%- include('../Partials/user/Landingpage/footer') %>

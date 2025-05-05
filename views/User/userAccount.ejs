@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChapterOne | Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-brown: #8B5A2B;
+            --secondary-brown: #A67C52;
+            --light-brown: #D2B48C;
+            --dark-brown: #654321;
+            --accent-gold: #D4AF37;
+            --soft-shadow: rgba(0, 0, 0, 0.05);
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .dashboard-sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            position: fixed;
+            height: 100vh;
+            box-shadow: var(--card-shadow);
+            padding: 25px 0;
+            overflow-y: auto;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-brown);
+            margin: 0;
+        }
+
+        .user-profile .profile-image img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 3px solid var(--light-brown);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+
+        .nav-link1 {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link1.active {
+            background-color: rgba(139, 90, 43, 0.1);
+            color: var(--primary-brown);
+            border-left-color: var(--primary-brown);
+        }
+
+        .nav-link1:hover {
+            background-color: rgba(139, 90, 43, 0.1);
+            color: var(--primary-brown);
+            border-left-color: var(--primary-brown);
+        }
+
+        .nav-link1 i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .dashboard-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-header h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-brown);
+            margin: 0;
+        }
+
+        /* Welcome Card */
+        .welcome-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--card-shadow);
+            background-image: linear-gradient(to right, rgba(255,255,255,0.95), rgba(255,255,255,0.9)), url('/images/pattern-bg.jpg');
+            background-size: cover;
+        }
+
+        .welcome-card h3 {
+            color: var(--primary-brown);
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 5px;
+        }
+
+        .primary-btn {
+            background-color: var(--primary-brown);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .primary-btn:hover {
+            background-color: var(--dark-brown);
+            color: white;
+        }
+
+        .primary-btn-sm {
+            background-color: var(--primary-brown);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .primary-btn-sm:hover {
+            background-color: var(--dark-brown);
+            color: white;
+        }
+
+        /* Stat Cards */
+        .stat-cards {
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(139, 90, 43, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .stat-icon i {
+            font-size: 22px;
+            color: var(--primary-brown);
+        }
+
+        .stat-details h4 {
+            margin: 0;
+            font-size: 22px;
+            color: var(--dark-brown);
+        }
+
+        .stat-details p {
+            margin: 5px 0 0;
+            color: #888;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            color: var(--secondary-brown);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .view-all {
+            color: var(--primary-brown);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Table Styles */
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 5px;
+        }
+
+        .custom-table th {
+            color: #888;
+            font-weight: 500;
+            padding: 12px 15px;
+            border: none;
+        }
+
+        .custom-table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.delivered {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .status-badge.processing {
+            background-color: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+
+        .status-badge.pending {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .action-btn {
+            color: var(--primary-brown);
+            width: 30px;
+            height: 30px;
+            background-color: rgba(139, 90, 43, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary-brown);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .empty-icon {
+            font-size: 36px;
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        /* Wallet Card */
+        .wallet-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .wallet-amount {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .wallet-amount span {
+            display: block;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .wallet-amount h3 {
+            color: var(--primary-brown);
+            margin: 0;
+        }
+
+        /* Toggle Button */
+        .toggle-sidebar {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 100;
+            background-color: var(--primary-brown);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .dashboard-sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .dashboard-content {
+                margin-left: 0;
+            }
+            
+            .toggle-sidebar {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Mobile Toggle Button (visible on small screens) -->
+        <button class="toggle-sidebar d-lg-none">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Sidebar -->
+        <div class="dashboard-sidebar">
+            <div class="brand-logo text-center mb-4">
+                <h3 class="logo-text">ChapterOne</h3>
+            </div>
+            
+            <div class="user-profile text-center mb-4">
+                <div class="profile-image">
+                    <img src="<%= user.profileImage %>" alt="Profile Picture" class="rounded-circle">
+                </div>
+                <h5 class="mt-3"><%= user.name %></h5>
+                <p class="text-muted small"><%= user.email %></p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="/account" class="nav-link1 active">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/profile" class="nav-link1">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/edit-profile" class="nav-link1">
+                            <i class="fas fa-user-edit"></i>
+                            <span>Edit Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <% if (!user.googleId) { %>
+                            <a href="/account/change-password" class="nav-link1">
+                                <i class="fas fa-lock"></i>
+                                <span>Change Password</span>
+                            </a>
+                        <% } %>
+                    </li>
+                    <li>
+                        <% if (!user.googleId) { %>
+                            <a href="/account/change-email" class="nav-link1">
+                                <i class="fas fa-envelope"></i>
+                                <span>Change Email</span>
+                            </a>
+                            <% } %>
+                    </li>
+                    <li>
+                        <a href="/account/orders" class="nav-link1">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/account/wallet" class="nav-link1">
+                            <i class="fas fa-wallet"></i>
+                            <span>Wallet</span>
+                        </a>
+                    </li>
+                    <li class="mt-4">
+                        <a href="/logout" class="nav-link1 text-danger">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <div class="dashboard-header">
+                <h2>Dashboard</h2>
+            </div>
+            
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h3>Welcome back, <%=  user.lastname %>!</h3>
+                        <p>Here's what's happening with your account today</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="/shop" class="btn primary-btn">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stat Cards -->
+            <div class="stat-cards">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h4>₹<%= userWallet && userWallet.amount ? userWallet.amount : '0.00' %></h4>
+                                <p>Wallet Balance</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <div class="stat-details">
+                                <% if (latestOrder) { %>
+                                  <h4>ORD-<%= latestOrder.orderId %></h4>
+                                  <p>Recent Orders</p>
+                                <% } else { %>
+                                  <h4>No Orders Yet</h4>
+                                  <p>Recent Orders</p>
+                                <% } %>
+                              </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-bookmark"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h4><%= wishlist && wishlist.books ? wishlist.books.length : 0 %></h4>
+                                <p>Wishlist Items</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order History and Address Section -->
+            <div class="row">
+                <!-- Recent Orders -->
+                <div class="col-lg-8 mb-4">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h5>Recent Orders</h5>
+                            <a href="/account/orders" class="view-all">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                       <% if (recentOrders && recentOrders.length > 0) { %>
+                                        <% recentOrders.forEach(order => { %>
+                                            <tr>
+                                                <td>#<%= order.orderId %></td>
+                                                <td><%= new Date(order.orderedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></td>
+
+                                                <td>
+                                                    <span class="status-badge <%= order.orderStatus.toLowerCase() %>">
+                                                        <%= order.orderStatus %>
+                                                    </span>
+                                                </td>
+                                                <td>₹<%= order.totalAmount %></td>
+                                                <td>
+                                                    <a href="/orders/<%= order.orderId %>" class="action-btn">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="5">
+                                                    <div class="empty-state">
+                                                        <div class="empty-icon">
+                                                            <i class="fas fa-shopping-bag"></i>
+                                                        </div>
+                                                        <p>You haven't placed any orders yet.</p>
+                                                        <a href="/shop" class="btn primary-btn-sm">Start Shopping</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <!-- Wallet Card -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h5>Wallet</h5>
+                            <a href="/account/wallet" class="view-all">Manage</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="wallet-card">
+                                <div class="wallet-amount">
+                                    <span>Balance</span>
+                                    <h3>₹<%= userWallet && userWallet.amount ? userWallet.amount : '0.00' %></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar on mobile
+        document.querySelector('.toggle-sidebar')?.addEventListener('click', function() {
+            document.querySelector('.dashboard-sidebar').classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.dashboard-sidebar');
+            const toggleBtn = document.querySelector('.toggle-sidebar');
+            
+            if (window.innerWidth <= 992 && 
+                sidebar.classList.contains('active') && 
+                !sidebar.contains(event.target) && 
+                event.target !== toggleBtn) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

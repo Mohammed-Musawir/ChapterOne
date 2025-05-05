@@ -1,0 +1,543 @@
+<%- include('../Partials/user/shopPage/header', { title: 'ChapterOne | Shop Books' }) %>
+<link rel="stylesheet" href="/css/User/userHome.css">
+<style>
+  /* Book shop styles */
+  body {
+      padding-top: 80px; 
+  }
+  
+  .card-link {
+      color: black;
+      text-decoration: none;
+  }
+  
+  .book-card {
+      position: relative;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px var(--soft-shadow);
+      height: 100%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+  }
+  
+  .book-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+  
+  .book-image {
+      object-fit: contain;
+      width: 100%;
+      background-color: #f8f8f8; 
+      padding: 10%;
+  }
+  
+  .book-card-content {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+  }
+  
+  .book-title {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      font-family: 'Playfair Display', serif;
+  }
+  
+  .book-author {
+      color: #666;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+  }
+  
+  .book-price {
+      color: var(--primary-brown);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+  }
+  
+  .btn-action {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f8f9fa;
+      color: var(--primary-brown);
+      border: 1px solid #dee2e6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .btn-action:hover {
+      background-color: var(--primary-brown);
+      color: white;
+  }
+  
+  /* Active wishlist item styling */
+  .add-to-wishlist .fa-heart.text-danger {
+      color: #dc3545 !important;
+  }
+  
+  .filter-section {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+  }
+  
+  .filter-section:last-child {
+      border-bottom: none;
+  }
+  
+  .form-check-input:checked {
+      background-color: var(--primary-brown);
+      border-color: var(--primary-brown);
+  }
+  
+  .page-item.active .page-link {
+      background-color: var(--primary-brown);
+      border-color: var(--primary-brown);
+  }
+  
+  .page-link {
+      color: var(--primary-brown);
+  }
+  
+  .page-link:focus {
+      box-shadow: 0 0 0 0.25rem rgba(93, 64, 55, 0.25);
+  }
+  
+  /* SweetAlert Custom Styling */
+  .swal2-popup {
+      font-family: 'Playfair Display', serif;
+      border-radius: 10px !important;
+  }
+  
+  .swal2-title {
+      font-family: 'Playfair Display', serif;
+  }
+  
+  .swal2-confirm {
+      background-color: var(--primary-brown) !important;
+  }
+
+  .offer-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--primary-brown);
+    color: white;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 4px;
+    z-index: 1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.85rem;
+    margin-left: 5px;
+    font-weight: normal;
+}
+</style>
+
+<body>
+  <!-- Search and Filter Section -->
+<div class="container mt-5"> 
+  <div class="row">
+      <!-- Left Sidebar for Filters -->
+      <div class="col-lg-3">
+          <div class="filter-sidebar p-4 mb-4" style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px var(--soft-shadow);">
+              <h4 style="font-family: 'Playfair Display', serif; color: var(--primary-brown);">Filter Books</h4>
+              
+              <form action="/shop" method="get">
+                  <!-- Preserve search query -->
+                  <% if (search) { %>
+                  <input type="hidden" name="search" value="<%= search %>">
+                  <% } %>
+                  
+                  <!-- Preserve sort option -->
+                  <% if (sortOption) { %>
+                  <input type="hidden" name="sort" value="<%= sortOption %>">
+                  <% } %>
+
+                  <!-- Price Range Filter -->
+                  <div class="filter-section mt-4">
+                      <h5 style="font-size: 1.1rem; color: var(--secondary-brown);">Price Range</h5>
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" name="price" value="0-200" id="price1" <%= priceRanges.includes('0-200') ? 'checked' : '' %>>
+                          <label class="form-check-label" for="price1">Under ₹200</label>
+                      </div>
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" name="price" value="200-500" id="price2" <%= priceRanges.includes('200-500') ? 'checked' : '' %>>
+                          <label class="form-check-label" for="price2">₹200 - ₹500</label>
+                      </div>
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" name="price" value="500-1000" id="price3" <%= priceRanges.includes('500-1000') ? 'checked' : '' %>>
+                          <label class="form-check-label" for="price3">₹500 - ₹1000</label>
+                      </div>
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" name="price" value="over1000" id="price4" <%= priceRanges.includes('over1000') ? 'checked' : '' %>>
+                          <label class="form-check-label" for="price4">Over ₹1000</label>
+                      </div>
+                  </div>
+                  
+                  <!-- Categories Filter -->
+                  <div class="filter-section mt-4">
+                      <h5 style="font-size: 1.1rem; color: var(--secondary-brown);">Categories</h5>
+                      <% filterCategory.forEach(function(category, index) { %>
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" name="category" id="cat<%= index + 1 %>" value="<%= category.name %>" <%= categories.includes(category.name) ? 'checked' : '' %>>
+                              <label class="form-check-label" for="cat<%= index + 1 %>"><%= category.name %></label>
+                          </div>
+                      <% }) %>
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary mt-4 w-100" style="background-color: var(--primary-brown); border-color: var(--primary-brown);">Apply Filters</button>
+                  <a href="/shop" class="btn btn-outline-secondary mt-2 w-100">Clear All</a>
+              </form>
+          </div>
+      </div>
+      
+      <!-- Right Content Area for Products -->
+      <div class="col-lg-9">
+          <!-- Search Bar -->
+          <div class="search-container mb-4">
+              <form class="d-flex" action="/shop" method="get">
+                  <!-- Preserve sort option -->
+                  <% if (sortOption) { %>
+                  <input type="hidden" name="sort" value="<%= sortOption %>">
+                  <% } %>
+                  
+                  <!-- Preserve category filters -->
+                  <% categories.forEach(function(category) { %>
+                  <input type="hidden" name="category" value="<%= category %>">
+                  <% }) %>
+                  
+                  <!-- Preserve price filters -->
+                  <% priceRanges.forEach(function(price) { %>
+                  <input type="hidden" name="price" value="<%= price %>">
+                  <% }) %>
+
+                  <input class="form-control me-2" type="search" name="search" placeholder="Search by title or author..." aria-label="Search" value="<%= search %>">
+                  <button class="btn btn-primary" type="submit" style="background-color: var(--primary-brown); border-color: var(--primary-brown);">
+                      <i class="fas fa-search"></i>
+                  </button>
+              </form>
+          </div>
+          
+          <!-- Sorting Options -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+              <p class="mb-0"><span class="fw-bold"><%= totalProductsCount %></span> books found</p>
+              <div class="d-flex align-items-center">
+                  <label for="sortSelect" class="me-2">Sort by:</label>
+                  <select class="form-select" id="sortSelect" style="width: auto;" onchange="location = this.value">
+                      <% 
+                      // Create base URL with current filters
+                      let baseUrl = "/shop?";
+                      let params = [];
+                      
+                      if (search) params.push(`search=${encodeURIComponent(search)}`);
+                      
+                      // Add each category
+                      categories.forEach(category => {
+                          params.push(`category=${encodeURIComponent(category)}`);
+                      });
+                      
+                      // Add each price range
+                      priceRanges.forEach(price => {
+                          params.push(`price=${encodeURIComponent(price)}`);
+                      });
+                      
+                      baseUrl += params.join('&');
+                      if (params.length > 0) baseUrl += '&'; 
+                      %>
+                      
+                      <option value="<%= baseUrl %>sort=AtoZ" <%= sortOption === 'AtoZ' ? 'selected' : '' %>>A to Z</option>
+                      <option value="<%= baseUrl %>sort=ZtoA" <%= sortOption === 'ZtoA' ? 'selected' : '' %>>Z to A</option>
+                      <option value="<%= baseUrl %>sort=price_asc" <%= sortOption === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+                      <option value="<%= baseUrl %>sort=price_desc" <%= sortOption === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+                  </select>
+              </div>
+          </div>
+          
+          <!-- Book Grid -->
+          <div class="row">
+              <% products.forEach(function(product) { %>
+                  <div class="col-md-4 mb-4">
+                      <div class="book-card">
+                          <a href="/bookPage/<%= product._id %>" class="card-link">
+                              <img src="<%= product.productImages %>" alt="<%= product.title %>" class="img-fluid book-image">
+                              
+                              <% if (product.hasOffer && product.offerPercentage > 0) { %>
+                                <div class="offer-badge">
+                                    <span><%= Math.round(product.offerPercentage) %>% OFF</span>
+                                </div>
+                                <% } %>
+                              
+                              <div class="book-card-content p-3">
+                                  <h5 class="book-title"><%= product.title %></h5>
+                                  <p class="book-author"><%= product.writer %></p>
+                                  <p class="book-price fw-bold">
+                                    ₹<%= product.price.toFixed(2) %>
+                                    <% if (product.hasOffer && product.offerPercentage > 0) { %>
+                                    <span class="original-price">₹<%= product.regularPrice.toFixed(2) %></span>
+                                    <% } %>
+                                </p>
+
+                              </a>
+                                  <div class="book-actions d-flex justify-content-around gap-2 mt-2">
+                                      <button class="btn btn-sm btn-action add-to-cart" title="Add to cart" data-product-id="<%= product._id %>">
+                                          <i class="fas fa-shopping-cart"></i>
+                                      </button>
+                                      <button class="btn btn-sm btn-action add-to-wishlist" title="Add to wishlist" data-product-id="<%= product._id %>">
+                                          <i class="fas fa-heart"></i>
+                                      </button>
+                                      <a href="/bookPage/<%= product._id %>" class="card-link">
+                                      <button class="btn btn-sm btn-action" title="Quick view">
+                                          <i class="fas fa-eye"></i>
+                                      </button>
+                                  </a>
+                                  </div>
+                              </div>
+                      </div>
+                  </div>
+              <% }) %>
+          </div>
+          
+          <!-- Pagination -->
+          <nav aria-label="Page navigation" class="mt-5">
+              <ul class="pagination justify-content-center">
+                  <% 
+                  // Create base URL for pagination with all current filters
+                  let paginationBase = "/shop?";
+                  let paginationParams = [];
+                  
+                  if (search) paginationParams.push(`search=${encodeURIComponent(search)}`);
+                  if (sortOption) paginationParams.push(`sort=${encodeURIComponent(sortOption)}`);
+                  
+                  // Add each category
+                  categories.forEach(category => {
+                      paginationParams.push(`category=${encodeURIComponent(category)}`);
+                  });
+                  
+                  // Add each price range
+                  priceRanges.forEach(price => {
+                      paginationParams.push(`price=${encodeURIComponent(price)}`);
+                  });
+                  
+                  paginationBase += paginationParams.join('&');
+                  if (paginationParams.length > 0) paginationBase += '&';
+                  %>
+                  
+                  <% if (currentPage > 1) { %>
+                      <li class="page-item">
+                          <a class="page-link" href="<%= paginationBase %>page=<%= currentPage - 1 %>" aria-label="Previous">
+                              <i class="fas fa-chevron-left"></i>
+                          </a>
+                      </li>
+                  <% } else { %>
+                      <li class="page-item disabled">
+                          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                              <i class="fas fa-chevron-left"></i>
+                          </a>
+                      </li>
+                  <% } %>
+                  
+                  <% for (let i = 1; i <= totalPages; i++) { %>
+                      <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                          <a class="page-link" href="<%= paginationBase %>page=<%= i %>"><%= i %></a>
+                      </li>
+                  <% } %>
+                  
+                  <% if (currentPage < totalPages) { %>
+                      <li class="page-item">
+                          <a class="page-link" href="<%= paginationBase %>page=<%= currentPage + 1 %>" aria-label="Next">
+                              <i class="fas fa-chevron-right"></i>
+                          </a>
+                      </li>
+                  <% } else { %>
+                      <li class="page-item disabled">
+                          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                              <i class="fas fa-chevron-right"></i>
+                          </a>
+                      </li>
+                  <% } %>
+              </ul>
+          </nav>
+      </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize all dropdowns
+  var dropdownElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'))
+  var dropdownList = dropdownElementList.map(function(dropdownToggleEl) {
+    return new bootstrap.Dropdown(dropdownToggleEl)
+  });
+  
+  // Function to show SweetAlert notification
+  function showSweetAlert(type, message) {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'bottom-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    
+    const primaryBrownColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-brown') || '#5D4037';
+    
+    if (type === 'success') {
+      Toast.fire({
+        icon: 'success',
+        title: message,
+        background: '#fff',
+        iconColor: primaryBrownColor,
+        color: '#333'
+      });
+    } else {
+      Toast.fire({
+        icon: 'error',
+        title: message,
+        background: '#fff',
+        iconColor: '#d33',
+        color: '#333'
+      });
+    }
+  }
+  
+  // Add to cart functionality
+  const addToCartButtons = document.querySelectorAll('.add-to-cart');
+  addToCartButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const productId = this.getAttribute('data-product-id');
+      
+      fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookId: productId,
+          quantity: 1
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show custom-styled SweetAlert notification
+          showSweetAlert('success', 'Book added to your cart!');
+          
+          // Update cart counter if it exists
+          const cartCounter = document.querySelector('.cart-counter');
+          if (cartCounter) {
+            cartCounter.textContent = parseInt(cartCounter.textContent || '0') + 1;
+            cartCounter.style.display = 'inline-block';
+          }
+        } else {
+          showSweetAlert('error', data.message || 'Failed to add book to cart');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showSweetAlert('error', error.message);
+      });
+    });
+  });
+  
+  // Add to wishlist functionality
+  const addToWishlistButtons = document.querySelectorAll('.add-to-wishlist');
+  addToWishlistButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const productId = this.getAttribute('data-product-id');
+      const heartIcon = this.querySelector('i.fa-heart');
+      
+      fetch('/wishlist/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookId: productId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+         
+            heartIcon.classList.add('text-danger');
+            showSweetAlert('success', 'Book added to your wishlist!');
+          
+          // Update wishlist counter if it exists
+          const wishlistCounter = document.querySelector('.wishlist-counter');
+          if (wishlistCounter && data.wishlistCount !== undefined) {
+            wishlistCounter.textContent = data.wishlistCount;
+            wishlistCounter.style.display = data.wishlistCount > 0 ? 'inline-block' : 'none';
+          }
+        } else {
+          showSweetAlert('error', data.message || 'Failed to update wishlist');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showSweetAlert('error', 'Something went wrong. Please try again.');
+      });
+    });
+  });
+  
+  // Check if items are in wishlist and update UI accordingly
+  function checkWishlistStatus() {
+    fetch('/wishlist/status', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.wishlistItems) {
+        // Update heart icons for items in wishlist
+        const wishlistItems = new Set(data.wishlistItems);
+        document.querySelectorAll('.add-to-wishlist').forEach(button => {
+          const productId = button.getAttribute('data-product-id');
+          if (wishlistItems.has(productId)) {
+            button.querySelector('i.fa-heart').classList.add('text-danger');
+          }
+        });
+      }
+    })
+    .catch(error => console.error('Error fetching wishlist status:', error));
+  }
+  
+  // Initialize wishlist status
+  checkWishlistStatus();
+});
+</script>
+</body>
+
+<%- include('../Partials/user/shopPage/footer') %>

@@ -1,0 +1,203 @@
+:root {
+    --primary: #0B1437;
+    --secondary: #6C72CB;
+    --accent: #00F5FF;
+    --dark: #060B1F;
+    --card-bg: #111C44;
+    --text-primary: #FFFFFF;
+    --text-secondary: #A0AEC0;
+}
+body {
+    background-color: var(--primary);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+.navbar {
+    background-color: var(--dark) !important;
+    border-bottom: 1px solid rgba(108, 114, 203, 0.2);
+}
+
+
+.logo {
+font-family: 'Arial Black', sans-serif;
+font-size: 24px;
+letter-spacing: 2px;
+background: linear-gradient(45deg, var(--accent), var(--secondary));
+-webkit-background-clip: text;
+background-clip: text; /*added */
+-webkit-text-fill-color: transparent;
+}
+.logo-icon {
+width: 30px;
+height: 30px;
+border: 2px solid var(--accent);
+display: inline-block;
+margin-right: 8px;
+transform: rotate(45deg);
+transition: all 0.4s ease;
+}
+
+
+
+
+/* .logo-icon {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--accent);
+    display: inline-block;
+    margin-right: 8px;
+    transform: rotate(45deg);
+    transition: all 0.4s ease;
+} */
+.navbar-brand:hover .logo-icon {
+    transform: rotate(225deg);
+    border-color: var(--secondary);
+}
+.nav-link {
+    color: var(--text-primary) !important;
+    position: relative;
+    padding: 8px 15px;
+}
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background: linear-gradient(90deg, var(--accent), var(--secondary));
+    transition: all 0.3s ease;
+}
+.nav-link:hover::after {
+    width: 100%;
+    left: 0;
+}
+.main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+}
+.auth-container {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid rgba(108, 114, 203, 0.2);
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+.form-control {
+    background-color: var(--primary);
+    border-color: var(--secondary);
+    color: var(--text-primary);
+}
+.form-control::placeholder {
+    color: var(--text-secondary);
+}
+.form-control:focus {
+    background-color: var(--primary);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.2rem rgba(0, 245, 255, 0.25);
+    color: var(--text-primary);
+}
+.btn-custom {
+    background: linear-gradient(45deg, var(--secondary), var(--accent));
+    color: var(--dark);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+.btn-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
+    color: var(--dark);
+}
+.btn-google {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+.btn-google:hover {
+    background: rgba(108, 114, 203, 0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.1);
+}
+.btn-google img {
+    width: 20px;
+    margin-right: 10px;
+    filter: brightness(0) invert(1);
+}
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--text-secondary);
+}
+
+
+.auth-switch a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.auth-switch a:hover {
+    color: var(--secondary);
+}
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: var(--text-secondary);
+}
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(108, 114, 203, 0.2);
+}
+.divider:not(:empty)::before {
+    margin-right: .25em;
+}
+.divider:not(:empty)::after {
+    margin-left: .25em;
+}
+.forgot-password {
+    text-align: right;
+    margin-bottom: 15px;
+}
+.forgot-password a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.forgot-password a:hover {
+    color: var(--accent);
+}
+footer {
+    background-color: var(--dark);
+    border-top: 1px solid rgba(108, 114, 203, 0.2);
+    padding: 20px 0;
+    margin-top: auto;
+}
+.auth-title {
+    text-align: center;
+    color: var(--accent);
+    margin-bottom: 30px;
+    font-size: 40px;
+    font-weight: 600;
+}

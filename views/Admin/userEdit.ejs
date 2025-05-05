@@ -1,0 +1,259 @@
+<%- include("../partials/admin/adminHeader") %>
+
+<div class="container">
+    <!-- Header Section -->
+    <div class="content-header row">
+        <div class="d-flex flex-column">
+            <h2 class="content-title card-title mb-5">Customers</h2>
+        </div>
+    </div>
+
+    <!-- 
+    <header class="card-header text-center mb-20">
+        <form action="/admin/users/" method="get" class="search-form w-100">
+            <div class="search-container">
+                <div class="input-group border border-1 rounded-pill" style="width: 500px; margin: 0 auto;">
+                    <input type="text" class="form-control search-input border-0" placeholder="Search customers..." name="search">
+                    <button class="btn btn-search" type="submit">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </header> -->
+
+    <!-- Customer Table -->
+    <div class="table-responsive mt-5">
+        <table class="table table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col"><b>Name</b></th>
+                    <th scope="col"><b>Email</b></th>
+                    <th scope="col"><b>Phone No</b></th>
+                    <th scope="col" class="text-center"><b>Action</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let i=0; i<data.length; i++) { %>
+                    <tr>
+                        <td><%= data[i].firstname %></td>
+                        <td><%= data[i].email %></td>
+                        <td><%= data[i].mobile %></td>
+                        <td class="text-center">
+                            <button class="btn <%= (data[i].isBlocked ? 'btn-success' : 'btn-danger') %> block-btn" 
+                                data-id="<%= data[i]._id %>"
+                                data-status="<%= data[i].isBlocked ? 'unblock' : 'block' %>">
+                                <%= data[i].isBlocked ? "Unblock" : "Block" %>
+                            </button>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-3">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mb-20">
+                <% for(let i=1; i<=totalPage; i++) { %>
+                    <li class="page-item <%= (i===currentPage) ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<style>
+    /* Custom styling */
+    .tably {
+        background-color: #A67C52;
+        
+    }
+    .search-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+    }
+
+    .search-form {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .search-input {
+        border-radius: 25px 0 0 25px;
+        height: 50px;
+        transition: all 0.3s ease;
+        background-color: var(--white);
+    }
+
+    .search-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(166, 124, 82, 0.15);
+        outline: none;
+    }
+
+    .btn-search {
+        background-color: var(--primary-color, #A67C52);
+        color: var(--white, #FFFFFF);
+        border-radius: 0 25px 25px 0;
+        padding: 0 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-search:hover {
+        background-color: var(--secondary-color, #8C6D4F);
+    }
+
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(166, 124, 82, 0.08);
+    }
+
+    .table thead th {
+        background-color: rgba(166, 124, 82, 0.05);
+        color: var(--primary-color, #A67C52);
+        font-weight: 600;
+        padding: 16px 12px;
+        border-bottom: 2px solid rgba(166, 124, 82, 0.1);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+        border: 1px solid rgba(166, 124, 82, 0.1);
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #A67C52;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(166, 124, 82, 0.03);
+    }
+
+    .table td {
+        padding: 16px 12px;
+        vertical-align: middle;
+        border: 2px solid rgba(5, 4, 3, 0.06);
+        font-size: 0.95rem;
+        color: var(--text-dark, #4A3F35);
+    }
+
+    .block-btn {
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        min-width: 100px;
+        padding: 8px 16px;
+        font-size: 0.875rem;
+        border-radius: 8px;
+    }
+
+    .btn-danger {
+        background-color: var(--danger-color, #B56B6B);
+        border-color: var(--danger-color, #B56B6B);
+    }
+
+    .btn-success {
+        background-color: var(--success-color, #6B8E6B);
+        border-color: var(--success-color, #6B8E6B);
+    }
+
+    .btn-danger:hover {
+        background-color: #A15C5C;
+        border-color: #A15C5C;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(181, 107, 107, 0.2);
+    }
+
+    .btn-success:hover {
+        background-color: #5A7A5A;
+        border-color: #5A7A5A;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(107, 142, 107, 0.2);
+    }
+
+    .pagination .page-link {
+        color: var(--text-dark, #4A3F35);
+        border-radius: 4px;
+        margin: 0 3px;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .active .page-link {
+        background-color: var(--primary-color, #A67C52);
+        border-color: var(--primary-color, #A67C52);
+        color: var(--white, #FFFFFF);
+    }
+
+    .pagination .page-link:hover {
+        background-color: rgba(166, 124, 82, 0.05);
+        color: var(--primary-color, #A67C52);
+    }
+
+    .content-title {
+        color: var(--primary-color, #A67C52);
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 12px;
+    }
+
+    .content-title:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 3px;
+        width: 60px;
+        background-color: var(--primary-color, #A67C52);
+    }
+
+    .table thead.table-dark th {
+        background-color: #343a40;
+        color: white;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll(".block-btn").forEach(button => {
+            button.addEventListener("click", async function() {
+                const userId = this.getAttribute("data-id");  
+                const action = this.getAttribute("data-status");  
+                const url = action === "block" ? "/admin/blockCustomer?id=" : "/admin/unblockCustomer?id=";
+
+                try {
+                    let response = await fetch(url + userId, { method: "GET" });
+                    if (response.ok) {
+                        // Toggle button text and class
+                        if (action === "block") {
+                            this.classList.remove("btn-danger");
+                            this.classList.add("btn-success");
+                            this.innerText = "Unblock";
+                            this.setAttribute("data-status", "unblock");
+                        } else {
+                            this.classList.remove("btn-success");
+                            this.classList.add("btn-danger");
+                            this.innerText = "Block";
+                            this.setAttribute("data-status", "block");
+                        }
+                    } else {
+                        console.error("Failed to update user status.");
+                    }
+                } catch (error) {
+                    console.log(`Error in Changing UNBLOCK TO BLOCK button in userEdit [SCRIPT] the error is ${error}`);
+                }
+            });
+        });
+    });
+</script>
+
+<%- include("../partials/admin/adminFooter") %>
