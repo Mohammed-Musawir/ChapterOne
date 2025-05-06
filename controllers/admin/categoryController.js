@@ -117,45 +117,66 @@ const loadEditCategory = async (req,res) => {
 }
 
 
-const updateCategory = async (req,res) => {
+const updateCategory = async (req, res) => {
     try {
-        const {id} = req.params;
-
-        if(!id){
-            console.log(`Doesnt find id req.params = ${req.params} in Update Category in Category controller`)
-            return res.render('500');
-        }
-
-        const {  categoryName, categoryDescription, isListed} = req.body;
-
-        if(!categoryName || !categoryDescription || !isListed){
-
-        }
-        
-        const updatedCategory = await categoryModel.findByIdAndUpdate(
-          id,
-          { 
-            name: categoryName, 
-            description: categoryDescription,
-            isListed:isListed
-          },
-          { new: true }
-        );
-        
-        if (!updatedCategory) {
-          return res.status(404).json({ success: false, message: 'Category not found' });
-        }
-        
-        return res.json({ 
-          success: true, 
-          message: 'Category updated successfully',
-          category: updatedCategory
-        });
-      } catch (error) {
-        console.error('Error updating category:', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+      const { id } = req.params;
+      
+      if (!id) {
+        console.log(`Doesn't find id req.params = ${req.params} in Update Category in Category controller`);
+        return res.render('500');
       }
-}
+      
+      const { categoryName, categoryDescription, isListed } = req.body;
+      
+      // Validate required fields
+      if (!categoryName || !categoryDescription || isListed === undefined) {
+        return res.status(400).json({ success: false, message: 'Missing required fields' });
+      }
+      
+      // Check if category exists before attempting to update
+      const existingCategory = await categoryModel.findById(id);
+      
+      if (!existingCategory) {
+        return res.status(404).json({ success: false, message: 'Category not found' });
+      }
+      
+      // Check if another category with the same name (case-insensitive) already exists
+      // But exclude the current category being updated from the check
+      const duplicateCategory = await categoryModel.findOne({
+        _id: { $ne: id }, // Exclude the current category
+        name: { $regex: new RegExp(`^${categoryName}$`, 'i') } // Case-insensitive match
+      });
+      
+      if (duplicateCategory) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'A category with this name already exists' 
+        });
+      }
+      
+      // Proceed with update if no duplicate is found
+      const updatedCategory = await categoryModel.findByIdAndUpdate(
+        id,
+        {
+          name: categoryName,
+          description: categoryDescription,
+          isListed: isListed
+        },
+        { new: true }
+      );
+      
+      return res.json({
+        success: true,
+        message: 'Category updated successfully',
+        category: updatedCategory
+      });
+    } catch (error) {
+      console.error('Error updating category:', error);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  }
+
+  
 
 const changeCategoryStatus = async (req,res) => {
     try {

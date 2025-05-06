@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
     },
     profileImage: { 
         type: String,
-        default:'/images/default/vectorstock_42797445.jpg'  
+        default:'/profileImages/vectorstock_42790738.jpg'  
     },
     referralCode: {
         type: String,

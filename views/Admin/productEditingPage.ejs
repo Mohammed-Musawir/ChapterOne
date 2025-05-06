@@ -854,18 +854,13 @@ document.addEventListener('DOMContentLoaded', function() {
       method: 'POST',
       body: formData
     })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error('Network response was not ok.');
-    })
+    .then(response =>  response.json())
     .then(data => {
       // Hide loading overlay
       document.querySelector('.loading-overlay').style.display = 'none';
       
-      // Show success message
-      Swal.fire({
+     if(data.success) {
+       Swal.fire({
         title: 'Success!',
         text: 'Product updated successfully',
         icon: 'success',
@@ -873,6 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }).then(() => {
         window.location.href = '/admin/products';
       });
+     }
     })
     .catch(error => {
       // Hide loading overlay

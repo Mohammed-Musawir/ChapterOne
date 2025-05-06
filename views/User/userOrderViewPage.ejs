@@ -846,17 +846,19 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/account/change-password" class="nav-link1 <%= activePage === 'change-password' ? 'active' : '' %>">
-                            <i class="fas fa-lock"></i>
-                            <span>Change Password</span>
-                        </a>
+                        <% if (!user.googleId) { %>
+                            <a href="/account/change-password" class="nav-link1">
+                                <i class="fas fa-lock"></i>
+                                <span>Change Password</span>
+                            </a>
+                        <% } %>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a href="/account/change-email" class="nav-link1 <%= activePage === 'change-email' ? 'active' : '' %>">
                             <i class="fas fa-envelope"></i>
                             <span>Change Email</span>
                         </a>
-                    </li>
+                    </li> -->
                     <li>
                         <a href="/account/orders" class="nav-link1 <%= activePage === 'orders' ? 'active' : '' %>">
                             <i class="fas fa-shopping-bag"></i>
@@ -902,9 +904,11 @@
                     <a href="/account/orders" class="back-btn">
                         <i class="fas fa-arrow-left"></i> Back to Order
                     </a>
-                    <a href="/account/orders/<%= order.orderId %>/invoice" class="back-btn">
-                        <i class="fas fa-file-invoice me-1"></i> Download Invoice
-                    </a>
+                    <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'returned' && order.orderStatus !== 'pending') { %>
+                        <a href="/account/orders/<%= order.orderId %>/invoice" class="back-btn">
+                            <i class="fas fa-file-invoice me-1"></i> Download Invoice
+                        </a>
+                    <% } %>
                 </div>
             </div>
         

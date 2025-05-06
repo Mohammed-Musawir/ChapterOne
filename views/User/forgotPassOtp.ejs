@@ -208,7 +208,7 @@
             <h2 class="page-title">Verify OTP</h2>
             <p class="info-text">We've sent a one-time password to <span class="email-highlight"><%= email %></span>. Please enter it below to reset your password.</p>
             
-            <form action="/verify-forgotPassword" method="post">
+            <form id="otpForm">
                 <div class="otp-inputs">
                     <input type="text" name="otp1" class="otp-input" maxlength="1" autofocus>
                     <input type="text" name="otp2" class="otp-input" maxlength="1">
@@ -253,6 +253,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const inputs = document.querySelectorAll('.otp-input');
+        const otpForm = document.getElementById('otpForm');
         const resendButton = document.getElementById('resendOtp');
         const countdownElement = document.getElementById('countdown');
         const timerDiv = document.querySelector('.timer');
@@ -317,6 +318,80 @@
             countdown = setInterval(updateCountdown, 1000);
         }
 
+        // Handle OTP form submission with fetch
+        otpForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Get all OTP digits
+            const otp1 = document.querySelector('input[name="otp1"]').value;
+            const otp2 = document.querySelector('input[name="otp2"]').value;
+            const otp3 = document.querySelector('input[name="otp3"]').value;
+            const otp4 = document.querySelector('input[name="otp4"]').value;
+            const otp5 = document.querySelector('input[name="otp5"]').value;
+            const otp6 = document.querySelector('input[name="otp6"]').value;
+            
+            // Combine OTP digits
+            const otpValue = otp1 + otp2 + otp3 + otp4 + otp5 + otp6;
+            
+            // Get email from the page
+            const emailElement = document.querySelector('.email-highlight');
+            const email = emailElement.textContent;
+            
+            // Send OTP verification request
+            fetch('/verify-forgotPassword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    otp: otpValue,
+                    email: email
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message with brown theme
+                    Swal.fire({
+                        title: 'Verification Successful',
+                        text: 'Your email has been verified successfully!',
+                        icon: 'success',
+                        confirmButtonText: 'Continue',
+                        confirmButtonColor: '#5D4037',
+                        background: '#fff',
+                        iconColor: '#5D4037'
+                    }).then(() => {
+                        // Redirect to reset password page or wherever needed
+                        window.location.href = data.redirectUrl || '/reset-password';
+                    });
+                } else {
+                    // Show error message with brown theme
+                    Swal.fire({
+                        title: 'Verification Failed',
+                        text: data.message || 'Invalid OTP. Please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'Try Again',
+                        confirmButtonColor: '#5D4037',
+                        background: '#fff',
+                        iconColor: '#5D4037'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Error with brown theme
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Something went wrong. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#5D4037',
+                    background: '#fff',
+                    iconColor: '#5D4037'
+                });
+            });
+        });
+
         // Handle OTP resend
         resendButton.addEventListener('click', function(event) {
             event.preventDefault();
@@ -335,7 +410,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // Replace alert with SweetAlert
+                    // SweetAlert with brown theme
                     Swal.fire({
                         title: 'Code Sent!',
                         text: 'A new verification code has been sent to your email',
@@ -343,25 +418,22 @@
                         confirmButtonText: 'OK',
                         confirmButtonColor: '#5D4037',
                         background: '#fff',
-                        iconColor: '#5D4037',
-                        customClass: {
-                            title: 'text-primary-brown',
-                            popup: 'swal-custom-popup'
-                        }
+                        iconColor: '#5D4037'
                     });
                     
                     startCountdown(); 
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    // Error SweetAlert
+                    // Error SweetAlert with brown theme
                     Swal.fire({
                         title: 'Error',
                         text: 'Failed to resend verification code. Please try again.',
                         icon: 'error',
                         confirmButtonText: 'OK',
                         confirmButtonColor: '#5D4037',
-                        background: '#fff'
+                        background: '#fff',
+                        iconColor: '#5D4037'
                     });
                 });
             }

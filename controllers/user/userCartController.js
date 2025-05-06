@@ -1,7 +1,7 @@
 const cartModel = require('../../models/cartSchema');
 const productModal = require('../../models/productSchema');
 const wishlistModel = require('../../models/wishlistSchema'); 
-const offerModel = require('../../models/offerSchema');
+const offerModel = require('../../models/offerSchema'); 
 
 const loadCart = async (req, res) => {
     try {
@@ -33,7 +33,7 @@ const loadCart = async (req, res) => {
         const wishlistProductIds = wishlist?.books && Array.isArray(wishlist.books) 
             ? wishlist.books
                 .filter(item => item.product) 
-                .map(item => typeof item.product === 'object' ? item.product.toString() : item.product.toString()) 
+                .map(item => typeof item.product === 'object' ? item.product._id.toString() : item.product.toString()) 
             : [];
         
         const excludingProductIds = [...new Set([...cartProductIds, ...wishlistProductIds])];
@@ -48,21 +48,17 @@ const loadCart = async (req, res) => {
             }).limit(4);
         }
         
-        /**
-         * Apply the best available offer to a product
-         * Prioritizes the offer with higher discount percentage
-         */
         const applyBestOffer = (product) => {
-            const productObj = typeof product.toObject === 'function' ? product.toObject() : product;
+            // Ensure we're working with a plain JavaScript object that can be modified
+            const productObj = typeof product.toObject === 'function' ? product.toObject() : JSON.parse(JSON.stringify(product));
             const productId = productObj._id.toString();
             const categoryId = productObj.category_id ? productObj.category_id.toString() : null;
             
             // Get applicable offers
             const productOffer = productOffers.get(productId);
             const categoryOffer = categoryId ? categoryOffers.get(categoryId) : null;
-
             
-            // Determine the best offer based on discount percentage
+            // Determine the best offer
             let bestOffer = null;
             let offerSource = null;
 
@@ -81,12 +77,14 @@ const loadCart = async (req, res) => {
                 bestOffer = categoryOffer;
                 offerSource = 'category';
             }
-            console.log(bestOffer);
-            // Apply the best offer if available
+            
+            // Apply the offer if available
             if (bestOffer) {
-                const discountAmount = Math.round((productObj.salePrice * bestOffer.discountPercentage) / 100);
-                const discountedPrice = productObj.salePrice - discountAmount; 
+                const originalPrice = productObj.salePrice;
+                const discountAmount = Math.round((originalPrice * bestOffer.discountPercentage) / 100);
+                const discountedPrice = originalPrice - discountAmount;
                 
+                // Create a new product object with offer data
                 return {
                     ...productObj,
                     hasOffer: true,
@@ -94,16 +92,14 @@ const loadCart = async (req, res) => {
                     offerType: bestOffer.offerType,
                     offerName: bestOffer.name,
                     offerSource: offerSource,
-                    regularPrice: productObj.regularPrice,
+                    regularPrice: originalPrice,
                     salePrice: discountedPrice
                 };
             } else {
-                // No offer available, use the regular sale price
+                // No offer available
                 return {
                     ...productObj,
-                    hasOffer: false,
-                    regularPrice: productObj.regularPrice,
-                    salePrice: productObj.salePrice
+                    hasOffer: false
                 };
             }
         };
@@ -134,19 +130,29 @@ const loadCart = async (req, res) => {
                     quantity: item.quantity
                 };
                 
-                // Calculate item total based on sale price (which may be discounted)
+                // Calculate item total
                 subtotal += productWithOffer.salePrice * item.quantity;
                 
                 updatedBooks.push(updatedItem);
             }
             
-            // Replace the original books array with our updated one
+            // Important: Replace the original books array with our updated one
             cart.books = updatedBooks;
         }
         
         const totalProductPrice = subtotal;
         let shippingCost = totalProductPrice > 1000 ? 0 : 60;
         const gstAmount = Math.round((totalProductPrice + shippingCost) * 0.18);
+        
+        // Debug logging to verify offer data is present
+        if (cart?.books?.length > 0) {
+            console.log('Sample cart item with offer data:', 
+                        JSON.stringify({
+                            hasOffer: cart.books[0].product.hasOffer,
+                            offerPercentage: cart.books[0].product.offerPercentage,
+                            offerSource: cart.books[0].product.offerSource
+                        }));
+        }
         
         res.render('User/cartPage', { 
             cart, 
@@ -159,7 +165,7 @@ const loadCart = async (req, res) => {
         console.error('Error loading cart:', error);
         return res.status(500).render('500');
     }
-}
+};
 
 const addToCart = async (req, res) => {
     try {

@@ -236,6 +236,7 @@ const changePass = async (req, res) => {
       newPasswordHash: await bcrypt.hash(newPassword, 10)
     };
 
+    console.log(req.session.passwordChange)
     console.log(`Change Password OTP: ${otp}`); // For development only, remove in production
 
     // Send OTP via email
@@ -275,15 +276,16 @@ const loadChangePassOTP = async (req, res) => {
   }
 }
 
-const changePassOTPSubmit = async (req, res) => {
+const changePassOTPSubmit = async (req, res) => { 
   try {
     // Get the OTP from the form
     const { otp } = req.body;
     
     // Get password change data from session
     const passwordChangeData = req.session.passwordChange;
-    
+
     if (!passwordChangeData) {
+
       return res.status(400).json({ 
         success: false, 
         message: 'No OTP request found. Please request a new one.' 
@@ -342,8 +344,8 @@ const changePassOTPSubmit = async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`Error in changePassOTPSubmit: ${error.message}`);
-    console.error(error.stack);
+    console.log(error)
+
     return res.status(500).json({ 
       success: false, 
       message: 'Internal server error' 

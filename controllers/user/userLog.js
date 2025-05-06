@@ -14,6 +14,8 @@ const { use } = require('passport');
 //Nodemailer Transpoter
 const transporter = nodemailer.createTransport({
     service:"gmail",
+    port: 465, 
+    secure: true,
     auth:{
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
@@ -182,6 +184,7 @@ const forgotPass = async (req,res) => {
         }
         req.session.userEmail = email;
         const otp = await generateOTP();
+
         req.session.otp = otp;
         
         const mailOptions = {
@@ -216,23 +219,34 @@ const load_verify_forgotPass = async (req,res) => {
 const verify_forgotPass = async (req,res) => {
     try {
         if (!req.session.otp || !req.session.userEmail) {
-            console.log(`Session expired in verify_forgotPass`);
-            return res.redirect('/forgotPass');
+            
+            return res.status(400).json({
+                success: false,
+                message: "Session expired. Please request a new OTP.",
+                redirectUrl: '/forgotPass'
+            });
         }
-        const OTP = req.body.otp1 + req.body.otp2 + req.body.otp3 + req.body.otp4 + req.body.otp5 + req.body.otp6;
-        
-        if(req.session.otp.toString() !== OTP){
-            console.log(`Incorrect OTP in verify_forgotpass`)
-            return res.render("User/forgotPassOtp",{email:req.session.userEmail,massage: " incorrect OTP"});
+        const {otp} = req.body;
+        if(req.session.otp.toString() !== otp){
+            return res.status(400).json({
+                success: false,
+                message: "Incorrect OTP. Please try again."
+            });
         }
 
-        // res.render('User/resetPass');
-        res.redirect('/reset-password')
+        
+        return res.status(200).json({
+            success: true,
+            message: "OTP verified successfully",
+            redirectUrl: '/reset-password'
+        });
 
     } catch (error) {
-        console.log(`Error in userLog in verify_forgotPass
-            Error is ${error}`);
-            res.render("500");
+        console.log(`Error in userLog in verify_forgotPass. Error is ${error}`);
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred. Please try again later."
+        });
     }
 }
 
@@ -364,10 +378,7 @@ const signup = async (req,res) => {
         const {firstName, lastName, email, mobileNumber,  password ,confirmPassword} = req.body;
         console.log(req.body)
         if(!firstName || !lastName || !email || !mobileNumber || !password || !confirmPassword){
-            console.log(`Feilds are missing 
-                ${req.body}`);
-                return res.render('User/userSignup',{massege:"Some feilds are missing"});
-                
+                return res.render('User/userSignup',{massege:"Some feilds are missing"}); 
             }
             
             if(password !== confirmPassword){
@@ -515,7 +526,7 @@ The ChapterOne Team`
         delete req.session.otp;
         delete req.session.userData;
 
-        res.redirect('/login')
+        res.redirect('/login') 
 
     } catch (error) {
         res.render("500");

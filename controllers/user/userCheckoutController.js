@@ -84,16 +84,18 @@ const loadCheckOutPage = async (req, res) => {
       const gstAmount = Math.round((subtotal + shippingCost) * 0.18);
       const totalPrice = subtotal + gstAmount + shippingCost;
       
+      const TotalPrice = Math.round(totalPrice)
+      const Subtotal = Math.round(subtotal)
       const activeCoupons = await couponmodel.find({isBlocked: false});
       // Get the applied coupon from session if it exists
       const appliedCoupon = req.session.appliedCoupon || [];
       
       res.render("user/userCheckoutPage", {
           addresses,
-          subtotal,
-          shippingCost,
+          subtotal : Subtotal,
+          shippingCost, 
           gstAmount,
-          totalPrice,
+          totalPrice : TotalPrice,
           activeCoupons,
           appliedCoupon,
           cart,

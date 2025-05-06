@@ -10,7 +10,7 @@ const MongoStore = require("connect-mongo");
 const passport = require('passport');
 const flash = require('connect-flash');
 require('./config/passport');
-app.locals.companyName = 'ChapterOne'
+app.locals.companyName = 'chapterOne'
 const cookieParser = require('cookie-parser');
 
   
@@ -19,7 +19,6 @@ const dotenv = require('dotenv'); //This line of code loads environment variable
 const { connect } = require('http2');
 const connectDB = require('./config/db');
 dotenv.config();                 
-                
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
@@ -40,6 +39,7 @@ app.use(session({
     }
 }))
 
+app.use(express.static('public'));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -50,7 +50,6 @@ app.use('/admin',adminRoutes);
 
 app.set("views",path.join(__dirname,"views"));
 app.set('view engine','ejs');
-app.use(express.static('public'));
 
 const PORT = process.env.PORT || 3000; 
 

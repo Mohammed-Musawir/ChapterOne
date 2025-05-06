@@ -188,88 +188,109 @@ const loadAddProducts = async (req,res) => {
 
 //Adding a product
 
-const addProduct = async (req,res) => {
-    
-    try {
-        
-        const categories = await categoryModel.find({});
-
-        if(!categories){
-            console.log(`Error when finding category`)
-            return res.status(500).json({massege:'Error'})
-        }
-        const {
-            name,
-            writer,
-            category_id,
-            language,
-            regularPrice,
-            salePrice,
-            availableQuantity,
-            description,
-            publishedDate
-        } = req.body;
-
-        if(!name ||!writer ||!category_id ||!language ||!regularPrice ||!salePrice ||!availableQuantity ||!description ||!publishedDate){
-            
-            console.log(`Problem with finding credentials in req.body in addProduct in productController`)
-
-            return res.render('Admin/addProduct',{categories,massege:'Need Credentials'})
-        }
-
-        const imagePaths = req.files.map(file => `/uploadedImages/${file.filename}`);
-
-        if(!imagePaths){
-
-            console.log(`Problem with imagePaths newProduct in addProduct in productController`)
-
-            return res.render('Admin/addProduct',{categories,massege:'Problem with imagePaths newProduct '})
-
-        }
-
-
-        const newProduct = new productModel({
-            name,
-            writer,
-            category_id,
-            language,
-            regularPrice,
-            salePrice,
-            availableQuantity,
-            description,
-            productImages: imagePaths,
-            publishedDate
-        })
-
-        if(!newProduct){
-            console.log(`Problem with Creating newProduct in addProduct in productController`);
-            return res.render('Admin/addProduct',{categories,massege:'Problem with Creating newProduct'})
-
-        }
-
-        await newProduct.save();
-        console.log(`New Book Added
-            name : ${name},
-            `)
-
-        res.redirect('/admin/addProducts');
-
-
-    } catch (error) {
-        res.render('500');
-        console.log(`Error show in addProducts and the 
-            Error is ${error}`)
+const addProduct = async (req, res) => { 
+  try {
+    // Get all categories for rendering the form
+    const categories = await categoryModel.find({});
+    if (!categories) {
+      console.log(`Error when finding categories`);
+      return res.status(500).json({ success: false, message: 'Error fetching categories' });
     }
+    
+    // Extract form data
+    const {
+      name,
+      writer,
+      category_id,
+      language,
+      regularPrice,
+      salePrice,
+      availableQuantity,
+      description,
+      publishedDate
+    } = req.body;
+    
+    // Validate required fields
+    if (!name || !writer || !category_id || !language || !regularPrice || 
+        !availableQuantity || !description || !publishedDate) {
+      console.log('Missing required fields in request body');
+      return res.status(400).json({
+        success: false,
+        message: 'All required fields must be filled'
+      });
+    }
+
+    const existingProduct = await productModel.findOne({ 
+      name: { $regex: new RegExp(`^${name}$`, 'i') } 
+    });
+    
+    if (existingProduct) {
+      console.log(`Product with name "${name}" already exists`);
+      return res.status(400).json({
+        success: false,
+        message: 'A book with this name already exists'
+      });
+    }
+   
+    // Check if images were uploaded
+    if (!req.files || req.files.length < 3) {
+      console.log('Not enough images provided (minimum 3 required)');
+      return res.status(400).json({
+        success: false,
+        message: 'At least 3 book images are required'
+      });
+    }
+    
+    // Process uploaded image paths
+    const imagePaths = req.files.map(file => `/uploadedImages/${file.filename}`);
+    
+    // Create new product
+    const newProduct = new productModel({
+      name,
+      writer,
+      category_id,
+      language,
+      regularPrice: parseFloat(regularPrice),
+      salePrice: salePrice ? parseFloat(salePrice) : undefined, // Handle optional salePrice
+      availableQuantity: parseInt(availableQuantity),
+      description,
+      productImages: imagePaths,
+      publishedDate: publishedDate 
+    });
+    
+    // Save the product
+    await newProduct.save();
+    
+    console.log(`New Book Added - Title: ${name}, Author: ${writer}`);
+    
+    // Return success response for fetch API
+    return res.status(201).json({
+      success: true,
+      message: 'Book added successfully',
+      product: {
+        id: newProduct._id,
+        name: newProduct.name
+      }
+    });
+  } catch (error) {
+    console.error(`Error in addProduct controller: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error occurred while adding the book'
+    });
+  }
 }
 
 //Editing a product
 
-const loadEditProduct = async (req,res) => {
+const loadEditProduct = async (req,res) => { 
     try {
         const {id} = req.params;
         const product = await productModel.findById(id).populate('category_id')
         const categories = await categoryModel.find({isListed:true})
         
+        console.log('Product Images:', product.productImages);
+
         res.render('Admin/productEditingPage',{product,categories})
     } catch (error) {
         res.render('500');
@@ -297,6 +318,19 @@ const editingProduct = async (req,res) => {
             console.log(`Product not found with ID: ${id}`);
         return res.render('500');
         }
+
+        const existingProduct = await productModel.findOne({ 
+          name: { $regex: new RegExp(`^${name}$`, 'i') } , 
+          _id: { $ne: id } // exclude the current product being updated
+      });
+
+      if (existingProduct) {
+          console.log(`Product with name "${name}" already exists`);
+          return res.status(400).json({ 
+              success: false, 
+              message: 'Product with this name already exists' 
+          });
+      }
 
         let imagePaths = product.productImages;
 
