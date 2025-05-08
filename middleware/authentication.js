@@ -22,7 +22,7 @@ const isAuthenticated = async (req,res,next) => {
 
         if (decoded === "expired") {
             console.log("🔄 Token Expired: Redirecting to login or refreshing token...");
-            return res.redirect('/login'); // Or implement a refresh mechanism
+            return res.redirect('/login'); 
         }
         
         if (!decoded) {

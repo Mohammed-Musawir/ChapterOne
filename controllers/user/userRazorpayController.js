@@ -8,7 +8,7 @@ const razorpayController = {
   createRazorpayOrder: async (req, res) => {
     try {
       const { amount, orderDetails } = req.body;
-      const userId = req.user._id || req.user.id; // Assuming auth middleware sets req.user
+      const userId = req.user._id || req.user.id; 
       
       if (!amount || amount <= 0) {
         return res.status(400).json({ success: false, message: 'Invalid amount' });
@@ -163,7 +163,7 @@ const razorpayController = {
       return res.status(200).json({
         success: true,
         message: 'Payment verified and order created successfully',
-        orderId: savedOrder.orderId // Using the generated orderId from the schema
+        orderId: savedOrder.orderId 
       });
     } catch (error) {
       console.error('Verify payment error:', error);
@@ -174,7 +174,7 @@ const razorpayController = {
     }
   },
 
-  // Handle payment failure
+  
   userPaymentError: async (req, res) => {
     try {
       const errorCode = req.query.error_code || '';

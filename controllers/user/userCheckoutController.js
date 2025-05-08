@@ -16,14 +16,14 @@ const loadCheckOutPage = async (req, res) => {
           totalItems = cart.books.reduce((acc, item) => acc + item.quantity, 0);
       }
       
-      // Get all active offers
+      
       const currentDate = new Date();
       const activeOffers = await offerModel.find({
           isActive: true,
           endDate: { $gt: currentDate }
       });
       
-      // Calculate product prices with applicable offers
+      
       const productsWithDiscounts = [];
       let subtotal = 0;
       
@@ -31,21 +31,21 @@ const loadCheckOutPage = async (req, res) => {
           for (const item of cart.books) {
               const product = item.product;
               
-              // Find product-specific offers
+              
               const productOffers = activeOffers.filter(offer => 
                   offer.offerType === 'product' && 
                   offer.product && 
                   offer.product.toString() === product._id.toString()
               );
               
-              // Find category offers for this product
+              
               const categoryOffers = activeOffers.filter(offer => 
                   offer.offerType === 'category' && 
                   offer.category && 
                   offer.category.toString() === product.category_id.toString()
               );
               
-              // Combine all applicable offers and find the best one
+              
               const allApplicableOffers = [...productOffers, ...categoryOffers];
               
               let bestOffer = null;
@@ -59,7 +59,7 @@ const loadCheckOutPage = async (req, res) => {
                   }
               });
               
-              // Calculate the discounted price
+              
               const originalPrice = product.salePrice;
               const discountedPrice = bestOffer ? 
                   originalPrice - (originalPrice * bestOffer.discountPercentage / 100) : 
@@ -68,7 +68,7 @@ const loadCheckOutPage = async (req, res) => {
               const totalForItem = discountedPrice * item.quantity;
               subtotal += totalForItem;
               
-              // Store product info with discount details
+              
               productsWithDiscounts.push({
                   product: product,
                   quantity: item.quantity,
@@ -87,7 +87,7 @@ const loadCheckOutPage = async (req, res) => {
       const TotalPrice = Math.round(totalPrice)
       const Subtotal = Math.round(subtotal)
       const activeCoupons = await couponmodel.find({isBlocked: false});
-      // Get the applied coupon from session if it exists
+      
       const appliedCoupon = req.session.appliedCoupon || [];
       
       res.render("user/userCheckoutPage", {
@@ -182,7 +182,7 @@ const applyCoupen = async (req, res) => {
       const gstAmount = Math.round((subtotalForCalculation + shippingCost) * 0.18);
       const newTotal = discountedSubtotal + gstAmount + shippingCost;
       
-      // Save the applied coupon in the session
+      
       req.session.appliedCoupon = {
         id: coupon._id,
         code: coupon.couponCode,
@@ -241,10 +241,10 @@ const removeCoupon = async (req, res) => {
         const updatedTotal = subtotal + gstAmount + shippingCost;
           
 
-        // This is the key line that was commented out before - actually delete the coupon from session
+        
         delete req.session.appliedCoupon;
         
-        // Make sure the session is saved
+        
         req.session.save();
 
         return res.status(200).json({

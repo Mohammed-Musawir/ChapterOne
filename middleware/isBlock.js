@@ -1,8 +1,8 @@
-const userModel = require('../models/userSchema');  // Adjust path as needed
+const userModel = require('../models/userSchema');  
 
 const isActive = async (req, res, next) => {
     try {
-        const userId = req.user?._id; // Ensure user ID exists
+        const userId = req.user.id || req.user._id;
 
         if (!userId) {
             return res.status(401).json({ 
@@ -30,7 +30,7 @@ const isActive = async (req, res, next) => {
             });
         }
 
-        next(); // Proceed to the next middleware/route if user is active
+        next(); 
     } catch (error) {
         console.error(`Error in isActive middleware: ${error.message}`);
         res.status(500).json({ 

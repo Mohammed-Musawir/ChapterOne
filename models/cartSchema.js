@@ -9,15 +9,15 @@ const cartSchema = new Schema({
         required:true, 
     }, 
     books:[{
-        product:{
+        product:{ 
             type:Schema.Types.ObjectId,
             ref:"Product",
             required:true
         },
         quantity:{ 
-          type:Number,
+          type:Number, 
           required:true
-        }   
+        } 
     }],
     createdAt:{
         type:Date,

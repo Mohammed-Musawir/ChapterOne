@@ -11,7 +11,7 @@ const JWT_Config = require('../../config/jwt');
 const { use } = require('passport');
 
 
-//Nodemailer Transpoter
+
 const transporter = nodemailer.createTransport({
     service:"gmail",
     port: 465, 
@@ -23,12 +23,12 @@ const transporter = nodemailer.createTransport({
     secure: true 
 })
 
-//OTP GENERATER
+
 function generateOTP(){
-    return Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit number
+    return Math.floor(100000 + Math.random() * 900000); 
 }
 
-//LANDING PAGE
+
 
 const loadLandingPage = async (req,res) => {
     try {
@@ -48,7 +48,7 @@ const loadLandingPage = async (req,res) => {
 
 
 
-//HOME
+
 const loadHome = async (req, res) => {
     try {
       if (!req.user) {
@@ -59,23 +59,23 @@ const loadHome = async (req, res) => {
       const userID = req.user._id;
       const wishlist = await wishlistModal.findOne({userId: userID});
       
-      // Get active offers
+      
       const activeOffers = await offerModal.find({
         isActive: true,
         endDate: { $gt: new Date() }
       });
       
-      // Get books with basic info
+      
       let books = await productModal.find().limit(6);
       const categories = await categoryModel.find().limit(3);
       
-      // Process each book to add discount information
+      
       books = books.map(book => {
         const bookObj = book.toObject();
         bookObj.discount = 0;
         bookObj.discountedPrice = bookObj.salePrice;
         
-        // Check for product-specific offers first
+        
         const productOffer = activeOffers.find(
           offer => offer.offerType === 'product' && offer.product && offer.product.toString() === bookObj._id.toString()
         );
@@ -87,7 +87,7 @@ const loadHome = async (req, res) => {
           return bookObj;
         }
         
-        // If no product offer, check for category offers
+        
         if (bookObj.category) {
           const categoryOffer = activeOffers.find(
             offer => offer.offerType === 'category' && offer.category && offer.category.toString() === bookObj.category.toString()
@@ -103,7 +103,7 @@ const loadHome = async (req, res) => {
         return bookObj;
       });
       
-      // Sort books by discount percentage in descending order
+      
       books.sort((a, b) => b.discount - a.discount);
       
       res.render('User/userHomePage', {books, categories, wishlist});
@@ -114,7 +114,7 @@ const loadHome = async (req, res) => {
   };
 
 
-// LOGIN
+
 const loadLogin = async (req,res) => {
     try {
         if(req.cookies.userToken){
@@ -153,14 +153,14 @@ const login = async (req, res) => {
         });
         
         res.status(200).json({success:true})
-        // res.redirect('/home');
+        
     } catch (error) {
         console.log(`Error in Controller in user in userLog the Error is ${error}`);
         res.render("500");
     }
 }
 
-//FORGOT PASSWORD
+
 
 const loadForgotPass = async (req,res) => {
     try {
@@ -188,7 +188,7 @@ const forgotPass = async (req,res) => {
         req.session.otp = otp;
         
         const mailOptions = {
-            from: process.env.EMAIL_USER, // Use environment variable
+            from: process.env.EMAIL_USER, 
             to: email,
             subject: 'Email Verification OTP',
             text: `Your OTP for email verification is: ${otp}`
@@ -280,7 +280,7 @@ const resetPassword = async (req,res) => {
         }
 
         const isValidPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-                console.log("Received Password:", password); // Debugging line
+                console.log("Received Password:", password); 
 
                 if (!isValidPassword.test(password)) {
                     console.log("password is not Valid in userLog controller resetPassword");
@@ -324,12 +324,12 @@ const forgot_resend_otp = async (req,res) => {
             return res.status(400).json({ success: false, message: "Session expired. Please try again." });
         }
         
-        // Generate new OTP
+        
         const newOtp = generateOTP();
         req.session.otp = newOtp;
        
         
-        // Send OTP via email
+        
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: req.session.userEmail,
@@ -352,7 +352,7 @@ const forgot_resend_otp = async (req,res) => {
 
 
 
-//SIGN UP
+
 const loadSignup = async (req,res) => {
     try {
         if(req.cookies.userToken){
@@ -393,9 +393,9 @@ const signup = async (req,res) => {
                 
             }
             
-////////////////////////////////////////////////////////////////////////////////
 
-                    // MOBILE VALIDATION
+
+                    
 
                 const isValidMobile =  /^(?!([0-9])\1{9}$)(?!.*(?:123456|654321|101010|000000)).{10}$/.test(mobileNumber);
 
@@ -406,10 +406,10 @@ const signup = async (req,res) => {
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
                 const isValidPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-                console.log("Received Password:", password); // Debugging line
+                console.log("Received Password:", password); 
 
                 if (!isValidPassword.test(password)) {
                     console.log("password is not Valid in user controller signup");
@@ -432,7 +432,7 @@ const signup = async (req,res) => {
            
 
             const mailOptions = {
-                from: process.env.EMAIL_USER, // Use environment variable
+                from: process.env.EMAIL_USER, 
                 to: email,
                 subject: 'Email Verification OTP',
                 text: `Your OTP for email verification is: ${otp}`
@@ -494,10 +494,10 @@ const signup_Verify_otp = async (req,res) => {
             password: hashedPassword
         });
         await user.save();
-//////////////////////////////////////////////////////////////////////////////////////////
-        // after registed Email just Fun
+
+        
         const mailOptions = {
-            from: process.env.EMAIL_USER, // Use environment variable
+            from: process.env.EMAIL_USER, 
             to: req.session.userData.email,
             subject: 'Welcome to ChapterOne - Your Reading Journey Begins!',
             text: `Dear ${req.session.userData.firstname} ${req.session.userData.lastname},
@@ -521,7 +521,7 @@ The ChapterOne Team`
         await transporter.sendMail(mailOptions);
             console.log('registered Email sent to: ' + req.session.userData.email);
 
-///////////////////////////////////////////////////////
+
         delete req.session.secretKey
         delete req.session.otp;
         delete req.session.userData;
@@ -611,12 +611,12 @@ const Loadabout = async (req,res) => {
 
 const checkingStatus = async (req,res) => {
     try {
-        const userId = req.user?._id||req.user?.id; // Assume user ID from session/auth middleware
+        const userId = req.user?._id||req.user?.id; 
         
-        // Lenin@2003
+        
 
         const clearUserSession = () => {
-            res.clearCookie('userToken'); // Adjust cookie name as per your auth setup
+            res.clearCookie('userToken'); 
             req.user = null;
         };
         
@@ -631,10 +631,10 @@ const checkingStatus = async (req,res) => {
             });
         }
         
-        // Find user by ID
+        
         const user = await userModel.findById(userId);
         
-        // Check if user exists
+        
         if (!user) {
             clearUserSession()
             return res.status(404).json({
@@ -644,7 +644,7 @@ const checkingStatus = async (req,res) => {
             });
         }
         
-        // Check if user is active
+        
         if (user.isBlocked) {
             clearUserSession()
             return res.status(403).json({
@@ -654,7 +654,7 @@ const checkingStatus = async (req,res) => {
             });
         }
         
-        // Return successful response if user is active
+        
         return res.status(200).json({
             success: true,
             message: 'User is active',

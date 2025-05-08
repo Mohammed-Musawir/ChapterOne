@@ -55,7 +55,7 @@ const isBlock = async (req, res, next) => {
 
 const googleAuthLoginCallback = async (req,res,next) => {
     passport.authenticate(
-        "google-login",   // 👉 Correct strategy name matching passport config
+        "google-login",  
         { failureRedirect: "/login", failureFlash: true },
         (err, user, info) => {
           if (err) {
@@ -73,17 +73,16 @@ const googleAuthLoginCallback = async (req,res,next) => {
               return next(err);
             }
      
-            // ✅ Generate JWT token
+            
             const token = JWT_Config.generateToken({ id: user._id });
             
             req.user = user;
             res.cookie('userToken', token, {
               httpOnly: true,
-              secure: false, // 👉 change to true in production
+              secure: false, 
               maxAge: 24 * 60 * 60 * 1000,
             }); 
-            // req.user = user;
-            // ✅ Handle popup window or normal redirect
+
             res.send(`
               <script>
                 if (window.opener) {
@@ -101,7 +100,7 @@ const googleAuthLoginCallback = async (req,res,next) => {
 
 const googleAuthSignupCallback = async (req,res,next) => {
      passport.authenticate(
-        'google-signup', // 👉 Use your strategy name here
+        'google-signup', 
         { failureRedirect: '/signup', failureFlash: true },
         (err, user, info) => {
           if (err) {
@@ -110,32 +109,28 @@ const googleAuthSignupCallback = async (req,res,next) => {
           }
     
           if (!user && info && info.message === "User already exists") {
-            // Instead of storing in session, redirect with query parameter
             return res.redirect('/signup?error=userExists&message=A user with this email already exists. Please log in instead.');
           }
     
           if (!user) {
-            // General error handling
             return res.redirect('/signup?error=signupFailed&message=' + encodeURIComponent(info ? info.message : "Google signup failed"));
           }
     
-          console.log(user)
           req.login(user, async (err) => {
             if (err) {
               console.error("Session login error:", err);
               return next(err);
             }
     
-            // ✅ Generate JWT token
             const token = JWT_Config.generateToken({ id: user._id });
             console.log(token)
             res.cookie('userToken', token, {
               httpOnly: true,
-              secure: false, // 👉 set true in production
+              secure: false,
               maxAge: 24 * 60 * 60 * 1000,
             });
     
-            // ✅ Respond for popup window or normal redirect
+            
             res.send(`
               <script>
                 if (window.opener) {

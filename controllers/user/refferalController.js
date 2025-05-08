@@ -58,7 +58,7 @@ const applyReferral = async (req,res) => {
         user.hasAppliedReferralCode = referralCode;
         await user.save();
 
-        // await addTransaction(user._id, type = 'Credit',amount =  100, description) = 'Referral Bonus');
+        
         
         await addTransaction(userId, 'Credit', 100, 'Referral Bonus');
         await addTransaction(referrer._id, 'Credit', 100, 'Referral Reward - Friend Joined');

@@ -1,11 +1,8 @@
 const JWT_Config = require('../config/jwt');
-// const {verifyToken} = require('../config/jwt')
+
 
 const isAuthenticated = async (req,res,next) => {
     try {
-
-         
-
         const token = 
         req.headers.authorization?.split(' ')[1] || 
         req.cookies?.adminToken || 

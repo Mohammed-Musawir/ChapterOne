@@ -6,7 +6,7 @@ const orderModal = require('../../models/orderSchema');
 
 const loadAccountPage = async (req,res) => {
     try {
-        // console.log(req.user)
+        
         const userID = req.user._id ||  req.user.id;
         
 

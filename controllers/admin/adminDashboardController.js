@@ -5,29 +5,29 @@ const Category = require('../../models/userSchema');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
-// Helper function to format date ranges
+
 const getDateRange = (period) => {
     const now = new Date();
     let startDate, endDate = now;
     
     switch(period) {
         case 'weekly':
-            // Last 7 days
+           
             startDate = new Date(now);
             startDate.setDate(now.getDate() - 7);
             break;
         case 'monthly':
-            // Last 30 days
+            
             startDate = new Date(now);
             startDate.setDate(now.getDate() - 30);
             break;
         case 'yearly':
-            // Last 12 months
+            
             startDate = new Date(now);
             startDate.setMonth(now.getMonth() - 12);
             break;
         default:
-            // Default to weekly
+            
             startDate = new Date(now);
             startDate.setDate(now.getDate() - 7);
     }
@@ -35,35 +35,35 @@ const getDateRange = (period) => {
     return { startDate, endDate };
 };
 
-// Helper function to generate chart labels
+
 const generateChartLabels = (period, startDate, endDate) => {
     const labels = [];
     const currentDate = new Date(startDate);
     
     switch(period) {
         case 'weekly':
-            // Generate day labels for the past 7 days
+           
             while (currentDate <= endDate) {
                 labels.push(currentDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
                 currentDate.setDate(currentDate.getDate() + 1);
             }
             break;
         case 'monthly':
-            // Generate labels for each day in the past 30 days
+           
             while (currentDate <= endDate) {
                 labels.push(currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
                 currentDate.setDate(currentDate.getDate() + 1);
             }
             break;
         case 'yearly':
-            // Generate month labels for the past 12 months
+            
             while (currentDate <= endDate) {
                 labels.push(currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
                 currentDate.setMonth(currentDate.getMonth() + 1);
             }
             break;
         default:
-            // Default to weekly
+            
             while (currentDate <= endDate) {
                 labels.push(currentDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
                 currentDate.setDate(currentDate.getDate() + 1);
@@ -73,16 +73,16 @@ const generateChartLabels = (period, startDate, endDate) => {
     return labels;
 };
 
-// Main dashboard controller
+
 const getDashboard = async (req, res) => {
     try {
-        // Get date range for default period (weekly)
+        
         const { startDate, endDate } = getDateRange('weekly');
         
-        // Get total orders
+        
         const totalOrders = await Order.countDocuments();
         
-        // Get total revenue
+        
         const revenueData = await Order.aggregate([
             {
                 $match: {
@@ -99,13 +99,13 @@ const getDashboard = async (req, res) => {
         
         const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
         
-        // Get total products
+        
         const totalProducts = await Product.countDocuments();
         
-        // Get total customers
+        
         const totalCustomers = await User.countDocuments({ isBlocked: false });
         
-        // Get top 10 best selling products
+        
         const topProducts = await Order.aggregate([
             {
                 $match: {
@@ -150,7 +150,7 @@ const getDashboard = async (req, res) => {
             }
         ]);
         
-        // Get top 10 best selling categories
+        
         const topCategories = await Order.aggregate([
             {
                 $match: {
@@ -205,10 +205,10 @@ const getDashboard = async (req, res) => {
             }
         ]);
         
-        // Get chart data for weekly period (default)
+        
         const chartData = await getChartData('weekly');
         
-        // Render dashboard with data
+        
         res.render('Admin/adminDashboard', {
             totalOrders,
             totalRevenue,
@@ -227,7 +227,7 @@ const getDashboard = async (req, res) => {
     }
 };
 
-// Controller for fetching chart data based on period
+
 const getChartDataa = async (req, res) => {
     try {
         const period = req.query.period || 'weekly';
@@ -238,7 +238,7 @@ const getChartDataa = async (req, res) => {
             ...chartData
         });
     } catch (error) {
-        console.error('Error fetching chart data:', error);
+        console.error('Error fetching chart data:', error); 
         res.status(500).json({
             success: false,
             message: 'Failed to fetch chart data',
@@ -247,19 +247,19 @@ const getChartDataa = async (req, res) => {
     }
 };
 
-// Helper function to get chart data
+
 async function getChartData(period) {
     const { startDate, endDate } = getDateRange(period);
     const labels = generateChartLabels(period, startDate, endDate);
     
-    // Initialize values array with zeros
+    
     const values = new Array(labels.length).fill(0);
     
-    // Get sales data for the period
+    
     let salesData;
     
     if (period === 'yearly') {
-        // Group by month for yearly data
+        
         salesData = await Order.aggregate([
             {
                 $match: {
@@ -284,7 +284,7 @@ async function getChartData(period) {
             }
         ]);
         
-        // Map sales data to values array
+        
         salesData.forEach(item => {
             const date = new Date(item._id.year, item._id.month - 1, 1);
             const dateStr = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -295,7 +295,7 @@ async function getChartData(period) {
             }
         });
     } else if (period === 'monthly') {
-        // Group by day for monthly data
+        
         salesData = await Order.aggregate([
             {
                 $match: {
@@ -322,7 +322,7 @@ async function getChartData(period) {
             }
         ]);
         
-        // Map sales data to values array
+        
         salesData.forEach(item => {
             const date = new Date(item._id.year, item._id.month - 1, item._id.day);
             const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -333,7 +333,7 @@ async function getChartData(period) {
             }
         });
     } else {
-        // Group by day for weekly data
+        
         salesData = await Order.aggregate([
             {
                 $match: {
@@ -360,7 +360,7 @@ async function getChartData(period) {
             }
         ]);
         
-        // Map sales data to values array
+        
         salesData.forEach(item => {
             const date = new Date(item._id.year, item._id.month - 1, item._id.day);
             const dateStr = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });

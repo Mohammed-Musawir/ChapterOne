@@ -7,8 +7,8 @@ const loadCustomber = async (req,res) => {
     try {
         
         const userData = await userModel.find();
-        let page = req.query.page || 1; // Get the page number from URL
-        let limit = 10; // How many users per page
+        let page = req.query.page || 1; 
+        let limit = 10; 
         let totalPage = Math.ceil(userData.length / limit);
         let startIndex = (page - 1) * limit;
         let endIndex = page * limit;

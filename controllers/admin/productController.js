@@ -31,7 +31,7 @@ const loadProductLists = async (req, res) => {
         endDate: { $gte: new Date() }
       }).sort({ discountPercentage: -1 });
       
-      // Store both offer types
+      
       productObj.productOffer = productOffer ? {
         discountPercentage: productOffer.discountPercentage,
         offerName: productOffer.name,
@@ -46,7 +46,7 @@ const loadProductLists = async (req, res) => {
         isActive: categoryOffer.isActive
       } : null;
       
-      // For backwards compatibility, set the best offer as the default
+      
       productObj.offerType = null;
       productObj.offerId = null;
       productObj.offerActive = false;
@@ -89,7 +89,7 @@ const loadProductLists = async (req, res) => {
   }
 };
 
-//Updating Product Status
+
 
 const updateProductStatus = async (req, res) => {
     try {
@@ -108,7 +108,7 @@ const updateProductStatus = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Product not found' });
       }
   
-      // If isActive is true, isBlocked should be false (and vice versa)
+      
       const updatingStatus = await productModel.findByIdAndUpdate(
         id,
         { isBlocked: !isActive },
@@ -133,7 +133,7 @@ const updateProductStatus = async (req, res) => {
   }
 
 
-  //delete the Product 
+  
 
 const deleteProduct = async (req,res) => {
     try {
@@ -173,7 +173,7 @@ const deleteProduct = async (req,res) => {
 
 
 
-//Add Product Page
+
 const loadAddProducts = async (req,res) => {
     try {
         const categories = await categoryModel.find({isListed:true});
@@ -186,18 +186,18 @@ const loadAddProducts = async (req,res) => {
 }
 
 
-//Adding a product
+
 
 const addProduct = async (req, res) => { 
   try {
-    // Get all categories for rendering the form
+    
     const categories = await categoryModel.find({});
     if (!categories) {
       console.log(`Error when finding categories`);
       return res.status(500).json({ success: false, message: 'Error fetching categories' });
     }
     
-    // Extract form data
+    
     const {
       name,
       writer,
@@ -210,7 +210,7 @@ const addProduct = async (req, res) => {
       publishedDate
     } = req.body;
     
-    // Validate required fields
+    
     if (!name || !writer || !category_id || !language || !regularPrice || 
         !availableQuantity || !description || !publishedDate) {
       console.log('Missing required fields in request body');
@@ -232,7 +232,7 @@ const addProduct = async (req, res) => {
       });
     }
    
-    // Check if images were uploaded
+    
     if (!req.files || req.files.length < 3) {
       console.log('Not enough images provided (minimum 3 required)');
       return res.status(400).json({
@@ -241,29 +241,29 @@ const addProduct = async (req, res) => {
       });
     }
     
-    // Process uploaded image paths
+    
     const imagePaths = req.files.map(file => `/uploadedImages/${file.filename}`);
     
-    // Create new product
+    
     const newProduct = new productModel({
       name,
       writer,
       category_id,
       language,
       regularPrice: parseFloat(regularPrice),
-      salePrice: salePrice ? parseFloat(salePrice) : undefined, // Handle optional salePrice
+      salePrice: salePrice ? parseFloat(salePrice) : undefined, 
       availableQuantity: parseInt(availableQuantity),
       description,
       productImages: imagePaths,
       publishedDate: publishedDate 
     });
     
-    // Save the product
+    
     await newProduct.save();
     
     console.log(`New Book Added - Title: ${name}, Author: ${writer}`);
     
-    // Return success response for fetch API
+    
     return res.status(201).json({
       success: true,
       message: 'Book added successfully',
@@ -281,7 +281,7 @@ const addProduct = async (req, res) => {
   }
 }
 
-//Editing a product
+
 
 const loadEditProduct = async (req,res) => { 
     try {
@@ -321,7 +321,7 @@ const editingProduct = async (req,res) => {
 
         const existingProduct = await productModel.findOne({ 
           name: { $regex: new RegExp(`^${name}$`, 'i') } , 
-          _id: { $ne: id } // exclude the current product being updated
+          _id: { $ne: id } 
       });
 
       if (existingProduct) {

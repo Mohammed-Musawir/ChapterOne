@@ -42,17 +42,6 @@ transition: all 0.4s ease;
 }
 
 
-
-
-/* .logo-icon {
-    width: 30px;
-    height: 30px;
-    border: 2px solid var(--accent);
-    display: inline-block;
-    margin-right: 8px;
-    transform: rotate(45deg);
-    transition: all 0.4s ease;
-} */
 .navbar-brand:hover .logo-icon {
     transform: rotate(225deg);
     border-color: var(--secondary);

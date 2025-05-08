@@ -15,7 +15,7 @@ const adminAuth = require('../middleware/adminAuth');
 
 
 
-//ADMIN LOGIN and LOGOUT ROUTES  
+ 
 router.route("/login")
         .get(adminLoginController.loadAdminLogin)
         .post(adminLoginController.adminLogin); 
@@ -29,12 +29,12 @@ router.get('/dashboard',adminDashboardController.getDashboard);
 router.get('/dashboard/chart-data', adminDashboardController.getChartDataa);
 
 
-//CUSTOMBER Routes
+
 router.get('/users',customerController.loadCustomber);
 router.get('/blockCustomer',customerController.blockCustomber)
 router.get('/unblockCustomer',customerController.UnblockCustomber)
 
-//Category Routes
+
 router.get('/category',categoryController.loadCategory);
 router.post("/addCategory",categoryController.addCategory); 
 router.get('/editCategory/:id',categoryController.loadEditCategory);
@@ -47,7 +47,7 @@ router.put('/updateCategoryStatus/:id',categoryController.changeCategoryStatus)
 
 
 
-//Product Routes
+
 router.get('/products',productController.loadProductLists);
 router.route('/addProducts')
         .get(productController.loadAddProducts)
@@ -59,7 +59,7 @@ router.get('/product-edit/:id',productController.loadEditProduct);
 router.post('/product-update/:id',multer.array('productImages',10),productController.editingProduct)
 
 
-//Coupen
+
 router.get('/coupon',coupenController.loadCoupenPage);
 router.route('/addCoupon')
 .get(coupenController.loadAddCoupen)
@@ -71,25 +71,25 @@ router.post('/updateCoupon',coupenController.editCoupon);
 
  
 
-//category OfferRoutes
+
 router.post('/addCategoryOffer',offerController.applyCategoryOffer);
 router.put('/removeCategoryOffer/:categoryId',offerController.removeCategoryOffer);
 router.patch('/toggleCategoryOfferStatus',offerController.categoryOfferStatus);
 
-//product OfferRoutes 
+
 router.post('/add-product-offer',offerController.applyProductOffer);
 router.delete('/remove-product-offer/:productId',offerController.removeProductOffer);
 router.patch('/offer-update-status/:offerId',offerController.productOfferStatus);
 
 
-//Orders
+
 router.get('/order',orderController.loadOrder);
 router.post('/orders/update-status',orderController.orderUpdateStatus);
 router.get('/orders/:orderId',orderController.loadOrderInfo);
 
 
 
-//SalesReport
+
 
 router.get('/salesreport',salesreportController.loadSalesReport);
 router.get('/getSalesReport',salesreportController.getSalesReport);

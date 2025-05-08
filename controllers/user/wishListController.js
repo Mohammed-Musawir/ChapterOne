@@ -9,40 +9,40 @@ const loadWishList = async (req, res) => {
     try {
         const userId = req.user._id || req.user.id;
         
-        // Get wishlist with populated product data
+        
         const wishlist = await wishlistModal.findOne({userId: userId}).populate('books.product');
         
-        // Get cart items
+        
         const cart = await cartModal.findOne({userId});
         
-        // Get product IDs from wishlist and cart for comparison
+        
         const wishlistBookIds = wishlist && wishlist.books ? wishlist.books.map(item => {
             return item.product && item.product._id ? item.product._id.toString() : '';
         }).filter(id => id !== '') : [];
         
         const cartBookIds = cart && cart.books ? cart.books.map(item => {
-            // Check if item.product exists before calling toString()
+            
             return item.product ? (typeof item.product === 'object' ? item.product._id.toString() : item.product.toString()) : '';
         }).filter(id => id !== '') : [];
         
-        // Get recommended books that are not in wishlist or cart
+        
         let recommendedBooks = await productModal.find({
             _id: { $nin: [...wishlistBookIds, ...cartBookIds] }
         }).limit(4);
         
-        // Get all active offers
+        
         const activeOffers = await offerModal.find({
             isActive: true,
             endDate: { $gt: new Date() }
         });
         
-        // Process offers for wishlist items
+        
         if (wishlist && wishlist.books && wishlist.books.length > 0) {
             for (let item of wishlist.books) {
-                // Skip if product is not populated or is undefined
+                
                 if (!item.product || !item.product._id) continue;
                 
-                // Calculate offer price
+                
                 const productOffers = activeOffers.filter(
                     offer => offer.offerType === 'product' && 
                     offer.product && 
@@ -52,11 +52,11 @@ const loadWishList = async (req, res) => {
                 const categoryOffers = activeOffers.filter(
                     offer => offer.offerType === 'category' && 
                     offer.category && 
-                    item.product.category && // Check if category exists
+                    item.product.category && 
                     offer.category.toString() === item.product.category.toString()
                 );
                 
-                // Combine offers and find the highest discount
+                
                 const allOffers = [...productOffers, ...categoryOffers];
                 
                 if (allOffers.length > 0) {
@@ -69,20 +69,20 @@ const loadWishList = async (req, res) => {
                     item.product.offerName = highestOffer.name;
                 }
                 
-                // Check if product is in cart
+                
                 item.isInCart = cartBookIds.includes(item.product._id.toString());
             }
         }
         
-        // Process offers for recommended books
+        
         recommendedBooks = recommendedBooks.map(book => {
-            // Skip processing if book is undefined
+            
             if (!book) return null;
             
-            // Convert to plain object to add new properties
+            
             const bookObj = book.toObject();
             
-            // Calculate offer price
+            
             const productOffers = activeOffers.filter(
                 offer => offer.offerType === 'product' && 
                 offer.product && 
@@ -92,11 +92,11 @@ const loadWishList = async (req, res) => {
             const categoryOffers = activeOffers.filter(
                 offer => offer.offerType === 'category' && 
                 offer.category && 
-                book.category && // Check if category exists
+                book.category && 
                 offer.category.toString() === book.category.toString()
             );
             
-            // Combine offers and find the highest discount
+            
             const allOffers = [...productOffers, ...categoryOffers];
             
             if (allOffers.length > 0) {
@@ -109,11 +109,11 @@ const loadWishList = async (req, res) => {
                 bookObj.offerName = highestOffer.name;
             }
             
-            // Check if product is in cart
+            
             bookObj.isInCart = cartBookIds.includes(book._id.toString());
             
             return bookObj;
-        }).filter(book => book !== null); // Remove any null entries
+        }).filter(book => book !== null); 
         
         res.render('User/userWishList', {wishlist, recommendedBooks});
     } catch (error) {
@@ -138,7 +138,7 @@ const addToWishlist = async (req, res) => {
         let wishlist = await wishlistModal.findOne({ userId: userID });
         
         if (wishlist) {
-            // Check if the book is already in the wishlist
+            
             const bookExists = wishlist.books.some(
                 (item) => item.product.toString() === bookId.toString()
             );
@@ -150,7 +150,7 @@ const addToWishlist = async (req, res) => {
                 });
             }
             
-            // Add the book to the existing wishlist
+            
             wishlist.books.push({ product: bookId });
             await wishlist.save();
         } else {
@@ -231,7 +231,7 @@ const removeItemFromWishlist = async (req, res) => {
 
 const shopWishlistStatus = async (req, res) => {
     try {
-        // Check if user is logged in
+        
         const userId = req.user._id|| req.user.id;
         if (!userId) {
             return res.status(401).json({
@@ -240,21 +240,21 @@ const shopWishlistStatus = async (req, res) => {
             });
         }
 
-        // Find the user's wishlist
+        
         const wishlist = await wishlistModal.findOne({userId})
             .populate('books.product');
         
         if (!wishlist) {
-            // Return empty wishlist if not found
+            
             return res.json({
                 success: true,
                 wishlistItems: []
             });
         }
 
-        // Extract just the book IDs from the wishlist
+        
         const wishlistItems = wishlist.books
-        .filter(item => item.product) // Only include items where product is populated
+        .filter(item => item.product) 
         .map(item => item.product._id.toString());
         
         return res.json({

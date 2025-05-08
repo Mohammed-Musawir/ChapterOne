@@ -7,7 +7,7 @@ const loadOrder = async (req, res) => {
     try {
         
         const currentPage = parseInt(req.query.page) || 1;
-        const pageSize = 10; // Set your preferred page size
+        const pageSize = 10; 
         const currentStatus = req.query.status || 'all';
         
       
@@ -55,7 +55,7 @@ const loadOrder = async (req, res) => {
         });
     } catch (error) {
         console.error('Error loading orders:', error);
-        res.render('500'); // Render error page
+        res.render('500'); 
     }
 };
 
@@ -68,54 +68,54 @@ const orderUpdateStatus = async (req, res) => {
       return res.status(400).json({ success: false, message: "orderId and status are required" });
     }
     
-    // Find the order first
+    
     const order = await orderModel.findById(orderId);
     
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
     
-    // Create update object with the new status for the order
+    
     const updateObj = {
       $set: {
         orderStatus: status,
       }
     };
     
-    // Instead of updating all products at once, we'll handle them individually
-    // First, map the products array to update status only for products that aren't cancelled or returned
+    
+    
     const updatedProducts = order.products.map(product => {
-      // If product is already cancelled or returned, preserve its status
+      
       if (product.productOrderStatus === 'cancelled' || product.productOrderStatus === 'returned') {
         return product;
       } else {
-        // Otherwise update to the new status
+        
         product.productOrderStatus = status;
         return product;
       }
     });
     
-    // Set the updated products array in the update object
+    
     updateObj.$set.products = updatedProducts;
     
-    // If status is delivered and payment method is COD, set payment status to completed
+    
     if (status === 'delivered' && order.paymentMethod === 'cod') {
       updateObj.$set.paymentStatus = 'completed';
     }
     
-    // If status is cancelled, add cancellation info  
+    
     if (status === 'cancelled') {
       updateObj.$set["orderCancellation.reason"] = req.body.reason || "No reason provided";
       updateObj.$set["orderCancellation.cancelledAt"] = new Date();
     }
     
-    // If status is returned, add return info
+    
     if (status === 'returned') {
       updateObj.$set["orderReturned.reason"] = req.body.reason || "No reason provided";
       updateObj.$set["orderReturned.returnedAt"] = new Date();
     }
     
-    // Update the order with all changes
+    
     const updatedOrder = await orderModel.findByIdAndUpdate(
       orderId,
       updateObj,
@@ -152,6 +152,7 @@ const loadOrderInfo = async (req, res) => {
       }
     });
     
+    console.log(order.subtotal)
     adjustedSubtotal = Math.round(adjustedSubtotal);
     
     const customer = {

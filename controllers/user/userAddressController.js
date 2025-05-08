@@ -36,65 +36,65 @@ const addAddress = async (req, res) => {
 
 
     
-  // Validate required fields
+  
   const errors = {};
     
-  // Validate fullName
+  
   if (!fullName || fullName.trim() === '') {
     errors.fullName = 'Full name is required';
   }
   
-  // Validate mobile number (must be a valid Indian mobile number)
+  
   if (!alternative_no) {
     errors.alternative_no = 'Phone number is required';
   } else if (!/^[6-9]\d{9}$/.test(alternative_no)) {
     errors.alternative_no = 'Please enter a valid Indian mobile number';
   }
   
-  // Validate house number
+  
   if (!houseNumber || houseNumber.trim() === '') {
     errors.houseNumber = 'House/Flat number is required';
   }
   
-  // Validate street
+  
   if (!street || street.trim() === '') {
     errors.street = 'Street/Area is required';
   }
   
-  // Validate landmark
+  
   if (!landmark || landmark.trim() === '') {
     errors.landmark = 'Landmark is required';
   }
   
-  // Validate city (only alphabets and spaces)
+  
   if (!city || city.trim() === '') {
     errors.city = 'City is required';
   } else if (!/^[A-Za-z\s]+$/.test(city)) {
     errors.city = 'City should contain only alphabets and spaces';
   }
   
-  // Validate state (only alphabets and spaces)
+  
   if (!state || state.trim() === '') {
     errors.state = 'State is required';
   } else if (!/^[A-Za-z\s]+$/.test(state)) {
     errors.state = 'State should contain only alphabets and spaces';
   }
   
-  // Validate pincode (must be 6 digits)
+  
   if (!pincode) {
     errors.pincode = 'PIN code is required';
   } else if (!/^\d{6}$/.test(pincode)) {
     errors.pincode = 'Please enter a valid 6-digit pincode';
   }
   
-  // Validate addressType (must be one of the allowed values)
+  
   if (!addressType) {
     errors.addressType = 'Address type is required';
   } else if (!['Home', 'Work', 'Other'].includes(addressType)) {
     errors.addressType = 'Invalid address type. Must be Home, Work, or Other';
   }
   
-  // Return errors if validation fails
+  
   if (Object.keys(errors).length > 0) {
     return res.status(400).json({
       success: false,
@@ -104,7 +104,7 @@ const addAddress = async (req, res) => {
   }
 
 
-    // If isDefault is true, update any existing default address
+    
     if (isDefault === true || isDefault === 'true') { 
         await addressModel.updateMany(
           { userId: userId, isDefault: true },
@@ -197,9 +197,9 @@ const editAddress = async (req, res) => {
     const userId = req.user._id || req.user.id;
     const addressId = req.params.id;
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
 
-    // Validate PIN code
+    
     if (!/^\d{6}$/.test(pincode)) {
         return res.status(400).json({
           success: false,
@@ -207,7 +207,7 @@ const editAddress = async (req, res) => {
         });
       }
 
-     // Validate phone number - Indian mobile numbers start with 6-9 followed by 9 digits
+     
      if (!/^[6-9]\d{9}$/.test(alternative_no)) {
         return res.status(400).json({
           success: false,
@@ -215,7 +215,7 @@ const editAddress = async (req, res) => {
         });
       }  
 
-    // Landmark Validation
+    
     if (!landmark || landmark.trim().length < 3) {
       return res
         .status(400)
@@ -224,7 +224,7 @@ const editAddress = async (req, res) => {
         });
     }
 
-    // City Validation
+    
     const onlyLetters = /^[A-Za-z\s]+$/;
     if (!city || !onlyLetters.test(city)) {
       return res
@@ -232,7 +232,7 @@ const editAddress = async (req, res) => {
         .json({ message: "City is required and should contain only letters" });
     }
 
-    // State Validation
+    
     if (!state || !onlyLetters.test(state)) {
       return res
         .status(400)
@@ -240,9 +240,9 @@ const editAddress = async (req, res) => {
     }
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
 
-    // If setting as default, unset any existing default addresses
+    
     if (isDefault === true || isDefault === 'true') {
         await addressModel.updateMany(
           { user: userId, isDefault: true },
@@ -286,18 +286,18 @@ const deleteAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
 
-    // Check if the address you're deleting is default
+    
     const isDefaultAddress = await addressModel.findById(addressId);
     if (!isDefaultAddress)
       return res.status(404).json({ message: "Address not found" });
 
-    // Delete the address
+    
     await addressModel.findByIdAndDelete(addressId);
 
-    // If the deleted one was default, make the latest one as default
+    
     if (isDefaultAddress.isDefault) {
       const latestAddress = await addressModel
-        .findOne({ userId: isDefaultAddress.userId }) // Assuming userId is stored in address
+        .findOne({ userId: isDefaultAddress.userId }) 
         .sort({ createdAt: -1 });
 
       if (latestAddress) {

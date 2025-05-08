@@ -14,12 +14,12 @@ const authGoogleCallback = async (req,res) => {
         const token = JWT_Config.generateToken({ id: req.user._id });
         res.cookie('userToken', token, { httpOnly: true });
         
-        // Return HTML with script to replace history state instead of redirect
+        
         res.send(`
           <html>
             <script>
               window.location.replace('/home');
-              // This replaces the current history entry instead of adding a new one
+              
             </script>
           </html>
         `);

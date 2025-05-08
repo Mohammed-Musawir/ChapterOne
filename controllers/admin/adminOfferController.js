@@ -165,7 +165,7 @@ const applyProductOffer = async (req, res) => {
     try {
         const { productId, offerType, offerName, discountPercentage, endDate, description } = req.body;
         
-        // Validate required fields
+        
         if (!productId || !offerType || !offerName || !discountPercentage || !endDate) {
             return res.status(400).json({
                 success: false,
@@ -173,7 +173,7 @@ const applyProductOffer = async (req, res) => {
             });
         }
 
-        // Validate offerType is 'product'
+        
         if (offerType !== 'product') {
             return res.status(400).json({
                 success: false,
@@ -181,7 +181,7 @@ const applyProductOffer = async (req, res) => {
             });
         }
 
-        // Validate discount percentage
+        
         if (discountPercentage < 1 || discountPercentage > 100) {
             return res.status(400).json({
                 success: false,
@@ -189,7 +189,7 @@ const applyProductOffer = async (req, res) => {
             });
         }
 
-        // Check if product exists
+        
         const product = await productModal.findById(productId);
         if (!product) {
             return res.status(404).json({
@@ -198,7 +198,7 @@ const applyProductOffer = async (req, res) => {
             });
         }
 
-        // Check if product already has an active offer
+        
         const existingOffer = await offerModal.findOne({
             product: productId,
             isActive: true,
@@ -213,7 +213,7 @@ const applyProductOffer = async (req, res) => {
             });
         }
 
-        // Create new offer
+        
         const newOffer = await offerModal.create({
             name: offerName,
             offerType,

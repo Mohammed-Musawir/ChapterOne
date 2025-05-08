@@ -1,14 +1,13 @@
 require('dotenv').config();
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const User = require("../models/userSchema"); // Import User model
+const User = require("../models/userSchema"); 
 
-// ✅ Serialize only user ID (to store in session)
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// ✅ Deserialize and retrieve user from DB
+
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
@@ -28,11 +27,10 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // ✅ Check if a user exists by email
+       
         let existingUser = await User.findOne({ email: profile.emails[0].value });
 
         if (existingUser) {
-          // ✅ If user exists but has no googleId, update with Google data
           if (!existingUser.googleId) {
             existingUser = await User.findOneAndUpdate(
               { email: profile.emails[0].value },
@@ -42,18 +40,17 @@ passport.use(
                   avatar: profile.photos[0].value,
                   firstname: profile.name.givenName,
                   lastname: profile.name.familyName,
-                  is_verified: true,  // ✅ Example: setting verified flag
+                  is_verified: true,  
                 },
               },
               { new: true }
             );
             return done(null, existingUser);
           } else {
-            // ✅ User already registered with Google or email
+            
             return done(null, false, { message: "User already exists. Please log in." });
           }
         } else {
-          // ✅ No user exists, create a new user
           const newUser = new User({
             googleId: profile.id,
             firstname: profile.name.givenName,

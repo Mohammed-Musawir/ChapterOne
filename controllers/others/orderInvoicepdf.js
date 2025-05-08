@@ -1,45 +1,43 @@
 const PDFDocument = require('pdfkit');
 const Order = require('../../models/orderSchema')
 
-/**
- * Controller to generate and download invoice PDF
- */
+
 const downloadInvoice = async (req, res) => {
     try {
         const userId = req.user._id || req.user.id;
         const { orderId } = req.params;
 
-        // Fetch order data with populated product details
+        
         const order = await Order.findOne({ orderId, userId }).populate('products.product');
         if (!order) return res.status(404).send("Order not found");
 
-        // Set headers for download BEFORE creating any response data
+        
         res.setHeader('Content-disposition', `attachment; filename="Invoice_${orderId}.pdf"`);
         res.setHeader('Content-type', 'application/pdf');
 
-        // Set up PDF document
+      
         const doc = new PDFDocument({ 
             margin: 50, 
             size: 'A4'
         });
         
-        // Pipe the PDF directly to the response
+       
         doc.pipe(res);
         
-        // Define theme colors
+       
         const theme = {
-            primary: '#3366CC',      // Blue - primary color
-            secondary: '#F5F5F5',    // Light gray for backgrounds
-            text: '#333333',         // Dark gray for text
-            highlight: '#E6F0FF',    // Light blue for highlights
-            accent: '#FF9900',       // Orange for accents
-            success: '#4CAF50'       // Green for success indicators
+            primary: '#3366CC',      
+            secondary: '#F5F5F5',    
+            text: '#333333',         
+            highlight: '#E6F0FF',   
+            accent: '#FF9900',       
+            success: '#4CAF50'       
         };
         
-        // Generate PDF content
+       
         generateInvoicePDF(doc, order, theme);
         
-        // Finalize the PDF - this will close the stream and send to client
+       
         doc.end();
     } catch (error) {
         console.error("Error generating invoice:", error);
@@ -51,38 +49,34 @@ const downloadInvoice = async (req, res) => {
     }
 };
 
-/**
- * Main function to generate the invoice PDF
- */
+
 function generateInvoicePDF(doc, order, theme) {
-    // Add page elements
+    
     addHeader(doc, theme);
     addInvoiceTitle(doc, theme);
     addInvoiceDetails(doc, order, theme);
     
-    // Customer and shipping info
+  
     const infoStartY = 220;
     addCustomerInformation(doc, order, theme, infoStartY);
     
-    // Product table position
+   
     const tableStartY = 320;
     addOrderDetails(doc, order, theme, tableStartY);
     
-    // Calculate position for totals section
+   
     const tableEndY = doc.y + 20;
     addTotalsSection(doc, order, theme, tableEndY);
     
-    // Add payment section
+   
     const paymentY = doc.y + 20;
     addPaymentInformation(doc, order, theme, paymentY);
     
-    // Add footer
+   
     createFooter(doc, theme);
 }
 
-/**
- * Add header with company name
- */
+
 function addHeader(doc, theme) {
     doc.rect(0, 0, doc.page.width, 100).fill(theme.primary);
     
@@ -97,9 +91,7 @@ function addHeader(doc, theme) {
        .text('Your Reading Journey Begins Here', 50, 70);
 }
 
-/**
- * Add invoice title
- */
+
 function addInvoiceTitle(doc, theme) {
     doc.fontSize(20)
        .fillColor(theme.primary)
@@ -111,13 +103,10 @@ function addInvoiceTitle(doc, theme) {
        .stroke(theme.primary);
 }
 
-/**
- * Add invoice details in a box
- */
 function addInvoiceDetails(doc, order, theme) {
     const boxY = 160;
     
-    // Add invoice details
+   
     doc.fillColor(theme.text)
        .fontSize(10)
        .font('Helvetica-Bold')
@@ -126,14 +115,14 @@ function addInvoiceDetails(doc, order, theme) {
     doc.font('Helvetica')
        .text(order.orderId, 150, boxY);
     
-    // Transaction ID
+   
     doc.font('Helvetica-Bold')
        .text('Transaction ID:', 50, boxY + 20);
        
     doc.font('Helvetica')
        .text(order.transactionId, 150, boxY + 20);
     
-    // Order Date
+   
     const orderDate = order.orderedDate ? new Date(order.orderedDate) : new Date();
     
     doc.font('Helvetica-Bold')
@@ -146,7 +135,7 @@ function addInvoiceDetails(doc, order, theme) {
            day: 'numeric'
        }), 150, boxY + 40);
     
-    // Status
+    
     doc.font('Helvetica-Bold')
        .text('Status:', 350, boxY);
        
@@ -155,13 +144,10 @@ function addInvoiceDetails(doc, order, theme) {
        .fillColor(statusColor)
        .text(order.orderStatus.toUpperCase(), 410, boxY);
        
-    // Reset text color
+   
     doc.fillColor(theme.text);
 }
 
-/**
- * Add customer information section
- */
 function addCustomerInformation(doc, order, theme, startY) {
     doc.rect(50, startY, doc.page.width - 100, 80)
        .fill(theme.secondary);
@@ -176,7 +162,7 @@ function addCustomerInformation(doc, order, theme, startY) {
        .font('Helvetica-Bold')
        .text('Billing Address:', 60, startY + 30);
     
-    // Customer info
+   
     const customerName = order.shippingAddress?.fullName || 'Customer';
     const customerPhone = order.shippingAddress?.alternative_no || 'N/A';
     
@@ -185,7 +171,7 @@ function addCustomerInformation(doc, order, theme, startY) {
        
     doc.text(`Phone: ${customerPhone}`, 150, startY + 45);
     
-    // Shipping address
+    
     doc.font('Helvetica-Bold')
        .text('Shipping Address:', 350, startY + 30);
     
@@ -202,40 +188,36 @@ function addCustomerInformation(doc, order, theme, startY) {
     doc.text(addressLine3, 450, startY + 60);
 }
 
-/**
- * Add order details with table
- */
+
 function addOrderDetails(doc, order, theme, startY) {
     doc.fontSize(12)
        .fillColor(theme.primary)
        .font('Helvetica-Bold')
        .text("ORDER ITEMS", 50, startY);
     
-    // Create product table
+    
     createProductTable(doc, order, startY + 20, theme);
 }
 
-/**
- * Create product table
- */
+
 function createProductTable(doc, order, tableTop, theme) {
-    // Ensure products array exists
+    
     const products = order.products || [];
     if (products.length === 0) {
         doc.fillColor(theme.text)
            .fontSize(10)
            .font('Helvetica-Oblique')
            .text("No products found in this order.", 50, tableTop + 20);
-        doc.y = tableTop + 40; // Update cursor position
+        doc.y = tableTop + 40; 
         return;
     }
     
-    // Table header
+    
     const headerHeight = 25;
     doc.rect(50, tableTop, doc.page.width - 100, headerHeight)
        .fill(theme.primary);
     
-    // Column definitions
+    
     const columns = [
         { text: "Product", x: 60, width: 200 },
         { text: "Writer", x: 260, width: 100 },
@@ -244,7 +226,7 @@ function createProductTable(doc, order, tableTop, theme) {
         { text: "Total", x: 500, width: 80 }
     ];
     
-    // Header text
+    
     doc.fillColor('#FFFFFF')
        .fontSize(10)
        .font('Helvetica-Bold');
@@ -253,7 +235,7 @@ function createProductTable(doc, order, tableTop, theme) {
         doc.text(col.text, col.x, tableTop + 8);
     });
     
-    // Table rows
+    
     let y = tableTop + headerHeight;
     const rowHeight = 30;
     
@@ -261,11 +243,11 @@ function createProductTable(doc, order, tableTop, theme) {
         const isEven = i % 2 === 0;
         const rowY = y + (i * rowHeight);
         
-        // Row background
+       
         doc.rect(50, rowY, doc.page.width - 100, rowHeight)
            .fill(isEven ? theme.highlight : theme.secondary);
         
-        // Product details
+       
         const productName = item.productDetails?.name || 'Unknown Product';
         const writer = item.productDetails?.writer || 'Unknown Author';
         const quantity = item.quantity || 0;
@@ -276,41 +258,39 @@ function createProductTable(doc, order, tableTop, theme) {
            .fontSize(9)
            .font('Helvetica');
         
-        // Product name
+        
         doc.text(productName, columns[0].x, rowY + 10, { 
             width: columns[0].width,
             ellipsis: true
         });
         
-        // Writer
+       
         doc.text(writer, columns[1].x, rowY + 10, {
             width: columns[1].width,
             ellipsis: true
         });
         
-        // Quantity
+        
         doc.text(quantity.toString(), columns[2].x, rowY + 10);
         
-        // Price
+       
         doc.text(`Rs. ${formatNumber(price)}`, columns[3].x, rowY + 10);
         
-        // Total
+        
         doc.font('Helvetica-Bold')
            .text(`Rs. ${formatNumber(total)}`, columns[4].x, rowY + 10);
     });
     
-    // Update cursor position
+   
     doc.y = y + (products.length * rowHeight);
 }
 
-/**
- * Add totals section
- */
+
 function addTotalsSection(doc, order, theme, startY) {
     const boxWidth = 250;
     const boxX = doc.page.width - boxWidth - 50;
     
-    // Safely get values
+    
     const subtotal = order.subtotal || 0;
     const gstRate = order.gstRate || 18;
     const gstAmount = order.gstAmount || (subtotal * gstRate / 100);
@@ -321,7 +301,7 @@ function addTotalsSection(doc, order, theme, startY) {
        .fontSize(10)
        .fillColor(theme.text);
     
-    // Draw lines
+   
     const linePositions = [
         { label: 'Subtotal:', value: `Rs. ${formatNumber(subtotal)}`, y: startY },
         { label: `GST (${gstRate}%):`, value: `Rs. ${formatNumber(gstAmount)}`, y: startY + 20 },
@@ -333,12 +313,12 @@ function addTotalsSection(doc, order, theme, startY) {
         doc.text(line.value, boxX + boxWidth - 80, line.y, { width: 80, align: 'right' });
     });
     
-    // Draw divider line
+    
     doc.moveTo(boxX, startY + 60)
        .lineTo(boxX + boxWidth, startY + 60)
        .stroke(theme.primary);
     
-    // Total amount
+    
     doc.font('Helvetica-Bold')
        .fontSize(12)
        .fillColor(theme.primary)
@@ -349,13 +329,11 @@ function addTotalsSection(doc, order, theme, startY) {
         align: 'right' 
     });
     
-    // Update cursor position
+    
     doc.y = startY + 90;
 }
 
-/**
- * Add payment information
- */
+
 function addPaymentInformation(doc, order, theme, startY) {
     doc.rect(50, startY, 250, 60)
        .fill(theme.secondary);
@@ -365,7 +343,7 @@ function addPaymentInformation(doc, order, theme, startY) {
        .font('Helvetica-Bold')
        .text('PAYMENT INFORMATION', 60, startY + 10);
     
-    // Payment method
+    
     const paymentMethod = getPaymentMethodName(order.paymentMethod);
     
     doc.fillColor(theme.text)
@@ -376,7 +354,7 @@ function addPaymentInformation(doc, order, theme, startY) {
     doc.font('Helvetica')
        .text(paymentMethod, 150, startY + 30);
     
-    // Payment status
+    
     doc.font('Helvetica-Bold')
        .text('Payment Status:', 60, startY + 45);
        
@@ -385,13 +363,11 @@ function addPaymentInformation(doc, order, theme, startY) {
        .fillColor(statusColor)
        .text(capitalizeFirstLetter(order.paymentStatus), 150, startY + 45);
     
-    // Update cursor position
+    
     doc.y = startY + 70;
 }
 
-/**
- * Add footer
- */
+
 function createFooter(doc, theme) {
     const footerTop = doc.page.height - 80;
     
@@ -421,9 +397,7 @@ function createFooter(doc, theme) {
     });
 }
 
-/**
- * Helper function to get status color
- */
+
 function getStatusColor(status, theme) {
     if (!status) return theme.accent;
     
@@ -439,9 +413,7 @@ function getStatusColor(status, theme) {
     }
 }
 
-/**
- * Helper function to format numbers with comma separators
- */
+
 function formatNumber(value) {
     if (value === undefined || value === null) value = 0;
     
@@ -451,9 +423,7 @@ function formatNumber(value) {
     });
 }
 
-/**
- * Helper function for payment method names
- */
+
 function getPaymentMethodName(method) {
     if (!method) return 'Unknown';
     
@@ -467,9 +437,7 @@ function getPaymentMethodName(method) {
     return methods[method] || method;
 }
 
-/**
- * Helper function to capitalize first letter
- */
+
 function capitalizeFirstLetter(string) {
     if (!string) return '';
     return string.charAt(0).toUpperCase() + string.slice(1);

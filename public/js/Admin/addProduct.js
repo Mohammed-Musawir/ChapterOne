@@ -1,5 +1,5 @@
 
-  // Define variables for cropping
+ 
   let cropper;
   let currentFileIndex;
   let selectedFiles = [];
@@ -7,15 +7,15 @@
   let cropperModal;
   
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize modal
+  
     cropperModal = new bootstrap.Modal(document.getElementById('imageCropperModal'));
     
-    // Set up click on upload placeholder
+
     document.querySelector('.upload-placeholder').addEventListener('click', function() {
       document.getElementById('productImages').click();
     });
     
-    // Image input change handler
+
     document.getElementById('productImages').addEventListener('change', function(event) {
       selectedFiles = Array.from(this.files);
       
@@ -25,13 +25,13 @@
         return;
       }
       
-      // Start cropping process
-      croppedImages = []; // Reset cropped images
+
+      croppedImages = []; 
       currentFileIndex = 0;
       startCropping();
     });
     
-    // Cancel button event
+t
     document.getElementById('cancelBtn').addEventListener('click', function() {
       if (confirm('Are you sure you want to cancel image cropping? You will need to select images again.')) {
         cropperModal.hide();
@@ -44,7 +44,7 @@
         croppedImages = [];
         currentFileIndex = 0;
         
-        // Reset preview area
+
         const previewArea = document.getElementById('imagePreviewArea');
         previewArea.innerHTML = `
           <div class="upload-placeholder d-flex align-items-center justify-content-center bg-light-brown rounded p-3 mb-2">
@@ -57,12 +57,12 @@
       }
     });
     
-    // Close modal button
+
     document.getElementById('closeModal').addEventListener('click', function() {
-      document.getElementById('cancelBtn').click(); // Trigger cancel button
+      document.getElementById('cancelBtn').click(); 
     });
     
-    // Crop and continue button
+
     document.getElementById('cropImageBtn').addEventListener('click', function() {
       if (!cropper) return;
       
@@ -72,40 +72,40 @@
         imageSmoothingQuality: 'high'
       });
       
-      // Get the cropped image as a data URL
+
       const croppedDataUrl = canvas.toDataURL('image/jpeg');
       
-      // Save this cropped image
+
       croppedImages.push({
         dataUrl: croppedDataUrl,
         index: currentFileIndex,
         filename: selectedFiles[currentFileIndex].name
       });
       
-      // Update progress bar
+    
       updateProgress();
       
-      // Destroy current cropper instance
+     
       if (cropper) {
         cropper.destroy();
         cropper = null;
       }
       
-      // Move to next image
+      
       currentFileIndex++;
       
-      // Check if we have more images to process
+      
       if (currentFileIndex < selectedFiles.length) {
-        // Process next image
+        
         processNextImage();
       } else {
-        // All images processed, hide modal and display them
+        
         cropperModal.hide();
         displayCroppedImages();
       }
     });
     
-    // Form submission
+    
     document.getElementById('addProductForm').addEventListener('submit', function(e) {
       e.preventDefault();
       
@@ -114,16 +114,16 @@
         return false;
       }
       
-      // Show loading overlay
+   
       showLoading('Saving book...');
       
-      // Convert cropped images to Blob files and append to FormData
+     
       const formData = new FormData(this);
       
-      // Remove the original file input images
+     
       formData.delete('productImages');
       
-      // Create promises for all blob conversions
+     
       const blobPromises = croppedImages.map((image, index) => {
         return fetch(image.dataUrl)
           .then(res => res.blob())
@@ -133,7 +133,7 @@
           });
       });
       
-      // When all blobs are ready, add them to formData and submit
+   
       Promise.all(blobPromises)
         .then(files => {
           files.forEach(file => {
@@ -150,14 +150,14 @@
   });
   
   function startCropping() {
-    // Start the cropping process with the first image
+   
     currentFileIndex = 0;
     processNextImage();
   }
   
   function processNextImage() {
     if (currentFileIndex >= selectedFiles.length) {
-      // All images processed, display them
+    
       displayCroppedImages();
       return;
     }
@@ -170,28 +170,28 @@
       return;
     }
     
-    // Update the modal title to show progress
+   
     document.getElementById('currentImageNumber').textContent = 
       ` (${currentFileIndex + 1} of ${selectedFiles.length})`;
     
-    // Update progress bar
+   
     updateProgress();
     
     const reader = new FileReader();
     reader.onload = function(e) {
-      // Set the image in the cropper
+      
       const cropperImage = document.getElementById('cropperImage');
       cropperImage.src = e.target.result;
       
-      // Show the modal
+     
       cropperModal.show();
       
-      // Initialize cropper after modal is shown
+     
       setTimeout(() => {
-        // Initialize cropper
+       
         cropper = new Cropper(cropperImage, {
-          aspectRatio: 0, // Square aspect ratio for book images
-          viewMode: 2,    // Restrict the crop box to not exceed the size of the canvas
+          aspectRatio: 0, 
+          viewMode: 2,   
           autoCropArea: 0.8,
           responsive: true,
           guides: true,
@@ -216,7 +216,7 @@
   
   function displayCroppedImages() {
     const previewArea = document.getElementById('imagePreviewArea');
-    previewArea.innerHTML = ''; // Clear existing previews
+    previewArea.innerHTML = ''; 
     
     croppedImages.forEach((image, index) => {
       const previewItem = document.createElement('div');
@@ -230,7 +230,7 @@
       previewArea.appendChild(previewItem);
     });
     
-    // Add upload more button if needed
+   
     const uploadMoreBtn = document.createElement('div');
     uploadMoreBtn.className = 'image-preview-item d-flex align-items-center justify-content-center bg-light-brown me-2 mb-2';
     uploadMoreBtn.style.cursor = 'pointer';
@@ -268,7 +268,7 @@
   }
   
   function showLoading(message) {
-    // Create loading overlay
+   
     const overlay = document.createElement('div');
     overlay.className = 'loading-overlay';
     overlay.innerHTML = `
@@ -285,5 +285,4 @@
     }
   }
   
-  // Make removePreview globally accessible for the onclick handler
   window.removePreview = removePreview;

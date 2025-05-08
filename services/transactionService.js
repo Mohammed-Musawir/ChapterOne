@@ -26,7 +26,7 @@ const addTransaction = async (userId, type, amount, description) => {
 
     await wallet.save();
 
-    // Save transaction
+ 
     const transaction = new transactionModal({
         userId,
         type,

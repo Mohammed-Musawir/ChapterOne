@@ -15,7 +15,7 @@ const cookieParser = require('cookie-parser');
 
   
 
-const dotenv = require('dotenv'); //This line of code loads environment variables from your .env file into process.env in a Node.js application.
+const dotenv = require('dotenv');
 const { connect } = require('http2');
 const connectDB = require('./config/db');
 dotenv.config();                 
@@ -28,14 +28,14 @@ app.use(flash());
 app.use(nocache());
 app.use(session({
     secret:process.env.SECRET_KEY,
-    resave:false,//need to study
+    resave:false,
     saveUninitialized:false,
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URI,
         collectionName: 'sessions'
     }),
     cookie: {
-        httpOnly : true // Prevents client-side JS access to the cookie
+        httpOnly : true 
     }
 }))
 

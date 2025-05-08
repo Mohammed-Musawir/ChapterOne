@@ -6,7 +6,7 @@ const loadShop = async (req, res) => {
     try {
 
         const page = parseInt(req.query.page) || 1;
-        const limit = 6; // Books per page
+        const limit = 6; 
         const skip = (page - 1) * limit;
         
         const search = req.query.search || '';

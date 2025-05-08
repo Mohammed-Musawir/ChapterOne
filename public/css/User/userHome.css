@@ -21,7 +21,7 @@ body {
     line-height: 1.6;
 }
 
-/* Navbar Styles */
+
 .navbar {
     background-color: white;
     box-shadow: 0 2px 10px var(--soft-shadow);
@@ -58,7 +58,7 @@ body {
     width: 100%;
 }
 
-/* Hero Section */
+
 .hero-section {
     background: linear-gradient(135deg, var(--accent-cream) 0%, white 100%);
     padding: 100px 0;
@@ -87,7 +87,7 @@ body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-/* Welcome Section */
+
 .welcome-section {
     padding: 30px 0;
 }
@@ -105,7 +105,7 @@ body {
     font-size: 1.1rem;
 }
 
-/* Book Grid */
+
 .book-grid {
     background-color: white;
     border-radius: 15px;
@@ -234,7 +234,7 @@ body {
     color: white;
 }
 
-/* Featured Section */
+
 .featured-section {
     background-color: white;
     border-radius: 15px;
@@ -253,7 +253,7 @@ body {
     font-size: 1.1rem;
 }
 
-/* Categories Section */
+
 .categories-section {
     background-color: white;
     padding: 40px;
@@ -314,7 +314,7 @@ body {
     transform: translateY(0);
 }
 
-/* Testimonials Section */
+
 .testimonials-section {
     padding: 40px;
     background-color: white;
@@ -345,7 +345,7 @@ body {
     color: var(--primary-brown);
 }
 
-/* Newsletter Section */
+
 .newsletter-section {
     background-color: var(--primary-brown);
     color: white;
@@ -370,7 +370,7 @@ body {
     background-color: white;
 }
 
-/* Footer */
+
 .footer {
     background-color: var(--primary-brown);
     color: white;

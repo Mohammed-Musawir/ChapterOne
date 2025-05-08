@@ -9,13 +9,13 @@ const loadCart = async (req, res) => {
         const cart = await cartModel.findOne({ userId }).populate('books.product');
         const wishlist = await wishlistModel.findOne({ userId });
         
-        // Fetch all active offers
+        
         const activeOffers = await offerModel.find({ 
             isActive: true, 
             endDate: { $gt: new Date() } 
         });
         
-        // Organize offers by type for easier lookup
+        
         const productOffers = new Map();
         const categoryOffers = new Map();
         
@@ -27,7 +27,7 @@ const loadCart = async (req, res) => {
             }
         });
 
-        // Get product IDs from cart and wishlist to exclude from recommendations
+        
         const cartProductIds = cart?.books.map(item => item.product._id.toString()) || [];
         
         const wishlistProductIds = wishlist?.books && Array.isArray(wishlist.books) 
@@ -38,7 +38,7 @@ const loadCart = async (req, res) => {
         
         const excludingProductIds = [...new Set([...cartProductIds, ...wishlistProductIds])];
         
-        // Get recommended books excluding products in cart and wishlist
+        
         let recommendedBooks = [];
         if (excludingProductIds.length === 0) {
             recommendedBooks = await productModal.find().limit(4);
@@ -47,18 +47,18 @@ const loadCart = async (req, res) => {
                 _id: { $nin: excludingProductIds.filter(id => id && id.length === 24) }
             }).limit(4);
         }
-        
+    
         const applyBestOffer = (product) => {
-            // Ensure we're working with a plain JavaScript object that can be modified
+            
             const productObj = typeof product.toObject === 'function' ? product.toObject() : JSON.parse(JSON.stringify(product));
             const productId = productObj._id.toString();
             const categoryId = productObj.category_id ? productObj.category_id.toString() : null;
+
             
-            // Get applicable offers
             const productOffer = productOffers.get(productId);
             const categoryOffer = categoryId ? categoryOffers.get(categoryId) : null;
             
-            // Determine the best offer
+            
             let bestOffer = null;
             let offerSource = null;
 
@@ -78,13 +78,12 @@ const loadCart = async (req, res) => {
                 offerSource = 'category';
             }
             
-            // Apply the offer if available
+            
             if (bestOffer) {
                 const originalPrice = productObj.salePrice;
                 const discountAmount = Math.round((originalPrice * bestOffer.discountPercentage) / 100);
                 const discountedPrice = originalPrice - discountAmount;
                 
-                // Create a new product object with offer data
                 return {
                     ...productObj,
                     hasOffer: true,
@@ -92,11 +91,10 @@ const loadCart = async (req, res) => {
                     offerType: bestOffer.offerType,
                     offerName: bestOffer.name,
                     offerSource: offerSource,
-                    regularPrice: originalPrice,
-                    salePrice: discountedPrice
+                    discountedAfterOffer: discountedPrice
                 };
             } else {
-                // No offer available
+                
                 return {
                     ...productObj,
                     hasOffer: false
@@ -104,14 +102,14 @@ const loadCart = async (req, res) => {
             }
         };
 
-        // Apply offers to recommended books
+        
         recommendedBooks = recommendedBooks.map(product => applyBestOffer(product));
         
-        // Calculate subtotal and apply offers to cart items
+        
         let subtotal = 0;
         
         if (cart && cart.books && cart.books.length > 0) {
-            // Create a new array for modified books
+            
             const updatedBooks = [];
             
             for (let i = 0; i < cart.books.length; i++) {
@@ -120,31 +118,39 @@ const loadCart = async (req, res) => {
                 
                 if (!product) continue;
                 
-                // Apply offer to the product
                 const productWithOffer = applyBestOffer(product);
+               
                 
-                // Create a new item with updated product data
                 const updatedItem = {
-                    _id: item._id,
                     product: productWithOffer,
                     quantity: item.quantity
                 };
+
                 
-                // Calculate item total
-                subtotal += productWithOffer.salePrice * item.quantity;
+                let price = 0
+                if(productWithOffer.discountedAfterOffer){
+                    price += productWithOffer.discountedAfterOffer
+                }else{
+                    price += productWithOffer.salePrice 
+                }
+                
+                subtotal += price * item.quantity;
                 
                 updatedBooks.push(updatedItem);
             }
+
+           
             
-            // Important: Replace the original books array with our updated one
             cart.books = updatedBooks;
+
+           
         }
         
         const totalProductPrice = subtotal;
         let shippingCost = totalProductPrice > 1000 ? 0 : 60;
         const gstAmount = Math.round((totalProductPrice + shippingCost) * 0.18);
         
-        // Debug logging to verify offer data is present
+        
         if (cart?.books?.length > 0) {
             console.log('Sample cart item with offer data:', 
                         JSON.stringify({
@@ -154,6 +160,7 @@ const loadCart = async (req, res) => {
                         }));
         }
         
+
         res.render('User/cartPage', { 
             cart, 
             totalProductPrice, 
@@ -172,7 +179,7 @@ const addToCart = async (req, res) => {
         const { bookId, quantity = 1 } = req.body;
         const userId = req.user._id || req.user.id;
 
-        // Validate inputs
+        
         if (!bookId) {
             return res.status(400).json({
                 success: false,
@@ -197,7 +204,7 @@ const addToCart = async (req, res) => {
             return res.status(404).json({success:false,message:'Insufficient stock available'});
         }
 
-                // Check if user already has a cart
+                
         let cart = await cartModel.findOne({ userId });
 
         if(!cart) {
@@ -261,10 +268,10 @@ const addToCart = async (req, res) => {
 
 const updateCart = async (req, res) => {
     try {
-        // Extract product ID and quantity from request body
+        
         const { productId, quantity } = req.body;
 
-        // Validate inputs
+        
         if (!productId) {
             return res.status(400).json({
                 success: false,
@@ -279,10 +286,10 @@ const updateCart = async (req, res) => {
             });
         }
 
-        // Get user's cart (assuming req.user contains authenticated user data)
+        
         const userId = req.user._id || req.user.id;
 
-        // Find user's cart
+        
         let cart = await cartModel.findOne({ userId });
 
         if (!cart) {
@@ -292,7 +299,7 @@ const updateCart = async (req, res) => {
             });
         }
 
-        // Find the book in the cart
+        
         const bookIndex = cart.books.findIndex(item =>
             item.product.toString() === productId
         );
@@ -304,7 +311,7 @@ const updateCart = async (req, res) => {
             });
         }
 
-        // Get product details to calculate updated price
+        
         const product = await productModal.findById(productId);
 
         if (!product) {
@@ -328,7 +335,7 @@ const updateCart = async (req, res) => {
          }
         
 
-        // Return updated cart info
+        
         return res.status(200).json({
             success: true,
             message: 'Cart updated successfully',
@@ -366,10 +373,10 @@ const removeItemFromCart = async (req, res) => {
             });
         }
 
-        // Remove the item from the user's cart
+        
         const updatedCart = await cartModel.findOneAndUpdate(
             { userId },
-            { $pull: { books: { product: bookId } } },//pull to remove item from an array
+            { $pull: { books: { product: bookId } } },
             { new: true }
         );
 

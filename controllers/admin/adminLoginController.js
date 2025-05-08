@@ -42,7 +42,7 @@ const adminLogin = async (req,res) => {
             maxAge: 24 * 60 * 60 * 1000 
           });
 
-          //admin@123
+          
 
         res.redirect('/admin/dashboard');
 
