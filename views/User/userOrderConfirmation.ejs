@@ -581,7 +581,7 @@
                 <% if (order.coupon && order.coupon.couponCode) { %>
                     <div class="below-order-item-forEach">
                         <span>Coupon Applied (<%= order.coupon.couponCode %>)</span>
-                        <span class="text-success">-₹<%= order.coupon.discount.toFixed(2) %></span>
+                        <span class="text-success">-₹<%= order.coupon.discount %></span>
                     </div>
                 <% } %>
                 

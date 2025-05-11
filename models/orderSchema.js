@@ -28,7 +28,6 @@ const orderSchema = new mongoose.Schema({
       discoundedPrice: { type: Number }
     },
     quantity: { type: Number, required: true, min: 1 }, 
-    price: { type: Number, required: true, min: 0 },
     productOrderStatus: { 
       type: String, 
       enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'], 

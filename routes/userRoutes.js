@@ -201,6 +201,9 @@ router.post('/api/apply-coupon',checkOutController.applyCoupen);
 router.post('/api/remove-coupon',checkOutController.removeCoupon);
 
 
+router.get('/api/wallet/balance',checkOutController.walletBalance);
+router.post('/api/wallet/pay',checkOutController.walletPay);
+
 
 
 router.post('/api/create-razorpay-order',razorpayController.createRazorpayOrder);

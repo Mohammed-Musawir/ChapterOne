@@ -853,12 +853,6 @@
                             </a>
                         <% } %>
                     </li>
-                    <!-- <li>
-                        <a href="/account/change-email" class="nav-link1 <%= activePage === 'change-email' ? 'active' : '' %>">
-                            <i class="fas fa-envelope"></i>
-                            <span>Change Email</span>
-                        </a>
-                    </li> -->
                     <li>
                         <a href="/account/orders" class="nav-link1 <%= activePage === 'orders' ? 'active' : '' %>">
                             <i class="fas fa-shopping-bag"></i>
@@ -913,29 +907,108 @@
             </div>
         
             <!-- Order Summary Cards -->
-            <div class="order-summary">
-                <div class="summary-item">
-                    <h6>Order Number</h6>
-                    <p>#<%= order.orderId %></p>
+            <div class="content-card mb-4">
+                <div class="card-header">
+                    <h5>Order Information</h5>
                 </div>
-                <div class="summary-item">
-                    <h6>Order Date</h6>
-                    <p><%= new Date(order.orderedDate).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      }) %></p>
-                </div>
-                <div class="summary-item">
-                    <h6>Payment Method</h6>
-                    <p><%= order.paymentMethod === 'cod'? 'Cash on delivery' : order.paymentMethod %></p>
-                </div>
-                <div class="summary-item">
-                    <h6>Order Status</h6>
-                    <p><span class="status-badge <%= order.orderStatus %>"><%= order.orderStatus %></span></p>
+                <div class="card-body">
+                    <div class="order-summary">
+                        <div class="summary-item">
+                            <h6>Order Number</h6>
+                            <p>#<%= order.orderId %></p>
+                        </div>
+                        <div class="summary-item">
+                            <h6>Order Date</h6>
+                            <p><%= new Date(order.orderedDate).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                              }) %></p>
+                        </div>
+                        <div class="summary-item">
+                            <h6>Payment Method</h6>
+                            <p><%= order.paymentMethod === 'cod'? 'Cash on delivery' : order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1) %></p>
+                        </div>
+                        <div class="summary-item">
+                            <h6>Payment Status</h6>
+                            <p><span class="status-badge <%= order.paymentStatus %>"><%= order.paymentStatus %></span></p>
+                        </div>
+                        <div class="summary-item">
+                            <h6>Order Status</h6>
+                            <p><span class="status-badge <%= order.orderStatus %>"><%= order.orderStatus %></span></p>
+                        </div>
+                        <div class="summary-item">
+                            <h6>Transaction ID</h6>
+                            <p><%= order.transactionId %></p>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+
+            
+
+
+<!-- Shipping Address Card -->
+<div class="content-card mb-4">
+    <div class="card-header">
+        <h5>Shipping Address</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-1"><strong><%= order.shippingAddress.fullName %></strong> (<%= order.shippingAddress.addressType %>)</p>
+                <p class="mb-1"><%= order.shippingAddress.houseNumber %>, <%= order.shippingAddress.street %></p>
+                <% if (order.shippingAddress.landmark) { %>
+                <p class="mb-1">Landmark: <%= order.shippingAddress.landmark %></p>
+                <% } %>
+                <p class="mb-1"><%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> - <%= order.shippingAddress.pincode %></p>
+                <p class="mb-1">Phone: <%= order.shippingAddress.alternative_no %></p>
+            </div>
+        </div>
+    </div>
+</div>
         
+
+
+
+<!-- Price Summary Card -->
+<div class="content-card mb-4">
+    <div class="card-header">
+        <h5>Price Details</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <span>₹<%= order.subtotal.toFixed(2) %></span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Shipping Cost:</span>
+                    <span>₹<%= order.shippingCost.toFixed(2) %></span>
+                </div>
+                <% if (order.gstAmount) { %>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>GST (<%= order.gstRate %>%):</span>
+                    <span>₹<%= order.gstAmount.toFixed(2) %></span>
+                </div>
+                <% } %>
+                <% if (order.coupon && order.coupon.discount && order.coupon !== undefined && order.coupon !== null && order.coupon.discount !== null && order.coupon.discount !== undefined) { %>
+                <div class="d-flex justify-content-between mb-2 text-success">
+                    <span>Coupon Discount (<%= order.coupon.couponCode %>):</span>
+                    <span>-₹<%= order.coupon.discount %></span>
+                </div>
+                <% } %>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold">
+                    <span>Total Amount:</span>
+                    <span>₹<%= order.totalAmount.toFixed(2) %></span>
+                </div>
+        </div>
+    </div>
+</div>
+
+
             <!-- Order Timeline Card -->
             <div class="content-card">
                 <div class="card-header">
@@ -1126,6 +1199,7 @@
                                 <!-- <div class="product-price">₹<%= product.productDetails.salePrice.toFixed(2) %></div> -->
                                   <!-- Updated price display with offer information -->
                                   <% if (product.offer) { %>
+                                    <div class="product-meta">₹<%= product.productDetails.salePrice.toFixed(2) %></div>
                                     <div class="product-price">
                                         <span class="product-price">₹<%= product.offer.offeredPrice %></span>
                                     </div>

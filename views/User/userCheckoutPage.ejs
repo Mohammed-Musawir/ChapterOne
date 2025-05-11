@@ -849,7 +849,7 @@ body {
                     </div>
 
 <!-- Add this section in the summary-list div where products are displayed -->
-<div class="summary-list">
+<div class="summary-list"> 
   <% if (typeof productsWithDiscounts !== 'undefined' && productsWithDiscounts.length > 0) { %>
       <% productsWithDiscounts.forEach(function(item) { %>
           <div class="summary-item" data-product-id="<%= item.product._id %>">
@@ -866,7 +866,7 @@ body {
                   <% if (item.appliedOffer) { %>
                       <div class="item-price">
                           <span class="original-price">₹<%= item.originalPrice %></span>
-                          <span class="discounted-price">₹<%= item.discountedPrice.toFixed(2) %></span>
+                          <span class="discounted-price">₹<%= item.discountedPrice %></span>
                           <span class="discount-badge">
                               <i class="fas fa-tag"></i> <%= item.appliedOffer.discountPercentage %>% OFF
                           </span>
@@ -982,11 +982,11 @@ body {
     </div>
 </div>
 
-<!-- Update the price summary section to include offer discounts -->
+
 <div class="price-summary">
   <div class="price-row">
-      <span class="price-label">Original subtotal</span>
-      <span class="price-value">₹<%= typeof originalSubtotal !== 'undefined' ? originalSubtotal : subtotal %></span>
+      <span class="price-label">Subtotal</span>
+      <span class="price-value">₹<%= typeof subtotal !== 'undefined' ? subtotal : 0 %></span>
   </div>
   
   <% if (typeof totalOfferDiscount !== 'undefined' && totalOfferDiscount > 0) { %>
@@ -995,11 +995,6 @@ body {
       <span class="price-discount">-₹<%= totalOfferDiscount %></span>
   </div>
   <% } %>
-  
-  <div class="price-row">
-      <span class="price-label">Subtotal after offers</span>
-      <span class="price-value">₹<%= typeof subtotal !== 'undefined' ? subtotal : 0 %></span>
-  </div>
   
   <div class="price-row">
       <span class="price-label">GST (18%)</span>
@@ -1031,7 +1026,7 @@ body {
     </div>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
     <script>
 // Custom SweetAlert theme configuration
 const themeColors = {
@@ -1062,6 +1057,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeOrderPlacement();
   initializeCouponFunctionality();
   initializeOfferDiscountDisplay();
+  initializeWalletPayment(); 
   checkCODEligibility();
   setTimeout(checkCODEligibility, 500);
 });
@@ -1123,14 +1119,6 @@ function checkCODEligibility() {
           const paymentOption = firstAvailablePayment.closest('.payment-option');
           paymentOption.classList.add('selected');
           firstAvailablePayment.checked = true;
-          
-          // Show notification to user
-          Toast.fire({
-            icon: 'info',
-            title: 'Cash on Delivery is not available for orders above ₹1000',
-            text: 'We\'ve selected an online payment method for you.',
-            background: themeColors.light
-          });
         }
       }
     } else {
@@ -1162,6 +1150,155 @@ function initializePaymentSelection() {
     });
   });
 }
+
+
+
+function initializeWalletPayment() {
+  // Get reference to wallet payment option
+  const walletOption = document.querySelector('.payment-option input[value="wallet"]');
+  
+  if (walletOption) {
+    const walletPaymentOption = walletOption.closest('.payment-option');
+    
+    // Fetch the user's wallet balance from the server
+    fetch('/api/wallet/balance')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const walletBalance = parseFloat(data.balance);
+          
+          // Get the current order total
+          const totalValueElem = document.getElementById('total-value');
+          const currentTotal = totalValueElem ? parseFloat(totalValueElem.textContent.replace('₹', '')) : 0;
+          
+          // Update wallet option display with balance information
+          const walletDetails = walletPaymentOption.querySelector('.payment-details');
+          if (walletDetails) {
+            const walletDesc = walletDetails.querySelector('.payment-description');
+            if (walletDesc) {
+              walletDesc.innerHTML = `Available balance: ₹${walletBalance.toFixed(2)}`;
+            }
+          }
+          
+          // Check if wallet has sufficient balance for the order
+          if (walletBalance >= currentTotal) {
+            // Enable wallet payment option
+            walletOption.disabled = false;
+            walletPaymentOption.classList.remove('disabled');
+            
+            // Remove any existing restriction message
+            const existingMsg = walletPaymentOption.querySelector('.payment-restriction');
+            if (existingMsg) {
+              existingMsg.remove();
+            }
+          } else {
+            // Disable wallet payment option
+            walletOption.disabled = true;
+            walletPaymentOption.classList.add('disabled');
+            
+            // Add message explaining why wallet can't be used
+            const messageElem = document.createElement('p');
+            messageElem.className = 'payment-restriction';
+            messageElem.innerHTML = `<i class="fas fa-info-circle"></i> Insufficient balance (₹${(currentTotal - walletBalance).toFixed(2)} more needed)`;
+            
+            // Find the payment details div to append the message
+            const detailsDiv = walletPaymentOption.querySelector('.payment-details');
+            if (detailsDiv && !detailsDiv.querySelector('.payment-restriction')) {
+              detailsDiv.appendChild(messageElem);
+            }
+          }
+          
+          // Update wallet status when order total changes (e.g., after applying coupon)
+          const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+              if (mutation.type === 'characterData') {
+                const newTotal = parseFloat(mutation.target.textContent.replace('₹', '')) || 0;
+                updateWalletStatus(walletOption, walletPaymentOption, walletBalance, newTotal);
+              }
+            });
+          });
+          
+          if (totalValueElem) {
+            observer.observe(totalValueElem, { 
+              characterData: true,
+              subtree: true
+            });
+          }
+        } else {
+          // Handle error - wallet information not available
+          console.error('Could not retrieve wallet information:', data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching wallet balance:', error);
+      });
+  }
+}
+
+
+function updateWalletStatus(walletOption, walletPaymentOption, walletBalance, currentTotal) {
+  if (walletBalance >= currentTotal) {
+    // Enable wallet payment
+    walletOption.disabled = false;
+    walletPaymentOption.classList.remove('disabled');
+    
+    // Remove any restriction message
+    const restrictionMsg = walletPaymentOption.querySelector('.payment-restriction');
+    if (restrictionMsg) {
+      restrictionMsg.remove();
+    }
+  } else {
+    // Disable wallet payment
+    walletOption.disabled = true;
+    walletPaymentOption.classList.add('disabled');
+    
+    // Update or add restriction message
+    let messageElem = walletPaymentOption.querySelector('.payment-restriction');
+    if (!messageElem) {
+      messageElem = document.createElement('p');
+      messageElem.className = 'payment-restriction';
+      
+      // Find the payment details div to append the message
+      const detailsDiv = walletPaymentOption.querySelector('.payment-details');
+      if (detailsDiv) {
+        detailsDiv.appendChild(messageElem);
+      }
+    }
+    
+    if (messageElem) {
+      messageElem.innerHTML = `<i class="fas fa-info-circle"></i> Insufficient balance (₹${(currentTotal - walletBalance).toFixed(2)} more needed)`;
+    }
+  }
+}
+
+
+function handleWalletPayment(orderDetails) {
+  showLoadingSpinner('Processing Wallet Payment', 'Please wait while we process your payment...');
+  
+  fetch('/api/wallet/pay', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(orderDetails)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showAlert('success', 'Payment Successful!', 'Your order has been placed successfully.')
+        .then(() => {
+          window.location.href = `/order-placed/${data.orderId}`;
+        });
+    } else {
+      showAlert('error', 'Payment Failed', data.message || 'Your payment could not be completed');
+    }
+  })
+  .catch(error => {
+    console.error('Error processing wallet payment:', error);
+    showAlert('error', 'Payment Error', 'There was a problem processing your payment');
+  });
+}
+
 
 
 // Add CSS styles for disabled payment options
@@ -1249,7 +1386,7 @@ function collectProductDetails() {
         const discountedPrice = parseFloat(discountedPriceElem.textContent.replace('₹', ''));
         
         productDetail.originalPrice = originalPrice;
-        productDetail.discountedPrice = discountedPrice.toFixed(2);
+        productDetail.discountedPrice = discountedPrice;
         productDetail.hasOffer = true;
       } else {
         // Get price for products without offers
@@ -1258,7 +1395,7 @@ function collectProductDetails() {
           const price = parseFloat(priceElem.textContent.replace('₹', '')) || 0;
           productDetail.price = price;
           // Even for products without special offers, include the price as discountedPrice
-          productDetail.discountedPrice = price.toFixed(2);
+          productDetail.discountedPrice = price;
         }
       }
       
@@ -1269,7 +1406,7 @@ function collectProductDetails() {
 }
 
 
-
+ 
 function confirmOrderPlacement(addressId, paymentMethod, subtotal, products) {
   Swal.fire({
     title: 'Confirm Order',
@@ -1288,11 +1425,30 @@ function confirmOrderPlacement(addressId, paymentMethod, subtotal, products) {
 }
 
 
-
 function placeOrder(addressId, paymentMethod, subtotal, products) {
   // Get currently applied coupon information if any
   const appliedCouponElem = document.getElementById('applied-coupon');
   const appliedCouponNameElem = document.getElementById('applied-coupon-name');
+  
+  // Make sure we have a valid subtotal by extracting it directly from the UI
+  let subtotalValue = 0;
+  document.querySelectorAll('.price-row').forEach(row => {
+    const label = row.querySelector('.price-label');
+    if (label && label.textContent.trim() === 'Subtotal') {
+      const valueElem = row.querySelector('.price-value');
+      if (valueElem) {
+        subtotalValue = parseFloat(valueElem.textContent.replace('₹', '')) || 0;
+      }
+    }
+  });
+  
+  // If subtotal is still 0, calculate from products as fallback
+  if (subtotalValue === 0 && products && products.length > 0) {
+    subtotalValue = products.reduce((total, item) => {
+      const price = item.discountedPrice || item.price || 0;
+      return total + (price * item.quantity);
+    }, 0);
+  }
   
   // Get updated total value directly from the UI
   const totalValueElem = document.getElementById('total-value');
@@ -1316,7 +1472,6 @@ function placeOrder(addressId, paymentMethod, subtotal, products) {
     }
   });
   
-
   // Prepare product data in the exact format expected by backend
   const orderProducts = products.map(item => {
     return {
@@ -1330,7 +1485,7 @@ function placeOrder(addressId, paymentMethod, subtotal, products) {
   const orderDetails = {
     addressId: addressId,
     paymentMethod: paymentMethod,
-    subtotal: subtotal,
+    subtotal: subtotalValue, // Use our correctly extracted subtotal
     gstAmount: gstAmount || 0,
     shippingCost: shippingCost || 0,
     totalAmount: currentTotal,
@@ -1357,12 +1512,11 @@ function placeOrder(addressId, paymentMethod, subtotal, products) {
     
     // Add coupon information to order details
     orderDetails.coupon = {
-      couponCode: couponCode,
-      discount: couponDiscount
+      couponCode: couponCode ,
+      couponDiscount: couponDiscount
     };
   }
 
-  console.log(orderDetails);
   
   // Handle different payment methods
   if (paymentMethod === 'razorPay') {
@@ -1454,6 +1608,9 @@ function placeOrder(addressId, paymentMethod, subtotal, products) {
       console.error('Error:', error);
       showAlert('error', 'Oops...', 'Something went wrong while setting up payment');
     });
+  } else if (paymentMethod === 'wallet') {
+    // For wallet payments
+    handleWalletPayment(orderDetails);
   } else {
     // For COD and other payment methods, proceed with regular order placement
     showLoadingSpinner('Processing Order', 'Please wait while we process your order...');
@@ -1482,7 +1639,6 @@ function placeOrder(addressId, paymentMethod, subtotal, products) {
     });
   }
 }
-
 
 
 function handleRazorpaySuccess(response, orderDetails) {
@@ -1567,13 +1723,14 @@ function initializeCouponFunctionality() {
     totalValue: document.getElementById('total-value'),
     appliedCouponElem: document.getElementById('applied-coupon'),
     appliedCouponNameElem: document.getElementById('applied-coupon-name'),
-    appliedCouponDiscountElem: document.getElementById('applied-coupon-discount') // Fixed: Added this line
+    appliedCouponDiscountElem: document.getElementById('applied-coupon-discount')
   };
   
+  // Get the subtotal value from the price summary
   let subtotal = 0;
   document.querySelectorAll('.price-row').forEach(row => {
     const label = row.querySelector('.price-label');
-    if (label && label.textContent.trim() === 'Subtotal after offers') {
+    if (label && label.textContent.trim() === 'Subtotal') {
       const valueElem = row.querySelector('.price-value');
       if (valueElem) {
         subtotal = parseFloat(valueElem.textContent.replace('₹', '')) || 0;
@@ -1622,6 +1779,7 @@ function initializeCouponFunctionality() {
     });
   }
   
+  // Rest of the function remains the same...
   if (elements.removeButton) {
     elements.removeButton.addEventListener('click', function() {
       showLoadingSpinner('Removing Coupon', 'Please wait...');
@@ -1675,6 +1833,7 @@ function initializeCouponFunctionality() {
   }
 }
 
+
 function getAppliedCouponFromPage() {
   const appliedCouponElem = document.getElementById('applied-coupon');
   const appliedCouponNameElem = document.getElementById('applied-coupon-name');
@@ -1725,12 +1884,12 @@ function updateCouponDetails(selectedOption, subtotal) {
       couponExpiry.style.display = 'none';
     }
     
-    // Check eligibility - use the correct subtotal (after product offers)
+    // Check eligibility using the subtotal value
     const minOrderValue = parseFloat(selectedOption.dataset.min) || 0;
-    if (minAmount) minAmount.textContent = minOrderValue.toFixed(2);
+    if (minAmount) minAmount.textContent = minOrderValue;
     
     if (subtotal < minOrderValue) {
-      const remaining = (minOrderValue - subtotal).toFixed(2);
+      const remaining = (minOrderValue - subtotal);
       if (remainingAmount) remainingAmount.textContent = remaining;
       
       // Update progress bar
@@ -1890,13 +2049,13 @@ function updatePriceSummaryAfterCouponRemoval(data) {
   // Update total with the new total from the server
   const totalElement = document.getElementById('total-value');
   if (totalElement && data.updatedTotal !== undefined) {
-    totalElement.textContent = `₹${data.updatedTotal.toFixed(2)}`;
+    totalElement.textContent = `₹${data.updatedTotal}`;
   }
   
   // Update GST if provided
   const gstElement = document.querySelector('.price-row:nth-child(4) .price-value');
   if (gstElement && data.gstAmount !== undefined) {
-    gstElement.textContent = `₹${data.gstAmount.toFixed(2)}`;
+    gstElement.textContent = `₹${data.gstAmount}`;
   }
   
   // Update shipping if provided
@@ -1906,7 +2065,7 @@ function updatePriceSummaryAfterCouponRemoval(data) {
       shippingElement.textContent = 'FREE';
       shippingElement.className = 'text-success';
     } else {
-      shippingElement.textContent = `₹${data.shippingCost.toFixed(2)}`;
+      shippingElement.textContent = `₹${data.shippingCost}`;
       shippingElement.className = 'price-value';
     }
   }
@@ -1999,7 +2158,7 @@ function initializeOfferDiscountDisplay() {
   // Format prices to show only 2 decimal places
   document.querySelectorAll('.discounted-price').forEach(el => {
     const price = parseFloat(el.textContent.replace('₹', ''));
-    el.textContent = `₹${price.toFixed(2)}`;
+    el.textContent = `₹${price}`;
   });
   
   // Add tooltip hover effects for offer details

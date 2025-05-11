@@ -286,8 +286,6 @@ const loadOrderPlacedConfirmation = async (req, res) => {
     
     const items = [];
     for (const item of orderDetails.products) {
-      
-      console.log(item)
       const displayPrice = item.productDetails.discoundedPrice || item.productDetails.salePrice;      
       items.push({
         name: item.productDetails.name || "Product",

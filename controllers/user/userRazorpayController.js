@@ -62,7 +62,6 @@ const razorpayController = {
     try {
       const { paymentId, orderId, signature, orderDetails } = req.body;
 
-      console.log(orderDetails);
       const userId = req.user._id || req.user.id;
       
       if (!paymentId || !orderId || !signature || !orderDetails) {
@@ -142,7 +141,7 @@ const razorpayController = {
       if (orderDetails.coupon && orderDetails.coupon.couponCode) {
         newOrder.coupon = {
           couponCode: orderDetails.coupon.couponCode,
-          discount: orderDetails.coupon.discount
+          discount: orderDetails.coupon.couponDiscount
         };
       }
       
