@@ -103,14 +103,16 @@ const razorpayController = {
             writer: product.writer || 'Unknown',
             salePrice: product.salePrice > 0 ? product.salePrice : product.regularPrice,
             productImages: product.productImages || [],
-            discountedPrice: orderProduct?.discountedPrice || null
+            discoundedPrice: orderProduct?.discoundedPrice || null
           },
           quantity: item.quantity,
           price: (product.salePrice > 0 ? product.salePrice : product.regularPrice) * item.quantity,
           productOrderStatus: 'pending'
         };
-      });
+      }); 
       
+      
+
       const newOrder = new Order({
         userId: userId,
         products: mappedProducts,

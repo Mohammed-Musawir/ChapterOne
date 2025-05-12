@@ -9,7 +9,7 @@ const offerModel = require('../../models/offerSchema');
 const addTransaction = require('../../services/transactionService');
 const mongoose = require('mongoose');
 
-
+ 
 
 const generateTimeline = (product, order) => {
     const timeline = [];
@@ -480,7 +480,7 @@ const cancelSingleProduct = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
     const { orderId } = req.params;
-    const { productIds, cancelReason, cancelDetails } = req.body;
+    const { productIds, cancelReason } = req.body;
     
     if (!productIds) {
       return res.status(400).json({ success: false, message: 'Product ID is required' });
@@ -526,10 +526,12 @@ const cancelSingleProduct = async (req, res) => {
     const quantityToRestore = order.products[productIndex].quantity;
 
     
-    const productToCancel = order.products[productIndex];
-    const productPrice = productToCancel.productDetails.discoundedPrice || productToCancel.productDetails.salePrice;
+    const productToCancel = order.products[productIndex];    
+    const productPrice = productToCancel.productDetails.discountedPrice || productToCancel.productDetails.salePrice;
     const refundAmount = productPrice * quantityToRestore;
-
+    
+    console.log(productToCancel)
+    console.log(refundAmount) 
     
     order.products[productIndex].productOrderStatus = 'cancelled';
     order.products[productIndex].productOrderCancellation = {

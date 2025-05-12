@@ -135,7 +135,7 @@ const applyCoupen = async (req, res) => {
               message: 'Coupon code is required' 
           });
       }
-
+ 
       const coupon = await couponmodel.findOne({
           couponCode: couponCode,
           isBlocked: false
@@ -291,7 +291,7 @@ const walletBalance = async(req,res) => {
         let wallet = await walletModel.findOne({userId});
 
         if(!wallet) {
-            wallet = new Wallet({
+            wallet = new walletModel({
                 userId,
                 amount: 0
               });
@@ -353,6 +353,7 @@ const walletPay = async (req, res) => {
   
       
       const wallet = await walletModel.findOne({ userId });
+      console.log(`hoiiiiiiiii       ${wallet}`)
       if (!wallet) {
         return res.status(400).json({
           success: false,
@@ -360,7 +361,6 @@ const walletPay = async (req, res) => {
         });
       }
   
-      console.log(totalAmount)
       if (wallet.amount < totalAmount) {
         return res.status(400).json({
           success: false,
