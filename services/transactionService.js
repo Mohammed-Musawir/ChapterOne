@@ -12,20 +12,22 @@ const addTransaction = async (userId, type, amount, description) => {
         });
     }
 
+    
 
     if (type === 'Credit') {
-        wallet.amount += amount;
+        wallet.amount += Math.round(amount);
     } else if (type === 'Debit') { 
-        if (wallet.amount < amount) {
+        if (wallet.amount < Math.round(amount)) {
             throw new Error('Insufficient wallet balance');
         }
-        wallet.amount -= amount;
+        wallet.amount -= Math.round(amount);
     } else {
         throw new Error('Invalid transaction type');
     }
 
     await wallet.save();
 
+    amount = Math.round(amount);
  
     const transaction = new transactionModal({
         userId,

@@ -219,7 +219,7 @@ router.get(`/account/orders/:orderId/invoice`,invoiceDownloadPDF)
 
 
 router.get('/order-placed/:orderId',orderController.loadOrderPlacedConfirmation);
-router.get('/orders/:orderId',orderController.loadOrderViewPage);
+router.get('/orders/:orderId',orderController.loadOrderViewPage); 
  
 
 

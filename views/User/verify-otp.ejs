@@ -322,7 +322,6 @@
         }
     });
 
-    // Start countdown on page load by calculating remaining time
     updateCountdown();
     if (parseInt(countdownElement.textContent) > 0) {
         countdown = setInterval(updateCountdown, 1000);

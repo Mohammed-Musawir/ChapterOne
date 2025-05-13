@@ -11,110 +11,6 @@ const mongoose = require('mongoose');
 
  
 
-const generateTimeline = (product, order) => {
-    const timeline = [];
-    
-    
-    timeline.push({
-        type: 'info',
-        title: 'Order Placed',
-        date: new Date(order.orderedDate).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        }),
-        description: 'Your order has been successfully placed.'
-    });
-    
-    
-    if (['processing', 'shipped', 'delivered'].includes(product.productOrderStatus)) {
-        timeline.push({
-            type: 'info',
-            title: 'Processing',
-            date: new Date(order.updatedAt).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            }),
-            description: 'Your order is being processed.'
-        });
-    }
-    
-    
-    if (['shipped', 'delivered'].includes(product.productOrderStatus)) {
-        timeline.push({
-            type: 'info',
-            title: 'Shipped',
-            date: new Date(order.updatedAt).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            }),
-            description: 'Your product has been shipped.'
-        });
-    }
-    
-    
-    if (product.productOrderStatus === 'delivered') {
-        timeline.push({
-            type: 'success',
-            title: 'Delivered',
-            date: new Date(order.updatedAt).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            }),
-            description: 'Your product has been delivered successfully.'
-        });
-    }
-    
-    
-    if (product.productOrderStatus === 'cancelled') {
-        timeline.push({
-            type: 'danger',
-            title: 'Cancelled',
-            date: product.productOrderCancellation && product.productOrderCancellation.cancelledAt ? 
-                new Date(product.productOrderCancellation.cancelledAt).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                }) : 
-                new Date(order.updatedAt).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                }),
-            description: product.productOrderCancellation && product.productOrderCancellation.reason ? 
-                `Reason: ${product.productOrderCancellation.reason}` : 'Product was cancelled.'
-        });
-    }
-    
-    
-    if (product.productOrderStatus === 'returned') {
-        timeline.push({
-            type: 'warning',
-            title: 'Returned',
-            date: product.productOrderReturned && product.productOrderReturned.returnedAt ? 
-                new Date(product.productOrderReturned.returnedAt).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                }) : 
-                new Date(order.updatedAt).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                }),
-            description: product.productOrderReturned && product.productOrderReturned.reason ? 
-                `Reason: ${product.productOrderReturned.reason}` : 'Product was returned.'
-        });
-    }
-    
-    return timeline; 
-};
- 
-
-
 const userPlacerOrder = async (req, res) => {
   try {
     const { addressId, paymentMethod, subtotal, gstAmount, shippingCost, totalAmount, products, coupon } = req.body;
@@ -394,85 +290,106 @@ const loadOrderListPage = async (req, res) => {
 };
 
 
-const loadOrderViewPage = async (req, res) => { 
-  try {
+const loadOrderViewPage = async (req, res) => {   
+  try {       
+      
       const userId = req.user._id || req.user.id;
-      const {orderId} = req.params;
+      const { orderId } = req.params;        
+
       
       const user = await userModel.findById(userId);
-      const order = await orderModel.findOne({ orderId, userId }).populate('products.product');
-      
-      if (!order) {
-          return res.status(404).render('User/userOrderNotFound', {
-              user,
-              message: 'Order not found.',
-              activePage: 'orders'
-          });
-      }
-      
-      
-      const activeOffers = await offerModel.find({ 
-          isActive: true, 
-          endDate: { $gte: new Date() } 
-      }).populate('product category');
-      
-      
-      for (const product of order.products) {
-          
-          const productOffers = activeOffers.filter(
-              offer => offer.offerType === 'product' && 
-              offer.product && 
-              offer.product._id.toString() === product.product._id.toString()
-          );
-          
-          
-          const categoryOffers = activeOffers.filter(
-              offer => offer.offerType === 'category' && 
-              offer.category && 
-              product.product.category && 
-              offer.category._id.toString() === product.product.category.toString()
-          );
-          
-          
-          const applicableOffers = [...productOffers, ...categoryOffers];
-          
-          
-          let bestOffer = null;
-          if (applicableOffers.length > 0) {
-              bestOffer = applicableOffers.reduce((best, current) => 
-                  current.discountPercentage > best.discountPercentage ? current : best, 
-                  applicableOffers[0]
-              );
-              
-              
-              const discountAmount = (product.productDetails.salePrice * bestOffer.discountPercentage) / 100;
-              const offeredPrice = product.productDetails.salePrice - discountAmount;
-              
-              
-              product.offer = {
-                  name: bestOffer.name,
-                  discountPercentage: bestOffer.discountPercentage,
-                  originalPrice: product.productDetails.salePrice,
-                  offeredPrice: offeredPrice.toFixed(2),
-                  savings: discountAmount.toFixed(2)
-              };
+      const order = await orderModel.findOne({            
+          orderId,
+          userId        
+      }).populate({
+          path: 'products.product',
+          populate: {
+              path: 'category_id', 
+              model: 'Category'
           }
-          
-          
-          product.timeline = generateTimeline(product, order);
-      }
+      });        
+
       
-      res.render("User/userOrderViewPage", {
-          user,
-          order,
-          activePage: 'orders'
-      });
+      if (!order) {           
+          return res.status(404).render('User/userOrderNotFound', {               
+              user,               
+              message: 'Order not found.',               
+              activePage: 'orders'           
+          });       
+      }        
+
       
-  } catch (error) {
-      console.error("Error loading user Order Detail Page:", error);
-      res.status(500).render('500');
-  }
-};
+      const activeOffers = await offerModel.find({           
+          isActive: true,           
+          endDate: { $gte: new Date() }       
+      }).populate('product category');        
+
+      
+      for (const product of order.products) {           
+          
+          const productOffers = activeOffers.filter(offer => {               
+              return offer.offerType === 'product'                    
+                  && offer.product                    
+                  && offer.product._id.toString() === product.product._id.toString();           
+          });            
+
+          
+          const categoryOffers = activeOffers.filter(offer => {               
+              return offer.offerType === 'category'                    
+                  && offer.category                    
+                  && product.product.category_id 
+                  && offer.category._id.toString() === product.product.category_id._id.toString();           
+          });            
+
+
+          
+          const applicableOffers = [               
+              ...productOffers,                
+              ...categoryOffers           
+          ];            
+
+          
+          if (applicableOffers.length > 0) {               
+              
+              const bestOffer = applicableOffers.reduce((best, current) => {                   
+                  
+                  if (!best) {                       
+                      return current;                   
+                  }                    
+
+                  
+                  return current.discountPercentage > best.discountPercentage                        
+                      ? current                        
+                      : best;               
+              }, null);                
+
+              
+              const originalPrice = product.productDetails.salePrice;               
+              const discountAmount = (originalPrice * bestOffer.discountPercentage) / 100;               
+              const offeredPrice = originalPrice - discountAmount;                
+
+              
+              product.offer = {                   
+                  name: bestOffer.name,                   
+                  discountPercentage: bestOffer.discountPercentage,                   
+                  originalPrice: originalPrice,                   
+                  offeredPrice: offeredPrice.toFixed(2),                   
+                  savings: discountAmount.toFixed(2)               
+              };           
+          }       
+      }        
+
+      
+      res.render("User/userOrderViewPage", {           
+          user,           
+          order,           
+          activePage: 'orders'       
+      });    
+  } catch (error) {       
+      console.error("Error loading user Order Detail Page:", error);       
+      res.status(500).render('500');   
+  } 
+}; 
 
 
 
@@ -507,12 +424,12 @@ const cancelSingleProduct = async (req, res) => {
     }
 
     
-    const productId = productIds 
+    const productId = productIds;
     const productIndex = order.products.findIndex(p => {
       const orderProductId = p.product; 
       return orderProductId.toString() === productId.toString();
     });
-
+ 
     if (productIndex === -1) {
       return res.status(404).json({ success: false, message: 'Product not found in order' });
     }
@@ -523,15 +440,43 @@ const cancelSingleProduct = async (req, res) => {
     }
 
     
-    const quantityToRestore = order.products[productIndex].quantity;
+    const productToCancel = order.products[productIndex];
+    const quantityToRestore = productToCancel.quantity;
 
     
-    const productToCancel = order.products[productIndex];    
-    const productPrice = productToCancel.productDetails.discountedPrice || productToCancel.productDetails.salePrice;
-    const refundAmount = productPrice * quantityToRestore;
+    const product = await productModel.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
     
-    console.log(productToCancel)
-    console.log(refundAmount) 
+    const activeOffers = await offerModel.find({
+      isActive: true,
+      endDate: { $gte: new Date() },
+      $or: [
+        { 
+          offerType: 'product', 
+          product: productId 
+        },
+        { 
+          offerType: 'category', 
+          category: product.category_id 
+        }
+      ]
+    });
+
+    
+    let highestDiscount = 0;
+    activeOffers.forEach(offer => {
+      highestDiscount = Math.max(highestDiscount, offer.discountPercentage);
+    });
+
+    
+    const originalPrice = productToCancel.productDetails.salePrice;
+    const discountedPrice = originalPrice * (1 - highestDiscount / 100);
+    const refundAmount = discountedPrice * quantityToRestore;
+
     
     order.products[productIndex].productOrderStatus = 'cancelled';
     order.products[productIndex].productOrderCancellation = {
@@ -550,10 +495,9 @@ const cancelSingleProduct = async (req, res) => {
     }
 
     
-    if (order.paymentMethod === 'razorPay' && order.paymentStatus === 'completed') {
+    if (order.paymentMethod !== 'cod' && order.paymentStatus === 'completed') {
       try {
-
-        
+      
         await addTransaction(
           userId,
           'Credit',
@@ -568,20 +512,6 @@ const cancelSingleProduct = async (req, res) => {
       } catch (refundError) {
         console.error('Error processing refund:', refundError);
         
-        
-      }
-    } else if (order.paymentMethod === 'wallet' && order.paymentStatus === 'completed') {
-      
-      await addTransaction(
-        userId,
-        'Credit',
-        refundAmount,
-        'Order Cancellation'
-      );
-      
-      
-      if (allProductsCancelled) {
-        order.paymentStatus = 'cancelled';
       }
     }
 
@@ -589,7 +519,6 @@ const cancelSingleProduct = async (req, res) => {
     await order.save();
 
     
-    const product = await productModel.findById(order.products[productIndex].product);
     if (product) {
       product.availableQuantity += quantityToRestore;
       await product.save();
@@ -599,7 +528,8 @@ const cancelSingleProduct = async (req, res) => {
       success: true,
       message: 'Product cancelled successfully',
       orderStatus: order.orderStatus,
-      refunded: order.paymentMethod !== 'cod' ? refundAmount : 0
+      refundAmount: refundAmount,
+      highestDiscount: highestDiscount
     });
 
   } catch (error) {
@@ -609,17 +539,166 @@ const cancelSingleProduct = async (req, res) => {
       message: 'Server error while cancelling product'
     });
   }
-};
+};                         
  
 
+  const bulkProductCancel = async (req, res) => {
+    try {
+      const userId = req.user._id || req.user.id;
+      const { orderId } = req.params;
+      const { productIds, cancelReason, cancelDetails } = req.body;
   
+      const productIdArray = productIds.split(",");
+  
+      
+      const order = await orderModel.findOne({ orderId, userId })
+        .populate({
+          path: 'products.product',
+          model: 'Product',
+          populate: {
+            path: 'category_id',
+            model: 'Category'
+          }
+        });
+  
+      if (!order) {
+        return res.status(404).json({ success: false, message: "Order not found" });
+      }
+  
+      const productsToUpdateStock = [];
+      let totalRefundAmount = 0;
+  
+      
+      const activeOffers = await offerModel.find({
+        isActive: true,
+        endDate: { $gte: new Date() }
+      });
+  
+      for (const product of order.products) {
+        if (productIdArray.includes(product.product._id.toString())) {
+          if (product.productOrderStatus !== 'cancelled' && product.productOrderStatus !== 'returned') {
+            
+            let refundPrice = product.productDetails.salePrice;
+            
+            
+            const productOffer = activeOffers.find(offer => 
+              offer.offerType === 'product' && 
+              offer.product && 
+              offer.product.toString() === product.product._id.toString()
+            );
+  
+            
+            const categoryOffer = activeOffers.find(offer => 
+              offer.offerType === 'category' && 
+              offer.category && 
+              offer.category.toString() === product.product.category_id._id.toString()
+            );
+  
+            
+            let highestDiscount = 0;
+            if (productOffer) {
+              highestDiscount = Math.max(highestDiscount, productOffer.discountPercentage);
+            }
+            if (categoryOffer) {
+              highestDiscount = Math.max(highestDiscount, categoryOffer.discountPercentage);
+            }
+  
+            
+            if (highestDiscount > 0) {
+              refundPrice = product.productDetails.salePrice * (1 - highestDiscount / 100);
+            }
+  
+            
+            product.productOrderStatus = 'cancelled';
+            product.productOrderCancellation = {
+              reason: cancelReason === 'other' ? cancelDetails : cancelReason,
+              cancelledAt: new Date()
+            };
+  
+            
+            productsToUpdateStock.push({
+              productId: product.product._id,
+              quantity: product.quantity
+            });
+  
+            
+            totalRefundAmount += refundPrice * product.quantity;
+          }
+        }
+      }
+  
+      
+      await order.save();
+  
+      
+      for (const item of productsToUpdateStock) {
+        await productModel.findByIdAndUpdate(
+          item.productId,
+          { $inc: { availableQuantity: item.quantity } },
+          { new: true }
+        );
+      }
+  
+      
+      const allProductsCancelled = order.products.every(
+        product => product.productOrderStatus === 'cancelled' || product.productOrderStatus === 'returned'
+      );
+  
+      
+      if (order.paymentMethod !== 'cod' && order.paymentStatus === 'completed' && totalRefundAmount > 0) {
+        try {
+          
+          await addTransaction(
+            userId,
+            'Credit',
+            totalRefundAmount,
+            'Order Cancellation'
+          );
+        } catch (refundError) {
+          console.error('Error processing refund:', refundError);
+        }
+      }
+  
+      
+      if (allProductsCancelled) {
+        order.orderStatus = 'cancelled';
+        order.orderCancellation = {
+          reason: cancelReason === 'other' ? cancelDetails : cancelReason,
+          cancelledAt: new Date()
+        };
+  
+        
+        if (order.paymentMethod !== 'cod' && order.paymentStatus === 'completed') {
+          order.paymentStatus = 'cancelled';
+        }
+  
+        await order.save();
+      }
+  
+      return res.status(200).json({
+        success: true,
+        message: "Products cancelled successfully",
+        updatedOrder: order
+      });
+  
+    } catch (error) {
+      console.error("Error in bulk product cancellation:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while cancelling products",
+        error: error.message
+      });
+    }
+  };
+
+
   const returnSingleProduct = async (req, res) => {
-    try { 
+
+    try {
       const userId = req.user._id || req.user.id;
       const { orderId } = req.params;
       const { productIds, returnReason } = req.body;
-      
-      
+          
       const order = await orderModel.findOne({ orderId, userId });
       
       if (!order) {
@@ -628,8 +707,7 @@ const cancelSingleProduct = async (req, res) => {
           message: 'Order not found or does not belong to this user'
         });
       }
-      
-      
+          
       const productToReturn = order.products.find(p => {
         const orderProductId = p.product;
         return orderProductId.toString() === productIds.toString();
@@ -641,16 +719,14 @@ const cancelSingleProduct = async (req, res) => {
           message: 'Product not found in this order'
         });
       }
-      
-      
+          
       if (productToReturn.productOrderStatus === 'returned') {
         return res.status(400).json({
           success: false,
           message: 'This product has already been returned'
         });
       }
-      
-      
+          
       const product = await productModel.findById(productToReturn.product);
       if (!product) {
         return res.status(404).json({
@@ -665,19 +741,50 @@ const cancelSingleProduct = async (req, res) => {
       
       
       productToReturn.productOrderStatus = 'returned';
-      
-      
       productToReturn.productOrderReturned = {
         reason: returnReason,
         returnedAt: new Date()
       };
       
       
-      const refundAmount = productToReturn.productDetails.discoundedPrice
-        ? productToReturn.productDetails.discoundedPrice * productToReturn.quantity
-        : productToReturn.productDetails.salePrice * productToReturn.quantity;
+      let refundAmount;
+      const basePrice = productToReturn.productDetails.salePrice; 
       
-      console.log("Refund amount:", refundAmount);
+      
+      const productOffers = await mongoose.model('Offer').find({
+        isActive: true,
+        offerType: 'product',
+        product: productToReturn.product,
+        endDate: { $gte: new Date() }
+      }).sort({ discountPercentage: -1 }); 
+      
+      
+      const categoryOffers = await mongoose.model('Offer').find({
+        isActive: true,
+        offerType: 'category',
+        category: product.category_id,
+        endDate: { $gte: new Date() }
+      }).sort({ discountPercentage: -1 }); 
+      
+      
+      const allOffers = [...productOffers, ...categoryOffers].sort((a, b) => 
+        b.discountPercentage - a.discountPercentage
+      );
+      
+      
+      if (allOffers.length > 0) {
+        const bestOffer = allOffers[0]; 
+        const discountAmount = basePrice * (bestOffer.discountPercentage / 100);
+        const discountedPrice = basePrice - discountAmount;
+        
+        refundAmount = discountedPrice * productToReturn.quantity;
+        
+
+      } else {
+        refundAmount = basePrice * productToReturn.quantity;
+      }
+      
+
       
       
       await addTransaction(
@@ -697,13 +804,11 @@ const cancelSingleProduct = async (req, res) => {
         };
       }
       
-      
       await order.save();
       
       
       const wallet = await walletModel.findOne({ userId });
       const currentBalance = wallet ? wallet.amount : 0;
-      
       
       res.status(200).json({
         success: true,
@@ -724,130 +829,15 @@ const cancelSingleProduct = async (req, res) => {
   };
 
 
-  const bulkProductCancel = async (req, res) => {
-    try {
-      const userId = req.user._id || req.user.id;
-      const { orderId } = req.params;
-      const { productIds, cancelReason, cancelDetails } = req.body;
-      
-      
-      const productIdArray = productIds.split(",");
-      
-      
-      const order = await orderModel.findOne({orderId, userId});
-      
-      if (!order) {
-        return res.status(404).json({ success: false, message: "Order not found" });
-      }
-      
-      
-      const productsToUpdateStock = [];
-      
-      let totalRefundAmount = 0;
-      
-      
-      for (const product of order.products) {
-        if (productIdArray.includes(product.product.toString())) {
-          
-          if (product.productOrderStatus !== 'cancelled' && product.productOrderStatus !== 'returned') {
-            
-            product.productOrderStatus = 'cancelled';
-            product.productOrderCancellation = {
-              reason: cancelReason === 'other' ? cancelDetails : cancelReason,
-              cancelledAt: new Date()
-            };
-            
-            
-            productsToUpdateStock.push({
-              productId: product.product,
-              quantity: product.quantity
-            });
-            
-            
-            const priceToRefund = product.productDetails.discoundedPrice || product.productDetails.salePrice;
-            totalRefundAmount += priceToRefund * product.quantity;
-          }
-        }
-      }
-      
-      
-      await order.save();
-      
-      
-      for (const item of productsToUpdateStock) {
-        await productModel.findByIdAndUpdate(
-          item.productId,
-          { $inc: { stock: item.quantity } },
-          { new: true }
-        );
-      }
-      
-      
-      const allProductsCancelled = order.products.every(
-        product => product.productOrderStatus === 'cancelled' || product.productOrderStatus === 'returned'
-      );
-      
-      
-      if (order.paymentMethod === 'razorPay' && order.paymentStatus === 'completed' && totalRefundAmount > 0) {
-        try {
- 
-          
-          
-          await addTransaction(
-            userId,
-            'Credit',
-            totalRefundAmount,
-            'Order Cancellation'
-          );
-          
-          console.log('Refund processed successfully:', refund);
-        } catch (refundError) {
-          console.error('Error processing refund:', refundError);
-          
-          
-        }
-      }
-      
-      
-      if (allProductsCancelled) {
-        order.orderStatus = 'cancelled';
-        order.orderCancellation = {
-          reason: cancelReason === 'other' ? cancelDetails : cancelReason,
-          cancelledAt: new Date()
-        };
-        
-        if (order.paymentMethod !== 'cod' && order.paymentStatus === 'completed') {
-          order.paymentStatus = 'cancelled';
-        }
-        
-        await order.save();
-      }
-      
-      return res.status(200).json({
-        success: true,
-        message: "Products cancelled successfully",
-        updatedOrder: order
-      });
-      
-    } catch (error) {
-      console.error("Error in bulk product cancellation:", error);
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred while cancelling products",
-        error: error.message
-      });
-    }
-  };
 
 
-const bulkProductReturn = async (req, res) => {
+  const bulkProductReturn = async (req, res) => {
     try {
         const { orderId } = req.params;
         const userId = req.user._id || req.user.id;
         const { productIds, returnReason, returnDetails } = req.body;
         
         const everyProductIds = productIds.split(",");
-        
         
         const order = await orderModel.findOne({ orderId, userId });
         
@@ -858,7 +848,6 @@ const bulkProductReturn = async (req, res) => {
             });
         }
         
-        
         if (order.orderStatus !== 'delivered') {
             return res.status(400).json({ 
                 success: false, 
@@ -866,13 +855,11 @@ const bulkProductReturn = async (req, res) => {
             });
         }
         
-        
         const returnedProducts = [];
         let totalRefundAmount = 0;
         
         
         for (const productId of everyProductIds) {
-            
             const productIndex = order.products.findIndex(
                 item => item.product.toString() === productId
             );
@@ -883,15 +870,58 @@ const bulkProductReturn = async (req, res) => {
             
             const orderProduct = order.products[productIndex];
             
-            
             if (orderProduct.productOrderStatus === 'returned' || 
                 orderProduct.productOrderStatus === 'cancelled') {
                 continue; 
             }
             
             
-            const unitPrice = orderProduct.productDetails.discoundedPrice || orderProduct.productDetails.salePrice;
-            const refundAmount = unitPrice * orderProduct.quantity;
+            const product = await productModel.findById(productId);
+            if (!product) {
+                continue; 
+            }
+            
+            
+            const productOffers = await mongoose.model('Offer').find({
+                offerType: 'product',
+                product: productId,
+                isActive: true,
+                endDate: { $gt: new Date() }
+            }).sort({ discountPercentage: -1 }); 
+            
+            
+            const categoryOffers = await mongoose.model('Offer').find({
+                offerType: 'category',
+                category: product.category_id,
+                isActive: true,
+                endDate: { $gt: new Date() }
+            }).sort({ discountPercentage: -1 }); 
+            
+            
+            let highestDiscountPercentage = 0;
+            
+            if (productOffers.length > 0) {
+                highestDiscountPercentage = productOffers[0].discountPercentage;
+            }
+            
+            if (categoryOffers.length > 0 && categoryOffers[0].discountPercentage > highestDiscountPercentage) {
+                highestDiscountPercentage = categoryOffers[0].discountPercentage;
+            }
+            
+            
+            const basePrice = product.salePrice || product.regularPrice;
+            let refundAmount;
+            
+            if (highestDiscountPercentage > 0) {
+                
+                const discountedPrice = basePrice - (basePrice * (highestDiscountPercentage / 100));
+                refundAmount = discountedPrice * orderProduct.quantity;
+            } else {
+                
+                const unitPrice = orderProduct.productDetails.discoundedPrice || orderProduct.productDetails.salePrice;
+                refundAmount = unitPrice * orderProduct.quantity;
+            }
+            
             totalRefundAmount += refundAmount;
             
             
@@ -902,20 +932,17 @@ const bulkProductReturn = async (req, res) => {
             };
             
             
-            const product = await productModel.findById(productId);
-            if (product) {
-                product.availableQuantity += orderProduct.quantity; 
-                await product.save();
-            }
+            product.availableQuantity += orderProduct.quantity; 
+            await product.save();
             
             returnedProducts.push({
                 productId,
                 quantity: orderProduct.quantity,
                 name: orderProduct.productDetails.name,
-                refundAmount
+                refundAmount,
+                appliedDiscountPercentage: highestDiscountPercentage > 0 ? highestDiscountPercentage : 0
             });
         }
-        
         
         if (returnedProducts.length === 0) {
             return res.status(400).json({
@@ -938,17 +965,15 @@ const bulkProductReturn = async (req, res) => {
             };
         }
         
-        
         await order.save();
 
+        
         await addTransaction(
-          userId,
-          'Credit',
-          totalRefundAmount,
-          'Order Refund'
-      );
-        
-        
+            userId,
+            'Credit',
+            totalRefundAmount,
+            'Order Refund'
+        );
         
         return res.status(200).json({
             success: true,
@@ -967,6 +992,7 @@ const bulkProductReturn = async (req, res) => {
         res.status(500).json({success: false, message: 'Internal Server Error'})
     }
 }
+
 
 module.exports = {
     

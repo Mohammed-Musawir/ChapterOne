@@ -1529,7 +1529,7 @@ function placeOrder(addressId, paymentMethod, subtotal, products) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: JSON.stringify({ 
         amount: currentTotal,
         orderDetails: orderDetails
       })
@@ -1561,7 +1561,7 @@ function placeOrder(addressId, paymentMethod, subtotal, products) {
         
         // Launch Razorpay checkout
         const options = {
-          key: 'rzp_test_aCX7D7quXrAK1v', // your test key
+          key: 'rzp_test_aCX7D7quXrAK1v', 
           amount: data.order.amount, // Amount from the server
           currency: data.order.currency,
           name: 'Your Bookstore',

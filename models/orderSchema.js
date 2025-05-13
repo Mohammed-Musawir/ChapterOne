@@ -21,11 +21,11 @@ const orderSchema = new mongoose.Schema({
   products: [{
     product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
     productDetails: {
-      name: { type: String, required: true },
+      name: { type: String, required: true }, 
       writer: { type: String, required: true },
       salePrice: { type: Number, required: true },
       productImages: { type: [String], required: true },
-      discoundedPrice: { type: Number }
+      discoundedPrice: { type: Number } 
     },
     quantity: { type: Number, required: true, min: 1 }, 
     productOrderStatus: { 
@@ -41,7 +41,7 @@ const orderSchema = new mongoose.Schema({
       reason: { type: String },
       cancelledAt: { type: Date }
     }
-  }], 
+  }],
   shippingAddress: {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     fullName: { type: String, required: true, trim: true },

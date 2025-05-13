@@ -105,7 +105,7 @@ const loadCheckOutPage = async (req, res) => {
         
         const appliedCoupon = req.session.appliedCoupon || [];
         
-        res.render("user/userCheckoutPage", {
+        res.render("User/userCheckoutPage", {
             addresses,
             subtotal: Subtotal,
             shippingCost,

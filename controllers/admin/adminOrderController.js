@@ -141,45 +141,20 @@ const loadOrderInfo = async (req, res) => {
       return res.status(404).send('Order not found');
     }
     
-    let adjustedSubtotal = 0;
-    let originalSubtotal = order.subtotal;
-    let a = 0
-    
-    order.products.forEach(product => {
-      const productPrice = product.productDetails.discoundedPrice? product.productDetails.discoundedPrice : product.price;
-      if (product.productOrderStatus !== 'cancelled' && product.productOrderStatus !== 'returned') {
-        adjustedSubtotal += productPrice * product.quantity;
-      }
-    });
-    
-    console.log(order.subtotal)
-    adjustedSubtotal = Math.round(adjustedSubtotal);
+
+     
+
     
     const customer = {
       name: order.shippingAddress.fullName, 
       email: order.userId.email
     };
     
-    const shipping = order.shippingCost;
-    const gst = order.gstAmount;
-    const updatedOrder =  await orderModel.findOneAndUpdate(
-      {
-        _id : orderId
-      },
-{
-      $set:{
-        subtotal:adjustedSubtotal,
-        totalAmount:adjustedSubtotal+gst+shipping
-      }}
-    )
 
-    await updatedOrder.save()
 
     res.render('Admin/adminOrderDetail', {
-      order : updatedOrder,
-      customer,
-      originalSubtotal,
-      adjustedSubtotal
+      order ,
+      customer
     });
     
   } catch (error) {

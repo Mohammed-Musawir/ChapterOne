@@ -1,7 +1,8 @@
 const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema');
-const Product = require('../../models/productSchema');
+const Offer = require('../../models/offerSchema');
 const Address = require('../../models/addressSchema');
+const Product = require('../../models/productSchema'); 
 const razorpayService = require('../../services/razorpayService');
 
 const razorpayController = {
@@ -44,7 +45,7 @@ const razorpayController = {
         amount,
         'INR',
         receiptId,
-        { orderDetails: JSON.stringify(orderDetails) }
+        { orderDetails } 
       );
       
       if (!result.success) {
@@ -61,7 +62,8 @@ const razorpayController = {
   verifyRazorpayPayment: async (req, res) => {
     try {
       const { paymentId, orderId, signature, orderDetails } = req.body;
-
+  
+     
       const userId = req.user._id || req.user.id;
       
       if (!paymentId || !orderId || !signature || !orderDetails) {
@@ -92,27 +94,85 @@ const razorpayController = {
       if (!cart || cart.books.length === 0) {
         return res.status(400).json({ success: false, message: 'Your cart is empty' });
       }
-      
-      const mappedProducts = cart.books.map(item => {
+  
+      const mappedProducts = await Promise.all(cart.books.map(async (item) => {
         const product = item.product;
+        
+        
+        const productOffer = await Offer.findOne({
+          offerType: 'product',
+          product: product._id,
+          isActive: true,
+          endDate: { $gt: new Date() }
+        }).sort({ discountPercentage: -1 }); 
+        
+        
+        const categoryOffer = await Offer.findOne({
+          offerType: 'category',
+          category: product.category,
+          isActive: true,
+          endDate: { $gt: new Date() }
+        }).sort({ discountPercentage: -1 }); 
+        
+
+        
+        
+        let discountPercentage = 0;
+        let appliedOffer = null;
+        
+        if (productOffer && categoryOffer) {
+          
+          if (productOffer.discountPercentage >= categoryOffer.discountPercentage) {
+            discountPercentage = productOffer.discountPercentage;
+            appliedOffer = productOffer;
+          } else {
+            discountPercentage = categoryOffer.discountPercentage;
+            appliedOffer = categoryOffer;
+          }
+        } else if (productOffer) {
+          discountPercentage = productOffer.discountPercentage;
+          appliedOffer = productOffer;
+        } else if (categoryOffer) {
+          discountPercentage = categoryOffer.discountPercentage;
+          appliedOffer = categoryOffer;
+        }
+        
+        
+        const salePrice = product.salePrice 
+        
+        
+        let discountedPrice = null;
+        if (discountPercentage > 0) {
+          const discountAmount = (salePrice * discountPercentage) / 100;
+          discountedPrice = Number((salePrice - discountAmount).toFixed(2));
+        }
+        
+        
+        
         const orderProduct = orderDetails.products.find(p => p.productId.toString() === product._id.toString());
+        
+
+                       
         return {
           product: product._id,
           productDetails: {
             name: product.name,
             writer: product.writer || 'Unknown',
-            salePrice: product.salePrice > 0 ? product.salePrice : product.regularPrice,
+            salePrice: salePrice,
             productImages: product.productImages || [],
-            discoundedPrice: orderProduct?.discoundedPrice || null
+            discountedPrice: orderProduct.discountedPrice || null,
+            appliedOffer: appliedOffer ? {
+              offerId: appliedOffer._id,
+              offerType: appliedOffer.offerType,
+              discountPercentage: appliedOffer.discountPercentage
+            } : null
           },
           quantity: item.quantity,
-          price: (product.salePrice > 0 ? product.salePrice : product.regularPrice) * item.quantity,
           productOrderStatus: 'pending'
         };
-      }); 
+      }));
       
       
-
       const newOrder = new Order({
         userId: userId,
         products: mappedProducts,
@@ -140,6 +200,7 @@ const razorpayController = {
         razorpaySignature: signature
       });
       
+      
       if (orderDetails.coupon && orderDetails.coupon.couponCode) {
         newOrder.coupon = {
           couponCode: orderDetails.coupon.couponCode,
@@ -147,7 +208,9 @@ const razorpayController = {
         };
       }
       
+      
       const savedOrder = await newOrder.save();
+      
       
       for (const item of cart.books) {
         await Product.findByIdAndUpdate(
@@ -156,6 +219,7 @@ const razorpayController = {
         );
       }
       
+     
       await Cart.findOneAndUpdate(
         { userId },
         { $set: { books: [] } }
