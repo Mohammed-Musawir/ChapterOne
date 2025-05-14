@@ -62,7 +62,7 @@ router.post('/product-update/:id',multer.array('productImages', 5), productContr
 router.post('/delete-image', productController.deleteImage);
 router.post('/reupload-images', multer.array('reuploadImages', 5), productController.reuploadImages);
 
-// router.post('/product-update/:id',multer.array('productImages',10),productController.editingProduct)
+
 
 
 

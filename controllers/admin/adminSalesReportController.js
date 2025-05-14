@@ -119,10 +119,18 @@ const getSalesReport = async (req, res) => {
                 }
                 
                 
-                const itemTotal = item.price * item.quantity;
+                // The price might be in productDetails (as salePrice) or directly in item
+                const itemPrice = (item.price !== undefined) ? item.price : 
+                                 (item.productDetails && item.productDetails.salePrice !== undefined) ? 
+                                  item.productDetails.salePrice : 0;
+                
+                const itemQuantity = item.quantity || 1;
+                const itemTotal = itemPrice * itemQuantity;
+                
                 const orderSubtotal = order.subtotal || 0;
-                const orderDiscount = order.coupon ? order.coupon.discount || 0 : 0;
-                const itemDiscountShare = orderDiscount > 0 && orderSubtotal > 0 ? 
+                const orderDiscount = order.coupon ? (order.coupon.discount || 0) : 0;
+                
+                const itemDiscountShare = (orderDiscount > 0 && orderSubtotal > 0) ? 
                     (itemTotal / orderSubtotal) * orderDiscount : 0;
                 
                 
@@ -130,17 +138,17 @@ const getSalesReport = async (req, res) => {
                     date: order.orderedDate,
                     orderId: order.orderId,
                     category: categoryName,
-                    product: item.productDetails ? item.productDetails.name : product.name || 'Unknown Product',
-                    quantity: item.quantity,
-                    price: parseFloat(item.price.toFixed(2)),
-                    discount: parseFloat(itemDiscountShare.toFixed(2)),
+                    product: item.productDetails ? item.productDetails.name : (product.name || 'Unknown Product'),
+                    quantity: itemQuantity,
+                    price: parseFloat((itemPrice || 0).toFixed(2)),
+                    discount: parseFloat((itemDiscountShare || 0).toFixed(2)),
                     coupon: order.coupon ? order.coupon.couponCode : null,
-                    total: parseFloat((itemTotal - itemDiscountShare).toFixed(2))
+                    total: parseFloat(((itemTotal || 0) - (itemDiscountShare || 0)).toFixed(2))
                 });
                 
                 
-                statsData.totalSales += itemTotal;
-                statsData.totalDiscounts += itemDiscountShare;
+                statsData.totalSales += (itemTotal || 0);
+                statsData.totalDiscounts += (itemDiscountShare || 0);
             }
             
             

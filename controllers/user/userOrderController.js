@@ -139,7 +139,7 @@ const userPlacerOrder = async (req, res) => {
     if (coupon && coupon.couponCode) {
       try {
         const couponDoc = await couponModel.findOne({ couponCode: coupon.couponCode });
-        
+        console.log(couponDoc)
         if (couponDoc) {
           if (!couponDoc.usedBy.includes(userId)) {
             couponDoc.usedBy.push(userId);

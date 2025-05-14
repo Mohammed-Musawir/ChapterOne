@@ -7,120 +7,126 @@ const offerModel = require('../../models/offerSchema');
 const walletModel = require('../../models/walletSchema');  
 const mongoose = require('mongoose');
 const addTransaction = require('../../services/transactionService');
+ 
 
 
 const loadCheckOutPage = async (req, res) => {
-    try { 
-        const userId = req.user._id || req.user.id;
-        const addresses = await addressModel.find({userId});
-        
-        const cart = await cartModel.findOne({userId}).populate('books.product');
-        
-        let totalItems = 0;
-        if (cart && cart.books.length > 0) {
-            totalItems = cart.books.reduce((acc, item) => acc + item.quantity, 0);
-        }
-            
-        const currentDate = new Date();
-        const activeOffers = await offerModel.find({
-            isActive: true,
-            endDate: { $gt: currentDate }
-        });
-            
-        const productsWithDiscounts = [];
-        let originalSubtotal = 0;
-        let subtotal = 0;
-        let totalOfferDiscount = 0;
-        
-        if (cart && cart.books.length > 0) {
-            for (const item of cart.books) {
-                const product = item.product;
-                
-                
-                const originalPrice = product.salePrice;
-                const originalItemTotal = Math.round(originalPrice * item.quantity);
-                originalSubtotal += originalItemTotal;
-                                
-                const productOffers = activeOffers.filter(offer => 
-                    offer.offerType === 'product' &&
-                    offer.product &&
-                    offer.product.toString() === product._id.toString()
-                );
-                                
-                const categoryOffers = activeOffers.filter(offer => 
-                    offer.offerType === 'category' &&
-                    offer.category &&
-                    offer.category.toString() === product.category_id.toString()
-                );
-                                
-                const allApplicableOffers = [...productOffers, ...categoryOffers];
-                
-                let bestOffer = null;
-                let highestDiscount = 0;
-                
-                allApplicableOffers.forEach(offer => {
-                    const discountAmount = (product.salePrice * offer.discountPercentage) / 100;
-                    if (discountAmount > highestDiscount) {
-                        highestDiscount = discountAmount;
-                        bestOffer = offer;
-                    }
-                });
-                                
-                
-                const discountedPrice = bestOffer ?
-                    originalPrice - (originalPrice * bestOffer.discountPercentage / 100) :
-                    originalPrice;
-                            
-                
-                const totalForItem = Math.round(discountedPrice * item.quantity);
-                subtotal += totalForItem;
-                
-                
-                if (bestOffer) {
-                    const itemDiscountAmount = Math.round((originalPrice - discountedPrice) * item.quantity);
-                    totalOfferDiscount += itemDiscountAmount;
-                }
-                                
-                productsWithDiscounts.push({
-                    product: product,
-                    quantity: item.quantity,
-                    originalPrice: Math.round(originalPrice),
-                    discountedPrice: Math.round(discountedPrice),
-                    appliedOffer: bestOffer,
-                    totalPrice: totalForItem  
-                });
-            }
-        }
-        
-        const shippingCost = subtotal > 1000 ? 0 : 60;
-        const gstAmount = Math.round((subtotal) * 0.18);
-        const totalPrice = subtotal + gstAmount + shippingCost;
-        
-        
-        const TotalPrice = totalPrice;
-        const Subtotal = subtotal;
-        const TotalOfferDiscount = totalOfferDiscount;
-        
-        const activeCoupons = await couponmodel.find({isBlocked: false});
-        
-        const appliedCoupon = req.session.appliedCoupon || [];
-        
-        res.render("User/userCheckoutPage", {
-            addresses,
-            subtotal: Subtotal,
-            shippingCost,
-            gstAmount,
-            totalPrice: TotalPrice,
-            totalOfferDiscount: TotalOfferDiscount,
-            activeCoupons,
-            appliedCoupon,
-            cart,
-            productsWithDiscounts
-        });
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Something went wrong");
-    }
+  try { 
+      const userId = req.user._id || req.user.id;
+      const addresses = await addressModel.find({userId});
+      
+      const cart = await cartModel.findOne({userId}).populate('books.product');
+      
+      let totalItems = 0;
+      if (cart && cart.books.length > 0) {
+          totalItems = cart.books.reduce((acc, item) => acc + item.quantity, 0);
+      }
+          
+      const currentDate = new Date();
+      const activeOffers = await offerModel.find({
+          isActive: true,
+          endDate: { $gt: currentDate }
+      });
+          
+      const productsWithDiscounts = [];
+      let originalSubtotal = 0;
+      let subtotal = 0;
+      let totalOfferDiscount = 0;
+      
+      if (cart && cart.books.length > 0) {
+          for (const item of cart.books) {
+              const product = item.product;
+              
+              
+              const originalPrice = product.salePrice;
+              const originalItemTotal = Math.round(originalPrice * item.quantity);
+              originalSubtotal += originalItemTotal;
+                              
+              const productOffers = activeOffers.filter(offer => 
+                  offer.offerType === 'product' &&
+                  offer.product &&
+                  offer.product.toString() === product._id.toString()
+              );
+                              
+              const categoryOffers = activeOffers.filter(offer => 
+                  offer.offerType === 'category' &&
+                  offer.category &&
+                  offer.category.toString() === product.category_id.toString()
+              );
+                              
+              const allApplicableOffers = [...productOffers, ...categoryOffers];
+              
+              let bestOffer = null;
+              let highestDiscount = 0;
+              
+              allApplicableOffers.forEach(offer => {
+                  const discountAmount = (product.salePrice * offer.discountPercentage) / 100;
+                  if (discountAmount > highestDiscount) {
+                      highestDiscount = discountAmount;
+                      bestOffer = offer;
+                  }
+              });
+                              
+              
+              const discountedPrice = bestOffer ?
+                  originalPrice - (originalPrice * bestOffer.discountPercentage / 100) :
+                  originalPrice;
+                          
+              
+              const totalForItem = Math.round(discountedPrice * item.quantity);
+              subtotal += totalForItem;
+              
+              
+              if (bestOffer) {
+                  const itemDiscountAmount = Math.round((originalPrice - discountedPrice) * item.quantity);
+                  totalOfferDiscount += itemDiscountAmount;
+              }
+                              
+              productsWithDiscounts.push({
+                  product: product,
+                  quantity: item.quantity,
+                  originalPrice: Math.round(originalPrice),
+                  discountedPrice: Math.round(discountedPrice),
+                  appliedOffer: bestOffer,
+                  totalPrice: totalForItem  
+              });
+          }
+      }
+      
+      const shippingCost = subtotal > 1000 ? 0 : 60;
+      const gstAmount = Math.round((subtotal) * 0.18);
+      const totalPrice = subtotal + gstAmount + shippingCost;
+      
+      
+      const TotalPrice = totalPrice;
+      const Subtotal = subtotal;
+      const TotalOfferDiscount = totalOfferDiscount;
+      
+      
+      const activeCoupons = await couponmodel.find({
+          isBlocked: false,
+          expireDate: { $gt: currentDate },
+          usedBy: { $nin: [userId] }
+      });
+      
+      const appliedCoupon = req.session.appliedCoupon || [];
+      
+      res.render("User/userCheckoutPage", {
+          addresses,
+          subtotal: Subtotal,
+          shippingCost,
+          gstAmount,
+          totalPrice: TotalPrice,
+          totalOfferDiscount: TotalOfferDiscount,
+          activeCoupons,
+          appliedCoupon,
+          cart,
+          productsWithDiscounts
+      });
+  } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Something went wrong");
+  }
 };
 
 
