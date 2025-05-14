@@ -56,7 +56,13 @@ router.patch('/product-update-status/:id',productController.updateProductStatus)
 router.delete('/products-delete/:id',productController.deleteProduct);
 
 router.get('/product-edit/:id',productController.loadEditProduct);
-router.post('/product-update/:id',multer.array('productImages',10),productController.editingProduct)
+router.get('/product-images-count/:id', productController.getProductImagesCount);
+
+router.post('/product-update/:id',multer.array('productImages', 5), productController.updateProduct);
+router.post('/delete-image', productController.deleteImage);
+router.post('/reupload-images', multer.array('reuploadImages', 5), productController.reuploadImages);
+
+// router.post('/product-update/:id',multer.array('productImages',10),productController.editingProduct)
 
 
 
@@ -96,4 +102,4 @@ router.get('/getSalesReport',salesreportController.getSalesReport);
 
 router.get("/serverError",errorController.adminload500);
 router.get("/page-not-found",errorController.adminload404);
-module.exports = router;
+module.exports = router; 

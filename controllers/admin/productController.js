@@ -288,8 +288,6 @@ const loadEditProduct = async (req,res) => {
         const {id} = req.params;
         const product = await productModel.findById(id).populate('category_id')
         const categories = await categoryModel.find({isListed:true})
-        
-        console.log('Product Images:', product.productImages);
 
         res.render('Admin/productEditingPage',{product,categories})
     } catch (error) {
@@ -299,82 +297,205 @@ const loadEditProduct = async (req,res) => {
     }
 }
 
-const editingProduct = async (req,res) => {
-    try {
-        const { id } = req.params;
-        const { name,
-            writer,
-            category_id,
-            language,
-            regularPrice,
-            salePrice,
-            availableQuantity,
-            description
-        } = req.body;
+const getProductImagesCount = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const product = await productModel.findById(id);
+      
+      if (!product) {
+          return res.status(404).json({ success: false, message: 'Product not found' });
+      }
+      
+      const count = product.productImages.length;
+      return res.json({ success: true, count });
+  } catch (error) {
+      console.log(`Error in getProductImagesCount: ${error}`);
+      return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
 
-        const product = await productModel.findById(id);
 
-        if(!product){
-            console.log(`Product not found with ID: ${id}`);
-        return res.render('500');
-        }
+const updateProduct = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const {
+          name,
+          writer,
+          category_id,
+          language,
+          regularPrice,
+          salePrice,
+          availableQuantity,
+          description,
+          imagesToRemove
+      } = req.body;
 
-        const existingProduct = await productModel.findOne({ 
-          name: { $regex: new RegExp(`^${name}$`, 'i') } , 
-          _id: { $ne: id } 
-      });
+      // Get current product
+      const product = await productModel.findById(id);
+      if (!product) {
+          return res.status(404).json({ success: false, message: 'Product not found' });
+      }
 
-      if (existingProduct) {
-          console.log(`Product with name "${name}" already exists`);
-          return res.status(400).json({ 
-              success: false, 
-              message: 'Product with this name already exists' 
+      // Handle removing images if specified
+      let updatedImages = [...product.productImages];
+      if (imagesToRemove && Array.isArray(imagesToRemove)) {
+          // Filter out images that need to be removed
+          updatedImages = updatedImages.filter(img => !imagesToRemove.includes(img));
+          
+          // Delete file from filesystem
+          imagesToRemove.forEach(imageToRemove => {
+              try {
+                  const imagePath = path.join(__dirname, '../public', imageToRemove);
+                  if (fs.existsSync(imagePath)) {
+                      fs.unlinkSync(imagePath);
+                  }
+              } catch (err) {
+                  console.log(`Error deleting file: ${err}`);
+              }
           });
       }
 
-        let imagePaths = product.productImages;
+      // Handle new image uploads
+      if (req.files && req.files.length > 0) {
+          const newImagePaths = req.files.map(file => `/uploadedImages/${file.filename}`);
+          updatedImages = [...updatedImages, ...newImagePaths];
+      }
 
-        if(req.files && req.files.length > 0){
-            product.productImages.forEach(imagePath => {
-                const fullPath = path.join(__dirname,'../../public',imagePath);
-                if(fs.existsSync(fullPath)){
-                    fs.unlinkSync(fullPath);
-                    console.log(`Deleted image: ${fullPath}`);
-                }
-            })
-            imagePaths = req.files.map(file => `/uploadedImages/${file.filename}`);
-        }
+      // Ensure at least 3 images
+      if (updatedImages.length < 3) {
+          return res.status(400).json({ 
+              success: false, 
+              message: 'Product must have at least 3 images' 
+          });
+      }
+
+      // Update product with new data
+      const updatedProduct = await productModel.findByIdAndUpdate(
+          id,
+          {
+              name,
+              writer,
+              category_id,
+              language,
+              regularPrice,
+              salePrice,
+              availableQuantity,
+              description,
+              productImages: updatedImages,
+              updatedAt: Date.now()
+          },
+          { new: true }
+      );
+
+      return res.status(200).json({ success: true, product: updatedProduct });
+  } catch (error) {
+      console.log(`Error in updateProduct: ${error}`);
+      return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
 
 
-        const updatedProduct = await productModel.findByIdAndUpdate(
-            id,
-            {
-                name,
-                writer,
-                category_id,
-                language,
-                regularPrice,
-                salePrice,
-                availableQuantity,
-                description,
-                productImages:imagePaths,
-                updatedAt:Date.now()
-            },
-            { new : true}
-        );
+const deleteImage = async (req, res) => {
+  try {
+      const { productId, imagePath } = req.body;
 
-        if(!updatedProduct){
-            console.log(`the Product is not updated`);
-            return res.status(500).json({ success: false, message: 'Failed to update product' });
-        }
+      if (!productId || !imagePath) {
+          return res.status(400).json({ success: false, message: 'Product ID and image path are required' });
+      }
 
-        console.log(`Product updated successfully: ${updatedProduct.name}`);
-         res.status(200).json({ success: true, message: 'Product updated successfully' });
-    } catch (error) {
-        console.log(`Error show in editingProduct in productController and the Error is ${error}`);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-}
+      // Find the product
+      const product = await productModel.findById(productId);
+      if (!product) {
+          return res.status(404).json({ success: false, message: 'Product not found' });
+      }
+
+      // Remove the image from the product's productImages array
+      // This doesn't save to DB yet - just registers the deletion intent
+      const updatedImages = product.productImages.filter(img => img !== imagePath);
+      
+      // Return success response
+      return res.json({ 
+          success: true, 
+          message: 'Image deletion registered', 
+          remainingCount: updatedImages.length 
+      });
+  } catch (error) {
+      console.log(`Error in deleteImage: ${error}`);
+      return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+const reuploadImages = async (req, res) => {
+  try {
+      const { productId, replacePaths } = req.body;
+      
+      if (!productId || !req.files || !req.files.length) {
+          return res.status(400).json({ 
+              success: false, 
+              message: 'Product ID and image files are required' 
+          });
+      }
+
+      // Find the product
+      const product = await productModel.findById(productId);
+      if (!product) {
+          return res.status(404).json({ success: false, message: 'Product not found' });
+      }
+
+      // Get new image paths
+      const newImagePaths = req.files.map(file => `/uploadedImages/${file.filename}`);
+      
+      // If replacePaths is provided, replace those images
+      let updatedImages = [...product.productImages];
+      if (replacePaths && Array.isArray(replacePaths)) {
+          // For each path to replace
+          replacePaths.forEach((oldPath, index) => {
+              if (index < newImagePaths.length) {
+                  // If old path exists in product images, replace it
+                  const replaceIndex = updatedImages.findIndex(img => img === oldPath);
+                  if (replaceIndex !== -1) {
+                      updatedImages[replaceIndex] = newImagePaths[index];
+                      
+                      // Delete old file from filesystem
+                      try {
+                          const imagePath = path.join(__dirname, '../public', oldPath);
+                          if (fs.existsSync(imagePath)) {
+                              fs.unlinkSync(imagePath);
+                          }
+                      } catch (err) {
+                          console.log(`Error deleting file: ${err}`);
+                      }
+                  } else {
+                      // If path doesn't exist, just add the new image
+                      updatedImages.push(newImagePaths[index]);
+                  }
+              }
+          });
+      } else {
+          // If no replacePaths, just add all new images
+          updatedImages = [...updatedImages, ...newImagePaths];
+      }
+
+      // Update product with new images
+      const updatedProduct = await productModel.findByIdAndUpdate(
+          productId,
+          {
+              productImages: updatedImages,
+              updatedAt: Date.now()
+          },
+          { new: true }
+      );
+
+      return res.status(200).json({ 
+          success: true, 
+          message: 'Images uploaded successfully', 
+          product: updatedProduct 
+      });
+  } catch (error) {
+      console.log(`Error in reuploadImages: ${error}`);
+      return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
 
 module.exports = {
     loadProductLists,
@@ -383,5 +504,8 @@ module.exports = {
     loadAddProducts,
     addProduct,
     loadEditProduct,
-    editingProduct
+    getProductImagesCount,
+    updateProduct,
+    deleteImage,
+    reuploadImages
 }
