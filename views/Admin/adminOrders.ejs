@@ -289,18 +289,18 @@
             </div>
             <div class="flex">
                 <% if (currentPage > 1) { %>
-                    <a href="/admin/orders?page=<%= currentPage - 1 %>&status=<%= currentStatus %>" class="pagination-btn">&laquo; Previous</a>
+                    <a href="/admin/order?page=<%= currentPage - 1 %>&status=<%= currentStatus %>" class="pagination-btn">&laquo; Previous</a>
                 <% } else { %>
                     <button class="pagination-btn" disabled>&laquo; Previous</button>
                 <% } %>
                 
                 <% for (let i = 1; i <= totalPages; i++) { %>
-                    <a href="/admin/orders?page=<%= i %>&status=<%= currentStatus %>" 
+                    <a href="/admin/order?page=<%= i %>&status=<%= currentStatus %>" 
                         class="pagination-btn <%= i === currentPage ? 'active' : '' %>"><%= i %></a>
                 <% } %>
                 
                 <% if (currentPage < totalPages) { %>
-                    <a href="/admin/orders?page=<%= currentPage + 1 %>&status=<%= currentStatus %>" class="pagination-btn">Next &raquo;</a>
+                    <a href="/admin/order?page=<%= currentPage + 1 %>&status=<%= currentStatus %>" class="pagination-btn">Next &raquo;</a>
                 <% } else { %>
                     <button class="pagination-btn" disabled>Next &raquo;</button>
                 <% } %>
