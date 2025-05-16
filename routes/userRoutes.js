@@ -122,7 +122,7 @@ router.route('/contact')
 
   router.get('/api/user/status',userLoginController.checkingStatus);
 
-  router.use(isBlocked)
+  // router.use(isBlocked)
 
 
 router.get('/home',userLoginController.loadHome);
