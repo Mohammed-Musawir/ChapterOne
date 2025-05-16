@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.all.min.js"></script>
     <style>
+         .swal2-popup {
+            border-radius: 10px;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -133,8 +137,7 @@
             <h1>Admin Panel</h1>
         </div>
         
-        <form action="/admin/login" method="post">
-
+        <form id="loginForm">
             <div class="input-group">
                 <label for="email">Email Address</label>
                 <input type="email" name="email" id="email" placeholder="Enter your email" required>
@@ -148,5 +151,70 @@
             <button type="submit" class="login-btn">Login</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Call login API
+            fetch('/admin/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+                redirect: 'manual'
+            })
+            .then(response => {
+                // Check if there's a server response first
+                if (response.status === 200) {
+                    // Status 200 - Check if it's an actual success or error
+                    return response.json().then(data => {
+                        if (data.error) {
+                            // If there's an error property in a 200 response, it's still an error
+                            throw new Error(data.error);
+                        } else {
+                            // True success - redirect to dashboard
+                            window.location.href = '/admin/dashboard';
+                            return { redirected: true };
+                        }
+                    });
+                } else if (response.redirected || response.type === 'opaqueredirect' || 
+                    [301, 302, 303, 307, 308].includes(response.status)) {
+                    // Handle redirects
+                    window.location.href = response.url || '/admin/dashboard';
+                    return { redirected: true };
+                } else {
+                    // Handle error responses from the server
+                    return response.json()
+                        .then(errorData => {
+                            throw new Error(errorData.error || 'Login failed');
+                        })
+                        .catch(err => {
+                            if (err instanceof SyntaxError) {
+                                // If JSON parsing fails, it's likely an HTML error page
+                                throw new Error('Invalid email or password.');
+                            }
+                            throw err;
+                        });
+                }
+            })
+            .catch(error => {
+                // Display error with SweetAlert (light brown theme)
+                Swal.fire({
+                    title: 'Login Failed',
+                    text: error.message || 'An error occurred during login. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B6B43',
+                    background: '#fdf6e3',
+                    iconColor: '#8B6B43'
+                });
+            });
+        });
+    </script>
 </body>
 </html>
