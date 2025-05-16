@@ -1,3 +1,4 @@
+const userModel = require('../../models/userSchema')
 const productModal = require('../../models/productSchema');
 const categoryModal = require('../../models/categorySchema');
 const offerModal = require('../../models/offerSchema');
@@ -6,6 +7,13 @@ const loadProductPage = async (req, res) => {
     try {
         const { id } = req.params;
         
+           let user = null;
+        
+            
+            if (req.user?._id || req.user?.id) {
+              const userId = req.user._id || req.user.id;
+              user = await userModel.findById(userId);
+            }
         
         const product = await productModal.findById(id).populate('category_id');
         
@@ -140,6 +148,7 @@ const loadProductPage = async (req, res) => {
         
         
         res.render('User/userProductPage', {
+            user,
             product,
             relatedProducts: relatedProductsWithOffers
         });
