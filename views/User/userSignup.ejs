@@ -257,30 +257,30 @@ textarea:focus::placeholder {
         <form id="signupForm" action="/signup" method="post">
             <div class="mb-3">
                 <label for="firstName" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Type here" required>
+                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Type here" >
             </div>
             <div class="mb-3">
                 <label for="lastName" class="form-label" >Last Name</label>
-                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Type here" required>
+                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Type here" >
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email Address</label>
-                <input type="email" name="email" class="form-control" id="email" placeholder="Type here" required>
+                <input type="email" name="email" class="form-control" id="email" placeholder="Type here" >
             </div>
             <div class="mb-3">
                 <label for="mobile" class="form-label">Mobile Number</label>
-                <input type="tel" name="mobileNumber" class="form-control" id="mobile" placeholder="Type Mobileno:" required>
+                <input type="tel" name="mobileNumber" class="form-control" id="mobile" placeholder="Type Mobileno:" >
             </div>
             <label for="password" class="form-label">Password</label>
             <div class="mb-3 password-container">
-                <input type="password" name="password" class="form-control" id="password" placeholder="Type Password" required>
+                <input type="password" name="password" class="form-control" id="password" placeholder="Type Password" >
                 <span class="password-toggle" onclick="togglePassword('password')">
                     <i class="fas fa-eye"></i>
                 </span>
             </div>
             <label for="confirmPassword" class="form-label">Confirm Password</label>
             <div class="mb-3 password-container ">
-                <input type="password" name="confirmPassword" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
+                <input type="password" name="confirmPassword" class="form-control" id="confirmPassword" placeholder="Confirm Password" >
                 <span class="password-toggle" onclick="togglePassword('confirmPassword')">
                     <i class="fas fa-eye"></i>
                 </span>
@@ -302,68 +302,6 @@ textarea:focus::placeholder {
             </div>
         </form>
     </div>
-
-    <!-- Add SweetAlert2 JS -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.js"></script>
-    <script>
-
-  
-
-        // Password toggle functionality
-        document.querySelectorAll('.password-container input').forEach(input => {
-            const toggle = input.nextElementSibling; // Get the eye button
-
-            input.addEventListener('input', () => {
-                if (input.value.trim() !== '') {
-                    toggle.style.display = 'block'; // Show Eye
-                } else {
-                    toggle.style.display = 'none'; // Hide Eye
-                }
-            });
-            
-            // Initially hide the toggle buttons
-            toggle.style.display = 'none';
-        });
-
-        function togglePassword(inputId) {
-            const passwordInput = document.getElementById(inputId);
-            const icon = event.currentTarget.querySelector('i');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-
-        // Check for error messages on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check for message from controller (based on your controller code)
-            const controllerMessage = "<%= typeof massege !== 'undefined' ? massege : '' %>";
-            
-            if (controllerMessage && controllerMessage !== '') {
-                Swal.fire({
-                    title: 'Alert!',
-                    text: controllerMessage,
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        popup: 'swal2-popup',
-                        title: 'swal2-title',
-                        confirmButton: 'swal2-styled swal2-confirm'
-                    }
-                });
-            }
-        });
-    </script> -->
-
-
-    <!-- Replace the script section at the bottom of your HTML file with this: -->
 
 <script>
     // Password toggle functionality

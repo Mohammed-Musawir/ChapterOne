@@ -483,14 +483,7 @@
                             </a>
                         <% } %>
                     </li>
-                    <!-- <li>
-                        <% if (!user.googleId) { %>
-                            <a href="/account/change-email" class="nav-link1">
-                                <i class="fas fa-envelope"></i>
-                                <span>Change Email</span>
-                            </a>
-                            <% } %>
-                    </li> -->
+
                     <li>
                         <a href="/account/orders" class="nav-link1">
                             <i class="fas fa-shopping-bag"></i>
@@ -552,11 +545,11 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="firstname" class="form-label">First Name*</label>
-                                <input type="text" class="form-control" id="firstname" name="firstname" value="<%= user.firstname %>" required>
+                                <input type="text" class="form-control" id="firstname" name="firstname" value="<%= user.firstname %>" >
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="lastname" class="form-label">Last Name*</label>
-                                <input type="text" class="form-control" id="lastname" name="lastname" value="<%= user.lastname %>" required>
+                                <input type="text" class="form-control" id="lastname" name="lastname" value="<%= user.lastname %>" >
                             </div>
                         </div>
                         

@@ -315,12 +315,6 @@
                             </a>
                         <% } %>
                     </li>
-                    <!-- <li>
-                        <a href="/account/change-email" class="nav-link1">
-                            <i class="fas fa-envelope"></i>
-                            <span>Change Email</span>
-                        </a>
-                    </li> -->
                     <li>
                         <a href="/account/orders" class="nav-link1">
                             <i class="fas fa-shopping-bag"></i>
@@ -368,11 +362,11 @@
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <label for="fullName" class="form-label">Full Name</label>
-                                <input type="text" id="fullName" name="fullName" class="form-control" value="<%= address.fullName %>" required>
+                                <input type="text" id="fullName" name="fullName" class="form-control" value="<%= address.fullName %>" >
                             </div>
                             <div class="col-md-6">
                                 <label for="addressType" class="form-label">Address Type</label>
-                                <select id="addressType" name="addressType" class="form-select" required>
+                                <select id="addressType" name="addressType" class="form-select" >
                                     <option value="Home" <%= address.addressType === 'Home' ? 'selected' : '' %>>Home</option>
                                     <option value="Work" <%= address.addressType === 'Work' ? 'selected' : '' %>>Work</option>
                                     <option value="Other" <%= address.addressType === 'Other' ? 'selected' : '' %>>Other</option>
@@ -383,29 +377,29 @@
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <label for="houseNumber" class="form-label">House/Flat Number</label>
-                                <input type="text" id="houseNumber" name="houseNumber" class="form-control" value="<%= address.houseNumber %>" required>
+                                <input type="text" id="houseNumber" name="houseNumber" class="form-control" value="<%= address.houseNumber %>" >
                             </div>
                             <div class="col-md-6">
                                 <label for="street" class="form-label">Street/Area</label>
-                                <input type="text" id="street" name="street" class="form-control" value="<%= address.street %>" required>
+                                <input type="text" id="street" name="street" class="form-control" value="<%= address.street %>" >
                             </div>
                         </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label for="landmark" class="form-label">Landmark</label>
-                                <textarea id="landmark" name="landmark" class="form-control" rows="2" required><%= address.landmark %></textarea>
+                                <textarea id="landmark" name="landmark" class="form-control" rows="2" ><%= address.landmark %></textarea>
                             </div>
                         </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <label for="city" class="form-label">City</label>
-                                <input type="text" id="city" name="city" class="form-control" value="<%= address.city %>" required>
+                                <input type="text" id="city" name="city" class="form-control" value="<%= address.city %>" >
                             </div>
                             <div class="col-md-6">
                                 <label for="state" class="form-label">State</label>
-                                <input type="text" id="state" name="state" class="form-control" value="<%= address.state %>" required>
+                                <input type="text" id="state" name="state" class="form-control" value="<%= address.state %>" >
                             </div>
                         </div>
                         
