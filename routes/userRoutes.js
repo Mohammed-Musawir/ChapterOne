@@ -5,6 +5,7 @@ const isBlockUser = require('../middleware/isBlock');
 const passport = require('passport');
 const multer = require('../config/multer');
 const invoiceDownloadPDF = require('../controllers/others/orderInvoicepdf');
+const isBlocked = require('../middleware/isBlock');
 
 
 const userLoginController = require('../controllers/user/userLog');
@@ -57,12 +58,9 @@ router.get("/page-not-found",errorController.userload404);
 
 
 
-router.get('/about',userLoginController.Loadabout);
 
 
-router.route('/contact') 
-  .get(userLoginController.loadContact) 
-  .post()
+
 
 
 
@@ -109,20 +107,25 @@ router.route("/reset-password")
 
 router.get('/logout',authMiddleware.isAuthenticated,userLoginController.LogOut);
 
+
 router.use(authMiddleware.isAuthenticated);
 
 
-router.get('/api/user/status',userLoginController.checkingStatus);
 
+router.get('/about',userLoginController.Loadabout);
+
+router.route('/contact') 
+  .get(userLoginController.loadContact) 
+  .post()
+
+  router.get('/shop',userShopController.loadShop); 
+
+  router.get('/api/user/status',userLoginController.checkingStatus);
+
+  router.use(isBlocked)
 
 
 router.get('/home',userLoginController.loadHome);
-
-
-
-
-
-router.get('/shop',userShopController.loadShop); 
 
 
 
@@ -197,6 +200,7 @@ router.post('/cart/check-stock',cartController.checkStock);
 
 
 router.get('/checkout',checkoutPageMiddleware,checkOutController.loadCheckOutPage);
+
 router.post('/api/apply-coupon',checkOutController.applyCoupen);
 router.post('/api/remove-coupon',checkOutController.removeCoupon);
 

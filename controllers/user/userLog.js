@@ -52,11 +52,15 @@ const loadLandingPage = async (req,res) => {
 const loadHome = async (req, res) => {
     try {
       if (!req.user) {
+       
         res.clearCookie('userToken');
         return res.redirect('/login');
       }
-      
-      const userID = req.user._id;
+     
+      const userID = req.user._id || req.user.id;
+
+      const user = await userModel.findById(userID);
+
       const wishlist = await wishlistModal.findOne({userId: userID});
       
       
@@ -106,7 +110,7 @@ const loadHome = async (req, res) => {
       
       books.sort((a, b) => b.discount - a.discount);
       
-      res.render('User/userHomePage', {books, categories, wishlist});
+      res.render('User/userHomePage', {books, categories, wishlist, user});
     } catch (error) {
       res.redirect('/page-not-found');
       console.log(`Error in Controller in user in loadHome the Error is ${error}`);
@@ -128,37 +132,66 @@ const loadLogin = async (req,res) => {
     }
 }
 
+
 const login = async (req, res) => {
     try {
-        const {email, password} = req.body;
-        const user = await userModel.findOne({email});
+        const { email, password } = req.body;
+        const user = await userModel.findOne({ email });
         
-        if(!user){
-            console.log(`in userLog in login dont have user`);
-            return res.redirect('/login?error=emailNotFound');
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                error: 'emailNotFound',
+                message: 'Email not found in our system'
+            });
         }
-
+        
+        if (user.isBlocked) {
+            return res.status(403).json({
+                success: false,
+                error: 'UserIsBanned',
+                message: 'Your account has been suspended'
+            });
+        }
+        
         const isMatch = await bycript.compare(password, user.password);
-
-        if(!isMatch){
+        
+        if (!isMatch) {
             console.log(`in userLog in login password is not match`);
-            return res.redirect('/login?error=passwordIncorrect');
-        } 
-
+            return res.status(401).json({
+                success: false,
+                error: 'passwordIncorrect',
+                message: 'Incorrect password'
+            });
+        }
+        
         const token = await JWT_Config.generateToken(user.toObject());
-
+        
         res.cookie('userToken', token, {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000 
+            maxAge: 24 * 60 * 60 * 1000
         });
         
-        res.status(200).json({success:true})
+        res.status(200).json({
+            success: true,
+            message: 'Login successful'
+        });
         
     } catch (error) {
         console.log(`Error in Controller in user in userLog the Error is ${error}`);
-        res.render("500");
+        res.status(500).json({
+            success: false,
+            error: 'serverError',
+            message: 'An unexpected error occurred'
+        });
     }
-}
+};
+
+
+
+
+
+
 
 
 
@@ -166,7 +199,7 @@ const loadForgotPass = async (req,res) => {
     try {
         res.render('User/forgotPass')
     } catch (error) {
-        res.redirect('/page-not-found');
+        res.redirect('/page-not-found'); 
         console.log(`Error in User in userLog in  forgotPass
             the Error is ${error}`)
     }
@@ -175,15 +208,25 @@ const loadForgotPass = async (req,res) => {
 const forgotPass = async (req,res) => {
     try {
         const {email} = req.body;
-        
+
         const user = await userModel.findOne({email});
         if(!user){
-            console.log(`user with this email 
-                Error in Controller in user in userLog in loginForgotPass`)
-            return res.render('User/forgotPass',{message:"User is not available"})
+            return res.status(404).json({ 
+                success: false, 
+                message: "User with this email does not exist" 
+            });
         }
+
+        if (user.googleId) {
+
+            return res.status(400).json({
+                success: false,
+                message: "This account is linked to Google. Please use Google sign-in instead."
+            });
+        }
+
         req.session.userEmail = email;
-        const otp = await generateOTP();
+        const otp = await generateOTP(); 
 
         req.session.otp = otp;
         
@@ -197,14 +240,24 @@ const forgotPass = async (req,res) => {
         await transporter.sendMail(mailOptions);
         console.log('Email sent to: ' + email);
         console.log(`The Otp for forgot password ${otp}`);
-        res.redirect('/verify-forgotPassword')
+
+
+                return res.status(200).json({ 
+            success: true, 
+            message: "OTP sent successfully",
+            redirect: "/verify-forgotPassword"
+        });
 
     } catch (error) {
-        console.log(`Error in userLog in forgotpass
-            Error is ${error}`);
-            res.render("500");
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while processing your request",
+            error: error.message
+        });
     }
 }
+
+
 
 const load_verify_forgotPass = async (req,res) => {
     try {
@@ -566,7 +619,14 @@ const signup_resend_otp = async (req,res) => {
 
 const loadContact = async (req,res) => {
     try {
-        res.render('User/contactPage')
+            let user = null;
+
+   
+    if (req.user?._id || req.user?.id) {
+      const userId = req.user._id || req.user.id;
+      user = await userModel.findById(userId);
+    }
+        res.render('User/contactPage', {user})
     } catch (error) {
         console.log(`Error in LoadContact: ${error}`);
         res.status(500).json({ message: "Internal Server Error" });
@@ -600,14 +660,22 @@ const sendUsContact = async (req,res) => {
     }
 }
 
-const Loadabout = async (req,res) => {
-    try {
-        res.render('User/userAbout');
-    } catch (error) {
-        console.log(`Error in LoadAbout: ${error}`);
-        res.status(500).json({ message: "Internal Server Error" });
+const Loadabout = async (req, res) => {
+  try {
+    let user = null;
+
+    
+    if (req.user?._id || req.user?.id) {
+      const userId = req.user._id || req.user.id;
+      user = await userModel.findById(userId);
     }
-}
+
+    res.render('User/userAbout', { user }); 
+  } catch (error) {
+    console.log(`Error in LoadAbout: ${error}`);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 const checkingStatus = async (req,res) => {
     try {

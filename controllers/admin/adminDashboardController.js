@@ -1,7 +1,7 @@
 const Order = require('../../models/orderSchema');
 const Product = require('../../models/productSchema');
 const User = require('../../models/userSchema');
-const Category = require('../../models/userSchema');
+const Category = require('../../models/categorySchema');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 

@@ -1,5 +1,6 @@
 const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema');
+const Coupen = require('../../models/coupenSchema');
 const Offer = require('../../models/offerSchema');
 const Address = require('../../models/addressSchema');
 const Product = require('../../models/productSchema'); 
@@ -206,6 +207,10 @@ const razorpayController = {
           couponCode: orderDetails.coupon.couponCode,
           discount: orderDetails.coupon.couponDiscount
         };
+         await Coupen.findOneAndUpdate(
+        { couponCode: orderDetails.coupon.couponCode },
+        { $addToSet: { usedBy: userId } }
+      );
       }
       
       

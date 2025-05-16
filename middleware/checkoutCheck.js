@@ -5,8 +5,9 @@ module.exports = async (req, res, next) => {
     const userId = req.user._id || req.user.id; 
     const cart = await Cart.findOne({ userId });
     
+
     if (!cart || !cart.books || cart.books.length === 0) {
-      return res.status(204).end(); 
+      return res.status(204).redirect('/cart'); 
     }
     
     next();

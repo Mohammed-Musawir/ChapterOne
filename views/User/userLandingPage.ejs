@@ -476,7 +476,7 @@
                 <a href="/about" class="btn btn-outline-primary mt-3">Our Story</a>
             </div>
             <div class="col-md-6">
-                <img src="/images/reading-corner.jpg" alt="Reading Corner" class="img-fluid rounded shadow-lg">
+                <img style="display: none;" src="/images/reading-corner.jpg" alt="Reading Corner" class="img-fluid rounded shadow-lg">
             </div>
         </div>
     </div>
@@ -493,13 +493,8 @@
                         <div class="book-card" data-id="<%= book._id %>">
                             <div class="card-image-container">
                                 <a href="/bookPage/<%= book._id %>" class="text-decoration-none">
-                                    <img src="<%= book.productImages[0] %>" alt="<%= book.name %>" class="img-fluid">
+                                    <img style="object-fit:contain ;" src="<%= book.productImages[0] %>" alt="<%= book.name %>"  >
                                 </a>
-                                <div class="card-actions">
-                                    <button class="action-btn cart-btn" title="Add to Cart">
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </button>
-                                </div>
                             </div>
                             <div class="card-content p-3">
                                 <a href="/bookPage/<%= book._id %>" class="text-decoration-none">
@@ -507,10 +502,6 @@
                                     <p class="book-writer"><%= book.writer %></p>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <p class="book-price mb-0">₹<%= book.salePrice %></p>
-                                        <div class="book-rating">
-                                            <i class="fas fa-star"></i>
-                                            <span>4.5</span>
-                                        </div>
                                     </div>
                                 </a>
                             </div>
@@ -532,10 +523,10 @@
                     <h2 class="mb-4">Monthly Featured Collection</h2>
                     <h3 class="featured-title">Crime & Mystery</h3>
                     <p class="featured-desc">Unravel enigmatic plots and follow brilliant detectives through twisting narratives that will keep you guessing until the final page.</p>
-                    <a href="/collection/mystery" class="btn btn-secondary mt-3">Explore Collection</a>
+                    <a  class="btn btn-secondary mt-3">Explore Collection</a>
                 </div>
                 <div class="col-md-6">
-                    <img src="/images/mystery-collection.jpg" alt="Mystery Collection" class="img-fluid rounded shadow">
+                    <img style="display: none;" src="/images/mystery-collection.jpg" alt="Mystery Collection" class="img-fluid rounded shadow">
                 </div>
             </div>
         </div>
@@ -662,24 +653,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.js"></script>
     
     <script>
-        // Add to cart functionality
-        document.querySelectorAll('.cart-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const bookCard = this.closest('.book-card');
-                const bookId = bookCard.dataset.id;
-                
-                Swal.fire({
-                    title: 'Added to Cart!',
-                    icon: 'success',
-                    confirmButtonText: 'Continue Shopping',
-                    timer: 2000
-                });
-                
-                // Here you would add code to actually add the item to cart
-                // via an API call or localStorage
-            });
-        });
-
         // Newsletter subscription
         document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
             e.preventDefault();

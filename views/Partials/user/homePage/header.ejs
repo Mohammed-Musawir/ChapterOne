@@ -90,8 +90,9 @@
                         <a class="nav-link" href="/contact">Contact</a>
                     </li>
                 </ul>
+                <% if (user) { %>
                 <div class="d-flex align-items-center">
-                    <div class="me-3">
+                    <div style="display: none;" class="me-3">
                         <input class="form-control" type="search" placeholder="Search books..." aria-label="Search">
                     </div>
                     <div class="me-3">
@@ -115,6 +116,7 @@
                         </ul>
                     </div>
                 </div>
+                <% } %>
             </div>
         </div>
     </nav>

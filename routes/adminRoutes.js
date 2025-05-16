@@ -13,7 +13,7 @@ const offerController = require('../controllers/admin/adminOfferController');
 const salesreportController = require('../controllers/admin/adminSalesReportController');
 const adminAuth = require('../middleware/adminAuth');
 
-
+ 
 
  
 router.route("/login")

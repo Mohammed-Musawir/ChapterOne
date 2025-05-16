@@ -1206,33 +1206,6 @@
                                 <% } else { %>
                                     <div class="product-price">₹<%= product.productDetails.salePrice.toFixed(2) %></div>
                                 <% } %>
-
-
-                                <!-- Product timeline -->
-                                <div class="product-timeline mt-3">
-                                    <div class="timeline-header">
-                                        <span class="small text-muted"><i class="fas fa-history me-1"></i> Product Timeline</span>
-                                        <button class="btn btn-sm btn-link p-0 ms-2 toggle-timeline" data-product-id="<%= product.product._id %>">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="timeline-content" id="timeline-<%= product.product %>" style="display: none;">
-                                        <% if (product.timeline && product.timeline.length > 0) { %>
-                                            <% product.timeline.forEach(event => { %>
-                                                <div class="timeline-point <%= event.type.toLowerCase() %>">
-                                                    <div class="timeline-date"><%= event.date %></div>
-                                                    <div class="timeline-title"><%= event.title %></div>
-                                                    <% if (event.description) { %>
-                                                        <div class="timeline-description text-muted small"><%= event.description %></div>
-                                                    <% } %>
-                                                </div>
-                                            <% }); %>
-                                        <% } else { %>
-                                            <div class="timeline-empty text-muted small">No timeline events for this product.</div>
-                                        <% } %>
-                                    </div>
-                                </div>
                             </div>
                             
                             <!-- Product status badge -->

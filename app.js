@@ -43,8 +43,8 @@ app.use(express.static('public'));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/',userRoutes);
 app.use('/admin',adminRoutes); 
+app.use('/',userRoutes);
 
 
 

@@ -187,6 +187,12 @@ const addToCart = async (req, res) => {
         const { bookId, quantity = 1 } = req.body;
         const userId = req.user._id || req.user.id;
 
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Log in to Continue'
+            });
+        }
         
         if (!bookId) {
             return res.status(400).json({

@@ -333,7 +333,6 @@ const walletPay = async (req, res) => {
         coupon
       } = req.body;
   
-      console.log(coupon)
       
       if (paymentMethod !== 'wallet') {
         return res.status(400).json({
@@ -451,6 +450,15 @@ const walletPay = async (req, res) => {
       
       
       const newOrder = new orderModel(orderDetails);
+
+
+      if (coupon && coupon.couponCode) {
+  await couponmodel.findOneAndUpdate(
+    { couponCode: coupon.couponCode },
+    { $addToSet: { usedBy: userId } }
+  );
+}
+
       const savedOrder = await newOrder.save();
   
     
@@ -480,6 +488,7 @@ const walletPay = async (req, res) => {
       });
     }
   }
+
 
 
 module.exports = { 

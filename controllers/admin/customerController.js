@@ -25,7 +25,7 @@ const loadCustomber = async (req,res) => {
 }
 
 
-const blockCustomber  = async (req,res) => {
+const blockCustomber  = async (req,res) => { 
     try {
         const userId = req.query.id;
         const userBlocked = await userModel.findByIdAndUpdate(userId,{$set:{isBlocked:true}});

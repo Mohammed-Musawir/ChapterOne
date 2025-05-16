@@ -1,3 +1,4 @@
+
 <%- include('../Partials/user/LandingPage/header', { title: 'ChapterOne | Discover Your Story' }) %>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap');
@@ -149,6 +150,62 @@
         padding: 120px 0 80px;
         flex: 1;
     }
+    
+    /* Custom SweetAlert Theme */
+    .themed-swal .swal2-title {
+        font-family: 'Playfair Display', serif;
+        color: var(--primary-brown);
+    }
+    
+    .themed-swal .swal2-content {
+        font-family: 'Open Sans', sans-serif;
+    }
+    
+    .themed-swal .swal2-confirm {
+        background-color: var(--primary-brown) !important;
+    }
+    
+    .themed-swal .swal2-icon.swal2-error {
+        border-color: var(--primary-brown) !important;
+    }
+    
+    .themed-swal .swal2-icon.swal2-error [class^=swal2-x-mark-line] {
+        background-color: var(--primary-brown) !important;
+    }
+    
+    .themed-swal .swal2-icon.swal2-success {
+        border-color: var(--secondary-brown) !important;
+    }
+    
+    .themed-swal .swal2-icon.swal2-success [class^=swal2-success-line] {
+        background-color: var(--secondary-brown) !important;
+    }
+    
+    .themed-swal .swal2-icon.swal2-success .swal2-success-ring {
+        border-color: var(--secondary-brown) !important;
+    }
+    
+    /* Loading spinner */
+    .spinner {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .btn-submit.loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 </style>
 
 <section class="content-section">
@@ -160,11 +217,11 @@
             <h2 class="page-title">Forgot Your Password?</h2>
             <p class="info-text">Enter your email address below and we'll send you a one-time password (OTP) to reset your password.</p>
             
-            <form action="/forgot-password" method="post">
+            <form id="forgotPasswordForm">
                 <div class="mb-4">
                     <input name="email" type="email" class="form-control" placeholder="Email Address" required>
                 </div>
-                <button type="submit" class="btn btn-submit">Send Reset OTP</button>
+                <button type="submit" id="submitBtn" class="btn btn-submit">Send Reset OTP</button>
             </form>
             
             <a href="/login" class="btn-back">
@@ -175,5 +232,104 @@
 </section>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.3/sweetalert2.all.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('forgotPasswordForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const email = form.querySelector('input[name="email"]').value;
+        
+        // Validate email
+        if (!email || !isValidEmail(email)) {
+            showAlert('error', 'Invalid Email', 'Please enter a valid email address.');
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.innerHTML = '<span class="spinner"></span> Processing...';
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+        
+        // Make fetch request
+        fetch('/forgot-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        })
+        .then(response => {
+            return response.json().then(data => {
+                if (!response.ok) {
+                    throw new Error(data.message || 'Something went wrong');
+                }
+                return data;
+            });
+        })
+        .then(data => {
+            // Success
+            showAlert('success', 'Email Sent!', 'We\'ve sent an OTP to your email address. Please check your inbox to reset your password.');
+            form.reset();
+            
+            // If there's a redirect URL in the response, navigate to it
+            if (data.redirect) {
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 2000);
+            }
+        })
+        .catch(error => {
+            // Error
+            showAlert('error', 'Error', error.message);
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            // Reset button state
+            submitBtn.innerHTML = 'Send Reset OTP';
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        });
+    });
+    
+    // Email validation function
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    // Sweet Alert themed function
+    function showAlert(icon, title, text) {
+        Swal.fire({
+            icon: icon,
+            title: title,
+            text: text,
+            customClass: {
+                container: 'themed-swal',
+                popup: 'themed-swal',
+                header: 'themed-swal',
+                title: 'themed-swal',
+                closeButton: 'themed-swal',
+                icon: 'themed-swal',
+                image: 'themed-swal',
+                content: 'themed-swal',
+                input: 'themed-swal',
+                actions: 'themed-swal',
+                confirmButton: 'themed-swal',
+                cancelButton: 'themed-swal',
+                footer: 'themed-swal'
+            },
+            buttonsStyling: true,
+            confirmButtonColor: '#5D4037'
+        });
+    }
+});
+</script>
 
 <%- include('../Partials/user/LandingPage/footer') %>

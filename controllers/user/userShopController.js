@@ -1,9 +1,18 @@
+const userModel = require('../../models/userSchema');
 const productModel = require('../../models/productSchema');
 const categoryModal = require('../../models/categorySchema');
 const offerModal = require('../../models/offerSchema');
 
 const loadShop = async (req, res) => {
     try {
+
+        let user = null
+        if (req.user?._id || req.user?.id) {
+              const userId = req.user._id || req.user.id;
+              user = await userModel.findById(userId);
+              console.log(user)
+            }
+
 
         const page = parseInt(req.query.page) || 1;
         const limit = 6; 
@@ -155,6 +164,7 @@ const loadShop = async (req, res) => {
         const filterCategory = await categoryModal.find({},{name:1});
 
         res.render('User/userShop', {
+            user,
             products,
             totalProductsCount,
             currentPage: page,
