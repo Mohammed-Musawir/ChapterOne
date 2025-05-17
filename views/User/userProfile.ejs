@@ -377,13 +377,6 @@
                         <% } %>
                     </li>
                     <li>
-                        <!-- <% if (!user.googleId) { %>
-                            <a href="/account/change-email" class="nav-link1">
-                                <i class="fas fa-envelope"></i>
-                                <span>Change Email</span>
-                            </a>
-                            <% } %>
-                    </li> -->
                     <li>
                         <a href="/account/orders" class="nav-link1">
                             <i class="fas fa-shopping-bag"></i>
@@ -538,6 +531,94 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
+            checkUserStatus()
+
+            function checkUserStatus() {
+    fetch('/api/user/status', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json()) // Convert response to JSON
+    .then(data => {
+        if (data.success) {
+            return;
+        }
+
+        // Handle errors based on errorType
+        switch (data.errorType) {
+            case 'USER_BLOCKED':
+                Swal.fire({
+                    title: 'Account Inactive',
+                    text: 'Your account is inactive. Please contact support for assistance.',
+                    icon: 'warning',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Back to Login'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+                break;
+
+            case 'UNAUTHORIZED':
+                // User is not logged in - redirect to login
+                Swal.fire({
+                    title: 'Unauthorized Access',
+                    text: 'Please log in to continue.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Login'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+                break;
+
+            case 'USER_NOT_FOUND':
+                Swal.fire({
+                    title: 'User Not Found',
+                    text: 'Your user account could not be found. Please try logging in again.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Login'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+                break;
+
+            case 'SERVER_ERROR':
+                Swal.fire({
+                    title: 'Server Error',
+                    text: 'Something went wrong. Please try again later.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B'
+                });
+                break;
+
+            default:
+                // Handle unknown errors
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message || 'Something went wrong',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B'
+                });
+        }
+    })
+    .catch(error => { 
+        console.error('Error:', error);
+
+        // Generic error alert
+        Swal.fire({
+            title: 'Error!',
+            text: 'Something went wrong. Please try again later.',
+            icon: 'error',
+            confirmButtonColor: '#8B5A2B'
+        });
+    });
+}
             // Toggle sidebar on mobile
             document.querySelector('.toggle-sidebar')?.addEventListener('click', function() {
             document.querySelector('.dashboard-sidebar').classList.toggle('active');

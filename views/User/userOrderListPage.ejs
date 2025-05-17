@@ -462,12 +462,6 @@
                             </a>
                         <% } %>
                     </li>
-                    <!-- <li>
-                        <a href="/account/change-email" class="nav-link1 <%= currentPage === 'change-email' ? 'active' : '' %>">
-                            <i class="fas fa-envelope"></i>
-                            <span>Change Email</span>
-                        </a>
-                    </li> -->
                     <li>
                         <a href="/account/orders" class="nav-link1 <%= currentPage === 'orders' ? 'active' : '' %>">
                             <i class="fas fa-shopping-bag"></i>
@@ -501,24 +495,6 @@
             <div class="dashboard-header">
                 <h2>My Orders</h2>
             </div>
-            
-            <!-- Search and Filter -->
-            <!-- <div class="search-filter">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search orders..." value="<%= searchQuery || '' %>">
-                </div>
-                <div class="filter-dropdown">
-                    <select class="form-select">
-                        <option value="" <%= !statusFilter ? 'selected' : '' %>>All Orders</option>
-                        <option value="pending" <%= statusFilter === 'pending' ? 'selected' : '' %>>Pending</option>
-                        <option value="processing" <%= statusFilter === 'processing' ? 'selected' : '' %>>Processing</option>
-                        <option value="shipped" <%= statusFilter === 'shipped' ? 'selected' : '' %>>Shipped</option>
-                        <option value="delivered" <%= statusFilter === 'delivered' ? 'selected' : '' %>>Delivered</option>
-                        <option value="cancelled" <%= statusFilter === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
-                    </select>
-                </div>
-            </div> -->
             
             <% if (orders && orders.length > 0) { %>
             <!-- Orders Table -->

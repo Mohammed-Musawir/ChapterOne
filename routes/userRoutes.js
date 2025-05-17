@@ -237,4 +237,9 @@ router.post('/orders/:orderId/multiple-products/return',orderController.bulkProd
 router.get('/referral',referralController.loadRefferal);
 router.post('/referral/apply',referralController.applyReferral);
 
+
+router.use((req, res, next) => {
+  res.status(404).render("User/404");
+});
+
 module.exports = router;

@@ -102,4 +102,9 @@ router.get('/getSalesReport',salesreportController.getSalesReport);
 
 router.get("/serverError",errorController.adminload500);
 router.get("/page-not-found",errorController.adminload404);
+
+router.use((req, res, next) => {
+  res.status(404).render("User/404");
+});
+
 module.exports = router; 

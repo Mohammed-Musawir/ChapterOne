@@ -510,26 +510,6 @@ body {
                 <h1 class="product-title" style="font-family: 'Playfair Display', serif;"><%= product.name %></h1>
                 <p class="product-author mb-2">by <span class="text-primary"><%= product.writer %></span></p>
                 
-                <!-- Ratings -->
-                <!-- <div class="product-ratings mb-3 d-flex align-items-center">
-                    <div class="stars me-2">
-                        <% for(let i = 1; i <= 5; i++) { %>
-                            <% if (i <= Math.floor(product.rating)) { %>
-                                <i class="fas fa-star text-warning"></i>
-                            <% } else if (i - 0.5 <= product.rating) { %>
-                                <i class="fas fa-star-half-alt text-warning"></i>
-                            <% } else { %>
-                                <i class="far fa-star text-warning"></i>
-                            <% } %>
-                        <% } %>
-                    </div>
-                    <span class="rating-value">
-    <%= (product.rating !== undefined && product.rating !== null) ? product.rating.toFixed(1) : 'N/A' %>
-</span>
-
-                    <span class="ms-2 text-muted">(<%= product.reviewCount %> reviews)</span>
-                </div> -->
-                
 
                 
 
@@ -665,12 +645,6 @@ body {
                 <div class="description-content">
                     <h4 class="mb-3">About the Book</h4>
                     <p><%= product.description %></p>
-                    
-                    <!-- <% if (product.longDescription) { %>
-                        <div class="mt-4">
-                            <%- product.longDescription %>
-                        </div>
-                    <% } %> -->
                 </div>
             </div>
             
@@ -688,14 +662,6 @@ body {
                                 <th scope="row">Author</th>
                                 <td><%= product.writer %></td>
                             </tr>
-                            <!-- <tr>
-                                <th scope="row">Publisher</th>
-                                <td><%= product.publisher %></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">ISBN-13</th>
-                                <td><%= product.isbn %></td>
-                            </tr> -->
                             <tr>
                                 <th scope="row">Publication Date</th>
                                 <td><%= product.publishedDate.toISOString().split('T')[0] %></td>
@@ -704,32 +670,10 @@ body {
                                 <th scope="row">Language</th>
                                 <td><%= product.language %></td>
                             </tr>
-                            <!-- <tr>
-                                <th scope="row">Page Count</th>
-                                <td><%= product.pageCount %> pages</td>
-                            </tr> -->
-                            <!-- <tr>
-                                <th scope="row">Dimensions</th>
-                                <td><%= product.dimensions %></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Weight</th>
-                                <td><%= product.weight %></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Edition</th>
-                                <td><%= product.edition %></td>
-                            </tr> -->
                             <tr>
                                 <th scope="row">Category</th>
                                 <td><%= product.category_id.name %></td>
                             </tr>
-                            <!-- <% if (product.subCategory) { %>
-                                <tr>
-                                    <th scope="row">Sub-Category</th>
-                                    <td><%= product.subCategory %></td>
-                                </tr>
-                            <% } %> -->
                         </tbody>
                     </table>
                 </div>
@@ -783,7 +727,7 @@ body {
                     </div>
                     
                     <!-- Review list -->
-                    <div class="review-list">
+                    <!-- <div class="review-list">
                         <% if (product.reviews && product.reviews.length > 0) { %>
                             <% product.reviews.forEach(function(review) { %>
                                 <div class="review-item mb-4 pb-4 border-bottom">
@@ -814,9 +758,9 @@ body {
                                         </button>
                                     </div>
                                 </div>
-                            <% }); %>
+                            <% }); %> -->
                             
-                            <!-- Pagination for reviews -->
+                            <!-- Pagination for reviews
                             <% if (product.reviewCount > 5) { %>
                                 <div class="review-pagination mt-4">
                                     <nav>
@@ -834,14 +778,14 @@ body {
                                     </nav>
                                 </div>
                             <% } %>
-                        <% } else { %>
-                            <div class="text-center py-5">
+                        <% } else { %> -->
+                            <!-- <div class="text-center py-5">
                                 <i class="far fa-comment-alt fa-3x text-muted mb-3"></i>
                                 <h5>No reviews yet</h5>
                                 <p class="text-muted">Be the first to review this book!</p>
                                 <button class="btn btn-primary mt-2">Write a Review</button>
                             </div>
-                        <% } %>
+                        <% } %> -->
                     </div>
                 </div>
             </div>
@@ -902,6 +846,96 @@ body {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+    checkUserStatus()
+
+     // Function to check user active status
+    function checkUserStatus() {
+    fetch('/api/user/status', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json()) // Convert response to JSON
+    .then(data => {
+        if (data.success) {
+            return;
+        }
+
+        // Handle errors based on errorType
+        switch (data.errorType) {
+            case 'USER_BLOCKED':
+                Swal.fire({
+                    title: 'Account Inactive',
+                    text: 'Your account is inactive. Please contact support for assistance.',
+                    icon: 'warning',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Back to Login'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+                break;
+
+            case 'UNAUTHORIZED':
+                // User is not logged in - redirect to login
+                Swal.fire({
+                    title: 'Unauthorized Access',
+                    text: 'Please log in to continue.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Login'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+                break;
+
+            case 'USER_NOT_FOUND':
+                Swal.fire({
+                    title: 'User Not Found',
+                    text: 'Your user account could not be found. Please try logging in again.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B',
+                    confirmButtonText: 'Login'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+                break;
+
+            case 'SERVER_ERROR':
+                Swal.fire({
+                    title: 'Server Error',
+                    text: 'Something went wrong. Please try again later.',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B'
+                });
+                break;
+
+            default:
+                // Handle unknown errors
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message || 'Something went wrong',
+                    icon: 'error',
+                    confirmButtonColor: '#8B5A2B'
+                });
+        }
+    })
+    .catch(error => { 
+        console.error('Error:', error);
+
+        // Generic error alert
+        Swal.fire({
+            title: 'Error!',
+            text: 'Something went wrong. Please try again later.',
+            icon: 'error',
+            confirmButtonColor: '#8B5A2B'
+        });
+    });
+}
     // Element selectors
     const quantityInput = document.getElementById('quantity');
     const decreaseBtn = document.getElementById('decreaseQuantity');

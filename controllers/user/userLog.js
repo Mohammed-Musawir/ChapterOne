@@ -755,9 +755,9 @@ const LogOut = async (req,res) => {
             the Error is ${error}`)
             res.render("500");
     }
-}
+} 
 
-
+ 
 
 
 module.exports = {

@@ -326,8 +326,6 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json()) // Convert response to JSON
     .then(data => {
         if (data.success) {
-            // User is active, continue normally
-            console.log('User status:', data);
             return;
         }
 
@@ -391,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         }
     })
-    .catch(error => {
+    .catch(error => { 
         console.error('Error:', error);
 
         // Generic error alert
