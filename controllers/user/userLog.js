@@ -426,83 +426,116 @@ const loadSignup = async (req,res) => {
 
 
 
-const signup = async (req,res) => {
+const signup = async (req, res) => {
     try {
-        const {firstName, lastName, email, mobileNumber,  password ,confirmPassword} = req.body;
-        console.log(req.body)
-        if(!firstName || !lastName || !email || !mobileNumber || !password || !confirmPassword){
-                return res.render('User/userSignup',{massege:"Some feilds are missing"}); 
-            }
-            
-            if(password !== confirmPassword){
-                console.log("Password do not match in user controller signup");
-                return res.render('User/userSignup',{massege:"Password do not match"});
-                
-            }
-            const userEmail = await userModel.findOne({email});
-            if(userEmail){
-                console.log("Email alredy exists in user controller signup");
-                return  res.render('User/userSignup',{massege:"email alredy exists"})
-                
-            }
-            
+        const { firstName, lastName, email, mobileNumber, password, confirmPassword } = req.body;
+        console.log(req.body);
 
-
-                    
-
-                const isValidMobile =  /^(?!([0-9])\1{9}$)(?!.*(?:123456|654321|101010|000000)).{10}$/.test(mobileNumber);
-
-                if(!isValidMobile){
-                    console.log("Password do not match in user controller signup");
-                    return res.render('User/userSignup',{massege:"invalid mobile number"});
+        
+        if (!firstName || !lastName || !email || !mobileNumber || !password || !confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                errors: {
+                    firstName: !firstName ? "First name is required" : null,
+                    lastName: !lastName ? "Last name is required" : null,
+                    email: !email ? "Email is required" : null,
+                    mobile: !mobileNumber ? "Mobile number is required" : null,
+                    password: !password ? "Password is required" : null,
+                    confirmPassword: !confirmPassword ? "Confirm password is required" : null
                 }
+            });
+        }
 
-
-
-
-
-                const isValidPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-                console.log("Received Password:", password); 
-
-                if (!isValidPassword.test(password)) {
-                    console.log("password is not Valid in user controller signup");
-                    return res.render('User/userSignup', { 
-                        massege: 'Password must contain at least 1 uppercase,1 lowercase,1 digit, 1 special character,and be at least 8 characters long'
-                    });
+        
+        if (password !== confirmPassword) {
+            console.log("Passwords do not match in user controller signup");
+            return res.status(400).json({
+                success: false,
+                errors: {
+                    confirmPassword: "Passwords do not match"
                 }
+            });
+        }
 
-            req.session.userData = {
-                firstname: firstName,
-                lastname: lastName,
-                email,
-                mobile: mobileNumber,
-                password: password 
-            }
-            
-            
-            const otp = await generateOTP();
-            req.session.otp = otp;
-           
+        
+        const userEmail = await userModel.findOne({ email });
+        if (userEmail) {
+            console.log("Email already exists in user controller signup");
+            return res.status(400).json({
+                success: false,
+                errorType: "userExists",
+                errors: {
+                    email: "Email already exists. Please use a different email or login"
+                }
+            });
+        }
 
-            const mailOptions = {
-                from: process.env.EMAIL_USER, 
-                to: email,
-                subject: 'Email Verification OTP',
-                text: `Your OTP for email verification is: ${otp}`
-            }
-            
-            await transporter.sendMail(mailOptions);
-            console.log('Email sent to: ' + email);
-            console.log(`The Otp is ${req.session.otp}`);
+        
+        const isValidMobile = /^(?!([0-9])\1{9}$)(?!.*(?:123456|654321|101010|000000)).{10}$/.test(mobileNumber);
+        if (!isValidMobile) {
+            console.log("Invalid mobile number in user controller signup");
+            return res.status(400).json({
+                success: false,
+                errors: {
+                    mobile: "Please enter a valid mobile number"
+                }
+            });
+        }
 
-            req.session.secretKey = 'Verify-Key'
+        
+        const isValidPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        console.log("Received Password:", password);
+        if (!isValidPassword.test(password)) {
+            console.log("Password is not valid in user controller signup");
+            return res.status(400).json({
+                success: false,
+                errors: {
+                    password: "Password must contain at least 1 uppercase, 1 lowercase, 1 digit, 1 special character, and be at least 8 characters long"
+                }
+            });
+        }
 
-        res.redirect("/verify-otp")
+        
+        req.session.userData = {
+            firstname: firstName,
+            lastname: lastName,
+            email,
+            mobile: mobileNumber,
+            password: password
+        };
+
+        
+        const otp = await generateOTP();
+        req.session.otp = otp;
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Email Verification OTP',
+            text: `Your OTP for email verification is: ${otp}`
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log('Email sent to: ' + email);
+        console.log(`The OTP is ${req.session.otp}`);
+
+        req.session.secretKey = 'Verify-Key';
+        
+        
+        return res.status(200).json({
+            success: true,
+            message: "Signup successful! Please verify your email.",
+            redirect: "/verify-otp"
+        });
+        
     } catch (error) {
-        res.render("500");
-        console.log(`Error in userController in userLog in signup ${error}`);
+        console.log(`Error in userController in signup: ${error}`);
+        return res.status(500).json({
+            success: false,
+            message: "An unexpected error occurred. Please try again later."
+        });
     }
-}
+};
 
 
 const Load_signup_Verify_otp = async (req,res) => {

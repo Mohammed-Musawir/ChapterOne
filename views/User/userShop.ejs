@@ -459,14 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 break;
 
-            default:
-                // Handle unknown errors
-                Swal.fire({
-                    title: 'Error',
-                    text: data.message || 'Something went wrong',
-                    icon: 'error',
-                    confirmButtonColor: '#8B5A2B'
-                });
+
         }
     })
     .catch(error => {

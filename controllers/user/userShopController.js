@@ -10,7 +10,6 @@ const loadShop = async (req, res) => {
         if (req.user?._id || req.user?.id) {
               const userId = req.user._id || req.user.id;
               user = await userModel.findById(userId);
-              console.log(user)
             }
 
 

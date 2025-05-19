@@ -6,9 +6,8 @@
     <title>Sign Up - Chapter One</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.js"></script>
+    <!-- Add SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.12/sweetalert2.min.css">
     
     <style>
         :root {
@@ -103,11 +102,6 @@
             font-size: 1.2rem;
         }
 
-        .btn-google img {
-            width: 20px;
-            margin-right: 10px;
-        }
-
         .divider {
             display: flex;
             align-items: center;
@@ -148,35 +142,33 @@
         }
 
         /* Placeholder styling for input fields */
-input::placeholder {
-    color: #999; /* Light gray color for placeholder text */
-    font-style: italic; /* Italicize placeholder text */
-    opacity: 1; /* Ensure full visibility (some browsers reduce opacity by default) */
-    font-size: 0.9rem; /* Slightly smaller font size */
-    transition: opacity 0.3s ease, color 0.3s ease; /* Smooth transition for focus effects */
-}
+        input::placeholder {
+            color: #999;
+            font-style: italic;
+            opacity: 1;
+            font-size: 0.9rem;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
 
-/* Placeholder styling for focused input fields */
-input:focus::placeholder {
-    color: #ccc; /* Lighter color when the input is focused */
-    opacity: 0.7; /* Reduce opacity slightly when focused */
-}
+        input:focus::placeholder {
+            color: #ccc;
+            opacity: 0.7;
+        }
 
-/* Placeholder styling for textarea */
-textarea::placeholder {
-    color: #999;
-    font-style: italic;
-    opacity: 1;
-    font-size: 0.9rem;
-    transition: opacity 0.3s ease, color 0.3s ease;
-}
+        textarea::placeholder {
+            color: #999;
+            font-style: italic;
+            opacity: 1;
+            font-size: 0.9rem;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
 
-textarea:focus::placeholder {
-    color: #ccc;
-    opacity: 0.7;
-}
+        textarea:focus::placeholder {
+            color: #ccc;
+            opacity: 0.7;
+        }
 
-.back-home {
+        .back-home {
             position: absolute;
             top: 20px;
             left: 20px;
@@ -199,52 +191,64 @@ textarea:focus::placeholder {
             margin-right: 5px;
         }
 
-        /* Custom SweetAlert styles that match your theme */
+        /* Error message styling */
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        /* Success message styling - kept for fallback */
+        .success-message {
+            color: #28a745;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+            display: none;
+        }
+        
+        /* Loading spinner for submit button */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.2em;
+            margin-right: 0.5rem;
+            display: none;
+        }
+
+        .form-loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        /* Custom SweetAlert styling */
         .swal2-popup {
             font-family: 'Georgia', serif;
-            border-radius: 10px;
         }
         
-        .swal2-title {
-            color: var(--dark-brown);
-            font-family: 'Playfair Display', serif;
+        .swal2-confirm {
+            background-color: var(--primary-brown) !important;
         }
         
-        .swal2-icon.swal2-error {
-            border-color: var(--primary-brown);
-            color: var(--primary-brown);
-        }
-        
-        .swal2-icon.swal2-warning {
-            border-color: var(--secondary-brown);
-            color: var(--secondary-brown);
-        }
-        
-        .swal2-icon.swal2-success {
-            border-color: var(--primary-brown);
-            color: var(--primary-brown);
-        }
-        
-        .swal2-styled.swal2-confirm {
-            background-color: var(--primary-brown);
-        }
-        
-        .swal2-styled.swal2-confirm:hover {
-            background-color: var(--secondary-brown);
+        .swal2-confirm:focus {
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.5) !important;
         }
     </style>
 </head>
 <body>
-
-    <% if (massege && massege.trim() !== "") { %>
-        <script>
-            Swal.fire({
-                icon: 'error',  // change to 'success' or 'warning' based on context
-                title: 'Oops...',
-                text: '<%= massege %>'
-            });
-        </script>
-    <% } %>
 
     <div class="back-home">
         <a href="/">
@@ -252,50 +256,69 @@ textarea:focus::placeholder {
         </a>
     </div>
     <div class="signup-container">
-        
         <h2 class="signup-title">Create Your Account</h2>
-        <form id="signupForm" action="/signup" method="post">
+        
+        <!-- Success message container (kept as fallback) -->
+        <div class="success-message" id="formSuccess">
+            Account created successfully! Redirecting to login...
+        </div>
+        
+        <form id="signupForm">
             <div class="mb-3">
                 <label for="firstName" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Type here" >
+                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Type here">
+                <div class="error-message" id="firstNameError"></div>
             </div>
             <div class="mb-3">
-                <label for="lastName" class="form-label" >Last Name</label>
-                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Type here" >
+                <label for="lastName" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Type here">
+                <div class="error-message" id="lastNameError"></div>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email Address</label>
-                <input type="email" name="email" class="form-control" id="email" placeholder="Type here" >
+                <input type="email" class="form-control" id="email" name="email" placeholder="Type here">
+                <div class="error-message" id="emailError"></div>
             </div>
             <div class="mb-3">
                 <label for="mobile" class="form-label">Mobile Number</label>
-                <input type="tel" name="mobileNumber" class="form-control" id="mobile" placeholder="Type Mobileno:" >
+                <input type="tel" class="form-control" id="mobile" name="mobileNumber" placeholder="Type Mobileno:">
+                <div class="error-message" id="mobileError"></div>
             </div>
-            <label for="password" class="form-label">Password</label>
-            <div class="mb-3 password-container">
-                <input type="password" name="password" class="form-control" id="password" placeholder="Type Password" >
-                <span class="password-toggle" onclick="togglePassword('password')">
-                    <i class="fas fa-eye"></i>
-                </span>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="password-container">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Type Password">
+                    <span class="password-toggle" onclick="togglePassword('password')">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <div class="password-requirements">
+                    Must have at least 8 characters, 1 uppercase, 1 lowercase, 1 digit, and 1 special character.
+                </div>
+                <div class="error-message" id="passwordError"></div>
             </div>
-            <label for="confirmPassword" class="form-label">Confirm Password</label>
-            <div class="mb-3 password-container ">
-                <input type="password" name="confirmPassword" class="form-control" id="confirmPassword" placeholder="Confirm Password" >
-                <span class="password-toggle" onclick="togglePassword('confirmPassword')">
-                    <i class="fas fa-eye"></i>
-                </span>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <div class="password-container">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
+                    <span class="password-toggle" onclick="togglePassword('confirmPassword')">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <div class="error-message" id="confirmPasswordError"></div>
             </div>
             <div class="d-grid gap-2 mb-3">
-                <button type="submit" class="btn btn-primary">Sign Up</button>
+                <button type="submit" id="submitBtn" class="btn btn-primary">
+                    <span class="spinner-border spinner-border-sm" id="submitSpinner"></span>
+                    Sign Up
+                </button>
             </div>
             
             <div class="divider">or</div>
             
-            <a href="/auth/google/signup" type="button" class="btn btn-google">
+            <a href="/auth/google/signup" class="btn btn-google">
                 <i class="fab fa-google google-icon"></i> Continue with Google
             </a>
-
-            
 
             <div class="login-link">
                 Already have an account? <a href="/login" style="color: var(--primary-brown);">Log In</a>
@@ -303,23 +326,11 @@ textarea:focus::placeholder {
         </form>
     </div>
 
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.12/sweetalert2.min.js"></script>
+
 <script>
     // Password toggle functionality
-    document.querySelectorAll('.password-container input').forEach(input => {
-        const toggle = input.nextElementSibling; // Get the eye button
-
-        input.addEventListener('input', () => {
-            if (input.value.trim() !== '') {
-                toggle.style.display = 'block'; // Show Eye
-            } else {
-                toggle.style.display = 'none'; // Hide Eye
-            }
-        });
-        
-        // Initially hide the toggle buttons
-        toggle.style.display = 'none';
-    });
-
     function togglePassword(inputId) {
         const passwordInput = document.getElementById(inputId);
         const icon = event.currentTarget.querySelector('i');
@@ -335,69 +346,278 @@ textarea:focus::placeholder {
         }
     }
 
-    // Check for error messages on page load
+    // Show/hide password toggle icon based on input content
+    document.querySelectorAll('.password-container input').forEach(input => {
+        const toggle = input.nextElementSibling;
+
+        input.addEventListener('input', () => {
+            if (input.value.trim() !== '') {
+                toggle.style.display = 'block';
+            } else {
+                toggle.style.display = 'none';
+            }
+        });
+        
+        // Initially hide the toggle buttons
+        toggle.style.display = 'none';
+    });
+
+    // Helper function to display error message
+    function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + 'Error');
+        
+        if (field && errorElement) {
+            field.classList.add('is-invalid');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+    }
+
+    // Helper function to clear error message
+    function clearError(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + 'Error');
+        
+        if (field && errorElement) {
+            field.classList.remove('is-invalid');
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    }
+
+    // Helper function to clear all errors
+    function clearAllErrors() {
+        const fields = ['firstName', 'lastName', 'email', 'mobile', 'password', 'confirmPassword'];
+        fields.forEach(field => clearError(field));
+    }
+
+    // Client-side validation
+    function validateForm() {
+        let isValid = true;
+        clearAllErrors();
+
+        // First Name validation
+        const firstName = document.getElementById('firstName').value.trim();
+        if (!firstName) {
+            showError('firstName', 'First name is required');
+            isValid = false;
+        }
+
+        // Last Name validation
+        const lastName = document.getElementById('lastName').value.trim();
+        if (!lastName) {
+            showError('lastName', 'Last name is required');
+            isValid = false;
+        }
+
+        // Email validation
+        const email = document.getElementById('email').value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            showError('email', 'Email address is required');
+            isValid = false;
+        } else if (!emailRegex.test(email)) {
+            showError('email', 'Please enter a valid email address');
+            isValid = false;
+        }
+
+        // Mobile validation - must match server-side regex
+        const mobile = document.getElementById('mobile').value.trim();
+        const mobileRegex = /^(?!([0-9])\1{9}$)(?!.*(?:123456|654321|101010|000000)).{10}$/;
+        if (!mobile) {
+            showError('mobile', 'Mobile number is required');
+            isValid = false;
+        } else if (!mobileRegex.test(mobile)) {
+            showError('mobile', 'Please enter a valid mobile number. It should be 10 digits and not contain repeated patterns');
+            isValid = false;
+        }
+
+        // Password validation - must match server-side regex
+        const password = document.getElementById('password').value;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!password) {
+            showError('password', 'Password is required');
+            isValid = false;
+        } else if (!passwordRegex.test(password)) {
+            showError('password', 'Password must contain at least 1 uppercase, 1 lowercase, 1 digit, 1 special character, and be at least 8 characters long');
+            isValid = false;
+        }
+
+        // Confirm Password validation
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        if (!confirmPassword) {
+            showError('confirmPassword', 'Please confirm your password');
+            isValid = false;
+        } else if (confirmPassword !== password) {
+            showError('confirmPassword', 'Passwords do not match');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    // Custom SweetAlert Toast for success
+    const showSuccessToast = (message, redirect = null) => {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: '#FFF8E7',
+            customClass: {
+                popup: 'colored-toast',
+                title: 'toast-title'
+            },
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            },
+            didClose: () => {
+                if (redirect) {
+                    window.location.href = redirect;
+                }
+            }
+        });
+
+        Toast.fire({
+            icon: 'success',
+            title: message
+        });
+    };
+
+    // Custom SweetAlert for success
+    const showSuccessAlert = (message, redirect = null) => {
+        Swal.fire({
+            title: 'Success!',
+            text: message,
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#8B4513',
+            background: '#FFF8E7',
+            customClass: {
+                confirmButton: 'swal-confirm-button'
+            }
+        }).then(() => {
+            if (redirect) {
+                window.location.href = redirect;
+            }
+        });
+    };
+
+    // Form submission with fetch API
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate form first
+        if (!validateForm()) {
+            return false;
+        }
+        
+        // Show loading state
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('submitSpinner');
+        submitBtn.disabled = true;
+        spinner.style.display = 'inline-block';
+        document.getElementById('signupForm').classList.add('form-loading');
+        
+        // Get form data
+        const formData = new FormData(this);
+        const formDataObj = {};
+        formData.forEach((value, key) => {
+            formDataObj[key] = value;
+        });
+        
+        // Send fetch request
+        fetch('/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formDataObj),
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Check if response indicates success
+            if (data.success) {
+                // Reset form
+                document.getElementById('signupForm').reset();
+                
+                // Show success message using SweetAlert
+                const message = data.message || 'Account created successfully!';
+                showSuccessAlert(message, data.redirect || null);
+            } else {
+                // Handle validation errors
+                if (data.errors) {
+                    // Clear previous errors
+                    clearAllErrors();
+                    
+                    // Display each field error
+                    Object.keys(data.errors).forEach(field => {
+                        if (data.errors[field]) { // Only display non-null error messages
+                            showError(field, data.errors[field]);
+                        }
+                    });
+                } else if (data.errorType === 'userExists') {
+                    // Handle specific error types
+                    showError('email', 'A user with this email already exists. Please log in instead.');
+                } else if (data.message) {
+                    // General error message
+                    showError('email', data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Show generic error message for network errors, etc.
+            showError('email', 'An error occurred during signup. Please try again.');
+        })
+        .finally(() => {
+            // Reset loading state
+            submitBtn.disabled = false;
+            spinner.style.display = 'none';
+            document.getElementById('signupForm').classList.remove('form-loading');
+        });
+    });
+
+    // Check for error messages from URL parameters on page load
     document.addEventListener('DOMContentLoaded', function() {
-        // Parse URL query parameters
         const urlParams = new URLSearchParams(window.location.search);
         const errorType = urlParams.get('error');
         const errorMessage = urlParams.get('message');
         
-        // Check for user exists error from Google OAuth
         if (errorType === 'userExists') {
-            Swal.fire({
-                title: 'Account Already Exists',
-                text: errorMessage || 'A user with this email already exists. Please log in instead.',
-                icon: 'warning',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#8B4513',
-                customClass: {
-                    popup: 'swal2-popup',
-                    title: 'swal2-title',
-                    confirmButton: 'swal2-styled swal2-confirm'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Optionally redirect to login page
-                    // window.location.href = '/login';
-                }
-            });
-        } 
-        // Check for general signup errors
-        else if (errorType === 'signupFailed') {
-            Swal.fire({
-                title: 'Signup Failed',
-                text: errorMessage || 'There was a problem with your signup. Please try again.',
-                icon: 'error',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#8B4513',
-                customClass: {
-                    popup: 'swal2-popup',
-                    title: 'swal2-title',
-                    confirmButton: 'swal2-styled swal2-confirm'
-                }
-            });
+            showError('email', errorMessage || 'A user with this email already exists. Please log in instead.');
+        } else if (errorType === 'signupFailed') {
+            showError('email', errorMessage || 'There was a problem with your signup. Please try again.');
         }
         
-        // Check for any server-side messages (from your EJS template)
-        const controllerMessage = "<%= typeof message !== 'undefined' ? message : '' %>";
-        if (controllerMessage && controllerMessage !== '' && controllerMessage !== "<%= typeof message !== 'undefined' ? message : '' %>") {
-            Swal.fire({
-                title: 'Alert!',
-                text: controllerMessage,
-                icon: 'warning',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#8B4513',
-                customClass: {
-                    popup: 'swal2-popup',
-                    title: 'swal2-title',
-                    confirmButton: 'swal2-styled swal2-confirm'
+        // Initialize SweetAlert2 with theme colors
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .colored-toast.swal2-icon-success {
+                    background-color: var(--cream) !important;
+                    color: var(--dark-brown) !important;
                 }
-            });
-        }
+                .toast-title {
+                    color: var(--dark-brown) !important;
+                    font-family: 'Georgia', serif !important;
+                }
+                .swal2-popup {
+                    background: var(--cream) !important;
+                }
+                .swal2-title, .swal2-html-container {
+                    color: var(--dark-brown) !important;
+                }
+                .swal-confirm-button {
+                    background-color: var(--primary-brown) !important;
+                }
+            </style>
+        `);
     });
 </script>
-
-
 
 </body>
 </html>
